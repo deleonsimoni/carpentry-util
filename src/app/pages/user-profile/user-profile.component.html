@@ -1,0 +1,184 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-12 col-md-10">
+        <h1 class="display-2 text-white">Create your order</h1>
+        <p class="text-white mt-0 mb-5">This is your order page. Here link you and</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt--7">
+  <div class="row">
+
+    <div class="col-xl-12 order-xl-1">
+      <div class="card bg-secondary shadow">
+        <div class="card-header bg-white border-0">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Order</h3>
+            </div>
+            <div class="col-4 text-right">
+              <a href="#!" class="btn btn-sm btn-primary">Recall email to carpentry</a>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="orderForm">
+            <h6 class="heading-small text-muted mb-4">Carpentry information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-username">Carpentry Email</label>
+                    <input type="text" id="input-username" class="form-control form-control-alternative"
+                      placeholder="Carpentry Email" formControlName="carpentryEmail">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h6 class="heading-small text-muted mb-4">Custumer information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-username">Custumer Name</label>
+                    <input type="text" id="input-username" class="form-control form-control-alternative"
+                      placeholder="Custumer Name" formControlName="custumerName">
+                  </div>
+                </div>
+
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-email">Foremen</label>
+                    <input type="email" id="input-email" class="form-control form-control-alternative"
+                      placeholder="Foremen" formControlName="foremen">
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name">Extras Checked</label>
+                    <input type="text" id="input-first-name" class="form-control form-control-alternative"
+                      placeholder="Extras Checked" formControlName="extrasChecked">
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Carp. Invoice #</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Carp. Invoice #" formControlName="carpInvoice">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Ship To</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Ship to" formControlName="shipTo">
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Lot.</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Lot" formControlName="lot">
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Type</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Type" formControlName="type">
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Elev.</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Elev" formControlName="elev">
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="row">
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">SQ Footage</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="SQ Footage" formControlName="sqFootage">
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name">Street Name</label>
+                    <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                      placeholder="Street Name" formControlName="streetName">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <!-- Address -->
+            <h6 class="heading-small text-muted mb-4">Order information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-address">Address</label>
+                    <input id="input-address" class="form-control form-control-alternative" placeholder="Home Address"
+                      value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09" type="text">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-city">City</label>
+                    <input type="text" id="input-city" class="form-control form-control-alternative" placeholder="City"
+                      value="New York">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-country">Country</label>
+                    <input type="text" id="input-country" class="form-control form-control-alternative"
+                      placeholder="Country" value="United States">
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-country">Postal code</label>
+                    <input type="number" id="input-postal-code" class="form-control form-control-alternative"
+                      placeholder="Postal code">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr class="my-4" />
+            <!-- Description -->
+            <h6 class="heading-small text-muted mb-4">Extras</h6>
+            <div class="pl-lg-4">
+              <div class="form-group">
+                <label>Comments</label>
+                <textarea rows="4" class="form-control form-control-alternative" formControlName="comment"
+                  placeholder="Comments from work"></textarea>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
