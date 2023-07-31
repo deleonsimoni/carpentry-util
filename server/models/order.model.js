@@ -4,11 +4,13 @@ const OrderSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       required: true
     },
-    carpentryEmail: {
-      type: String,
-      required: true,
+    carpentry: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
     },
     custumerName: {
       type: String,
@@ -96,7 +98,11 @@ const OrderSchema = new mongoose.Schema(
     arches: [
       {
         size: { type: String },
-        content: { type: String }
+        col1: { type: String },
+        col2: { type: String },
+        col3: { type: String },
+        col4: { type: String },
+        col5: { type: String }
       },
     ],
 
@@ -126,20 +132,29 @@ const OrderSchema = new mongoose.Schema(
     shelves: [
       {
         size: { type: String },
-        type: { type: String },
+        type4: { type: String },
+        type6: { type: String },
+        type8: { type: String },
+        type10: { type: String },
+        type12: { type: String },
         qty: { type: String }
       },
     ],
 
     closetRods: [
       {
-        size: { type: String },
+        type1: { type: String },
+        type2: { type: String },
+        type3: { type: String },
+        type4: { type: String },
+
       },
     ],
 
     rodSupport: [
       {
         type: { type: String },
+        desc: { type: String },
         qty: { type: String },
       },
     ],

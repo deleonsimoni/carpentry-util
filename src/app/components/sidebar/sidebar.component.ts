@@ -27,12 +27,18 @@ export class SidebarComponent implements OnInit {
 
   public menuItems: any[];
   public isCollapsed = true;
+  user;
 
   constructor(
     private router: Router,
     private authService: AuthService) { }
 
   ngOnInit() {
+
+    this.authService.getUser().subscribe(user => {
+      this.user = user;
+    });
+
     this.menuItems = ROUTES.filter(menuItem => menuItem);
     this.router.events.subscribe((event) => {
       this.isCollapsed = true;

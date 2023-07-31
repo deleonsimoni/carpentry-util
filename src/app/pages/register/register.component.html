@@ -40,6 +40,20 @@
           </div>
           <form [formGroup]="registerForm" role="form">
             <div class="form-group">
+              <div class="input-group input-group-alternative">
+
+                <label>
+                  <input type="radio" value="company" formControlName="roles">
+                  <span>Company</span>
+                </label>
+                <label>
+                  <input type="radio" value="carpentry" formControlName="roles">
+                  <span>Carpentry</span>
+                </label>
+
+              </div>
+            </div>
+            <div class="form-group">
               <div class="input-group input-group-alternative mb-3">
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="ni ni-hat-3"></i></span>

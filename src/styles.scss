@@ -2,9 +2,8 @@
 @use '@angular/material' as mat;
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
-$custom-typography: mat.define-legacy-typography-config(
-  $font-family: 'Exo',
-);
+$custom-typography: mat.define-legacy-typography-config($font-family: 'Exo',
+  );
 
 // TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
 //  The following line adds:
@@ -20,6 +19,7 @@ $custom-typography: mat.define-legacy-typography-config(
 body {
   background-color: #f4f3f3;
   margin: 0;
+
   app-root * {
     font-family: 'Exo', sans-serif;
   }

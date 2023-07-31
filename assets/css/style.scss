@@ -1,4 +1,5 @@
---- --- @import '~ngx-toastr/toastr';
+@import '~ngx-toastr/toastr';
+@import "~ngx-spinner/animations/ball-climbing-dot.css";
 
 @import "{{ site.theme }}";
 

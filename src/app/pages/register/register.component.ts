@@ -32,7 +32,7 @@ export class RegisterComponent implements OnInit {
       email: [null, [Validators.required, Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
-
+      roles: ['company']
 
       /*address: this.builder.group({
         street: [null, [Validators.required]],
@@ -76,7 +76,7 @@ export class RegisterComponent implements OnInit {
         .register(this.registerForm.value)
         .subscribe((res: any) => {
           this.toastr.success('Cadastro realizado com sucesso.', 'Bem-vindo');
-          this.router.navigate(['dashboard']);
+          this.router.navigate(['/tables']);
         }, err => {
           this.carregando = false;
           if (err.status === 500) {

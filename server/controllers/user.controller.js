@@ -4,13 +4,6 @@ const User = require('../models/user.model');
 const { PDFDocument, setFontAndSize, rgb } = require('pdf-lib');
 const fs = require('fs');
 
-const userSchema = Joi.object({
-  fullname: Joi.string().required(),
-  email: Joi.string().email(),
-  mobileNumber: Joi.string().regex(/^[1-9][0-9]{9}$/),
-  password: Joi.string().required(),
-  repeatPassword: Joi.string().required().valid(Joi.ref('password')),
-});
 
 module.exports = {
   insert,
@@ -18,7 +11,6 @@ module.exports = {
 };
 
 async function insert(user) {
-  user = await userSchema.validateAsync(user, { abortEarly: false });
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   delete user.password;
   return await new User(user).save();

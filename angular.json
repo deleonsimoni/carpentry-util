@@ -30,6 +30,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/ngx-spinner/animations/ball-climbing-dot.css",
               "src/styles.scss",
               "src/assets/scss/argon.scss",
               "node_modules/ngx-toastr/toastr.css"

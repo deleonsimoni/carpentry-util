@@ -10,7 +10,7 @@
     </div>
   </div>
 </div>
-<div class="container-fluid mt--7">
+<div class="container-fluid mt--9">
   <div class="row">
 
     <div class="col-xl-12 order-xl-1">
@@ -32,9 +32,14 @@
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
-                    <label class="form-control-label" for="input-username">Carpentry Email</label>
-                    <input type="text" id="input-username" class="form-control form-control-alternative"
-                      placeholder="Carpentry Email" formControlName="carpentryEmail">
+                    <label class="form-control-label" for="input-username">Carpentry</label>
+                    <select class="form-control form-control-alternative" formControlName="carpentry">
+                      <option [ngValue]="null" disabled>Select Carpentry</option>
+                      <option *ngFor="let carpentry of carpentrys" [ngValue]="carpentry._id">{{carpentry.fullname + ' -
+                        '
+                        +
+                        carpentry.email}}</option>
+                    </select>
                   </div>
                 </div>
               </div>
@@ -128,44 +133,202 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <hr class="my-4" />
-            <!-- Address -->
-            <h6 class="heading-small text-muted mb-4">Order information</h6>
-            <div class="pl-lg-4">
+
               <div class="row">
-                <div class="col-md-12">
+
+                <div class="col-lg-12">
                   <div class="form-group">
-                    <label class="form-control-label" for="input-address">Address</label>
-                    <input id="input-address" class="form-control form-control-alternative" placeholder="Home Address"
-                      value="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09" type="text">
+                    <button *ngIf="!idOrder" (click)="saveOrder()" [disabled]="!orderForm.valid"
+                      class="btn btn-success">New Order</button>
+
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-city">City</label>
-                    <input type="text" id="input-city" class="form-control form-control-alternative" placeholder="City"
-                      value="New York">
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-country">Country</label>
-                    <input type="text" id="input-country" class="form-control form-control-alternative"
-                      placeholder="Country" value="United States">
-                  </div>
-                </div>
-                <div class="col-lg-4">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-country">Postal code</label>
-                    <input type="number" id="input-postal-code" class="form-control form-control-alternative"
-                      placeholder="Postal code">
+
+            </div>
+            <div *ngIf="idOrder">
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">CANTINA DOORS</h6>
+              <div formArrayName="cantinaDoors">
+
+                <div *ngFor="let cantinaDoorsForm of orderForm?.get('cantinaDoors').controls; let i = index"
+                  class="pl-4">
+                  <div [formGroup]="cantinaDoorsForm">
+
+                    <div class="row">
+                      <div class="col-5">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="name">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SWING</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="swing">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+
+                    </div>
                   </div>
                 </div>
               </div>
+
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">FRENCH DOORS</h6>
+              <div formArrayName="frenchDoors">
+
+                <div *ngFor="let frenchDoorsForm of orderForm?.get('frenchDoors').controls; let i = index" class="pl-4">
+                  <div [formGroup]="frenchDoorsForm">
+
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SIZE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="size">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">HEIGHT</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="height">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">JAMB</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="jamb">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">DOUBLE DOORS</h6>
+              <div formArrayName="doubleDoors">
+
+                <div *ngFor="let doubleDoorsForm of orderForm?.get('doubleDoors').controls; let i = index" class="pl-4">
+                  <div [formGroup]="doubleDoorsForm">
+
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SIZE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="size">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">HEIGHT</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="height">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">JAMB</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="jamb">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">SINGLE DOORS</h6>
+              <div formArrayName="singleDoors">
+
+                <div *ngFor="let singleDoorsForm of orderForm?.get('singleDoors').controls; let i = index" class="pl-4">
+                  <div [formGroup]="singleDoorsForm">
+
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SIZE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="size">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">LEFT</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="left">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">RIGHT</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="right">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country">JAMB</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="jamb">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
             </div>
+
+
             <hr class="my-4" />
             <!-- Description -->
             <h6 class="heading-small text-muted mb-4">Extras</h6>
@@ -176,6 +339,365 @@
                   placeholder="Comments from work"></textarea>
               </div>
             </div>
+
+
+            <div *ngIf="idOrder">
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">ARCHES</h6>
+              <div formArrayName="arches">
+
+                <div *ngFor="let archesForm of orderForm?.get('arches').controls; let i = index" class="pl-4">
+                  <div [formGroup]="archesForm">
+
+                    <div class="row">
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SIZE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="size">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col1">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col2">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col3">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col4">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col5">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">TRIM</h6>
+              <div formArrayName="trim">
+
+                <div *ngFor="let trimForm of orderForm?.get('trim').controls; let i = index" class="pl-4">
+                  <div [formGroup]="trimForm">
+
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">ITEM</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="item">
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">DETAILS</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="details">
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">HARDWARE</h6>
+              <div formArrayName="hardware">
+
+                <div *ngFor="let hardwareForm of orderForm?.get('hardware').controls; let i = index" class="pl-4">
+                  <div [formGroup]="hardwareForm">
+
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">ITEM</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="item">
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">TYPE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type">
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">LABOUR</h6>
+              <div formArrayName="labour">
+
+                <div *ngFor="let labourForm of orderForm?.get('labour').controls; let i = index" class="pl-4">
+                  <div [formGroup]="labourForm">
+
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">ITEM</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="item">
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">SHELVES - WIRE/METAL</h6>
+              <div formArrayName="shelves">
+
+                <div *ngFor="let shelvesForm of orderForm?.get('shelves').controls; let i = index" class="pl-4">
+                  <div [formGroup]="shelvesForm">
+
+                    <div class="row">
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">SIZE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="size">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">4`</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type4">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">6`</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type6">
+                        </div>
+                      </div>
+                      <div class="col-1">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">8`</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type8">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">10`</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type10">
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">12`</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type12">
+                        </div>
+                      </div>
+                      <div class="col-1">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">CLOSET RODS</h6>
+              <div formArrayName="closetRods">
+
+                <div *ngFor="let closetRodsForm of orderForm?.get('closetRods').controls; let i = index" class="pl-4">
+                  <div [formGroup]="closetRodsForm">
+
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">48</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type1">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">72</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type2">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">96</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type3">
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">120</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type4">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">ROD SUPPORT</h6>
+              <div formArrayName="rodSupport">
+
+                <div *ngFor="let rodSupportForm of orderForm?.get('rodSupport').controls; let i = index" class="pl-4">
+                  <div [formGroup]="rodSupportForm">
+
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type">
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="desc">
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">ROUND WINDOW</h6>
+              <div formArrayName="roundWindow">
+
+                <div *ngFor="let roundWindowForm of orderForm?.get('roundWindow').controls; let i = index" class="pl-4">
+                  <div [formGroup]="roundWindowForm">
+
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">TYPE</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="type">
+                        </div>
+                      </div>
+
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city">QTY</label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="qty">
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+
+
+
+
+
+
+            </div>
+
+
+
+
           </form>
         </div>
       </div>
