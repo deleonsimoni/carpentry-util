@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
@@ -53,6 +53,14 @@ export class UserProfileComponent implements OnInit {
 
     this.fillForm();
 
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  handleBeforeUnload(event: Event) {
+    event.returnValue = false;
+    if (this.idOrder && (!this.isCompany && this.orderForm.value.status == 2 || this.isCompany && this.orderForm.value.status == 3)) {
+      alert("You have unsaved data changes. Are you sure to close the page?")
+    }
   }
 
   fillForm() {
@@ -123,7 +131,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   back() {
-
+    this.router.navigate(['/tables']);
   }
 
   saveOrder() {
@@ -170,6 +178,10 @@ export class UserProfileComponent implements OnInit {
     this.modalService.open(content, { centered: true, backdrop: false });
   }
 
+  finalizeOrderWithoutStatus() {
+    this.finalizeOrder();
+  }
+
   finalizeOrder() {
     this.spinner.show();
 
@@ -179,6 +191,26 @@ export class UserProfileComponent implements OnInit {
 
         if (!data.errors) {
           this.toastr.success('Order Completed', 'Success');
+          this.router.navigate(['/tables']);
+        } else {
+          this.toastr.error('Error finalize order', 'Atenção');
+        }
+
+      }, err => {
+        this.spinner.hide();
+        this.toastr.error('Error finalize order', 'Erro: ');
+      });
+  }
+
+  backOrderToCarpentry() {
+    this.spinner.show();
+
+    this.orderService.backOrderToCarpentry(this.orderForm.value, this.idOrder)
+      .subscribe((data) => {
+        this.spinner.hide();
+
+        if (!data.errors) {
+          this.toastr.success('Order released for the carpenter', 'Success');
           this.router.navigate(['/tables']);
         } else {
           this.toastr.error('Error finalize order', 'Atenção');

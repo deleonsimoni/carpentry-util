@@ -718,17 +718,19 @@
             <div class="box-bottom row">
 
               <div>
-                <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="updateOrder()"
-                  class="btn btn-primary">Save
-                  Order</button>
-                <button *ngIf="this.isCompany && this.orderStatus" (click)="finalizeOrder()"
-                  class="btn btn-warning">Save
-                  Order</button>
+                <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="updateOrder()" class="btn btn-primary">
+                  Save Order</button>
+                <button *ngIf="this.isCompany && this.orderStatus != 2" (click)="finalizeOrderWithoutStatus()"
+                  class="btn btn-primary">
+                  Save Order</button>
               </div>
 
               <div class="right">
                 <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="finalizeOrderPopUp(content)"
                   class="btn btn-warning">Complete Order</button>
+                <button *ngIf="this.isCompany && this.orderStatus == 3" (click)="backOrderToCarpentry()"
+                  class="btn btn-warning">
+                  Back to Carpentry</button>
               </div>
 
             </div>

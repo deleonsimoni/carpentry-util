@@ -13,6 +13,8 @@ router.route('/:idOrder').get(asyncHandler(detailOrder));
 router.route('/:idOrder/generatePDF').get(asyncHandler(generatePDF));
 router.route('/:idOrder/update').post(asyncHandler(updateOrder));
 router.route('/:idOrder/finalize').post(asyncHandler(finalizeOrder));
+router.route('/:idOrder/backOrderToCarpentry').post(asyncHandler(backOrderToCarpentry));
+
 
 router.route('/').post(asyncHandler(createOrder));
 
@@ -28,6 +30,11 @@ async function updateOrder(req, res) {
 
 async function finalizeOrder(req, res) {
   let response = await orderCtrl.finalizeOrder(req.user, req.body, req.params.idOrder);
+  res.json(response);
+}
+
+async function backOrderToCarpentry(req, res) {
+  let response = await orderCtrl.backOrderToCarpentry(req.user, req.body, req.params.idOrder);
   res.json(response);
 }
 

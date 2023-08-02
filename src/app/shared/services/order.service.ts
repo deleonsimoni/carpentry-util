@@ -23,6 +23,10 @@ export class OrderService {
     return this.http.post<any>(`/api/order/${id}/finalize`, form);
   }
 
+  backOrderToCarpentry(form: any, id) {
+    return this.http.post<any>(`/api/order/${id}/backOrderToCarpentry`, form);
+  }
+
   getOrdersFromUser() {
     return this.http.get<any>(`/api/order`);
   }

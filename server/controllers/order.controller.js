@@ -9,6 +9,7 @@ module.exports = {
   updateOrder,
   finalizeOrder,
   getOrders,
+  backOrderToCarpentry,
   generatePDF
 };
 
@@ -66,6 +67,19 @@ async function finalizeOrder(user, body, idOrder) {
   )
 }
 
+
+async function backOrderToCarpentry(user, body, idOrder) {
+
+  body.status = 2;
+
+  return await Order.findOneAndUpdate(
+    {
+      $and: [{ _id: idOrder }],
+      $or: [{ 'user': user._id }, { 'carpentry': user._id }]
+    },
+    body
+  )
+}
 
 async function generatePDF(user, idOrder) {
   const today = new Date();
@@ -324,6 +338,9 @@ async function generatePDF(user, idOrder) {
       case 'singleRight10':
         field.setText(order.singleDoors[9].right);
         break;
+      case 'singleJamb10':
+        field.setText(order.singleDoors[9].jamb);
+        break;
 
       case 'singleLeft11':
         field.setText(order.singleDoors[10].left);
@@ -331,12 +348,18 @@ async function generatePDF(user, idOrder) {
       case 'singleRight11':
         field.setText(order.singleDoors[10].right);
         break;
+      case 'singleJamb11':
+        field.setText(order.singleDoors[10].jamb);
+        break;
 
       case 'singleLeft12':
         field.setText(order.singleDoors[11].left);
         break;
       case 'singleRight12':
         field.setText(order.singleDoors[11].right);
+        break;
+      case 'singleJamb12':
+        field.setText(order.singleDoors[11].jamb);
         break;
 
 
