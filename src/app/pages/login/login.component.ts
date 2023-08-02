@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@app/shared/services';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private builder: FormBuilder,
     private toastr: ToastrService,
+    private spinner: NgxSpinnerService
 
   ) {
     this.loginForm = this.builder.group({
@@ -33,12 +35,19 @@ export class LoginComponent implements OnInit, OnDestroy {
   login(): void {
 
     if (this.loginForm.valid) {
+      this.spinner.show();
+
       this.authService.login(this.loginForm.value)
         .subscribe((res: any) => {
-          this.toastr.success('Bom te ver de novo', 'Bem-vindo :)');
-          this.router.navigateByUrl('/');
+          this.spinner.hide();
+
+          this.toastr.success('Nice to see you', 'Welcome :)');
+          this.router.navigate(['/tables']);
+
 
         }, err => {
+          this.spinner.hide();
+
           if (err.status === 401) {
             this.toastr.error('Email ou senha inválidos', 'Erro: ');
           }

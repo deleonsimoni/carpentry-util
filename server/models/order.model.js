@@ -46,6 +46,10 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
     },
 
+    preHugs: {
+      type: Number,
+    },
+
     createdAt: {
       type: Date,
       default: Date.now,
@@ -89,7 +93,7 @@ const OrderSchema = new mongoose.Schema(
     doubleDoors: [
       {
         size: { type: String },
-        heigh: { type: String },
+        height: { type: String },
         qty: { type: String },
         jamb: { type: String },
       },

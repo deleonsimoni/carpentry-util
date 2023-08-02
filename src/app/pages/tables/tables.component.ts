@@ -47,12 +47,38 @@ export class TablesComponent implements OnInit {
       });
   }
 
+  geratePDF(idOrder, custumerName) {
+    this.spinner.show();
+
+    this.orderService.generatePDF(idOrder)
+      .subscribe((data) => {
+
+        if (data.errors) {
+          this.spinner.hide();
+          this.toastr.error('Error generate PDF', 'Atenção');
+        } else {
+
+          const link = document.createElement("a");
+          link.href = data;
+          link.download = `${custumerName}.pdf`
+          link.click();
+
+          this.spinner.hide();
+        }
+
+      }, err => {
+        this.spinner.hide();
+        this.toastr.error('Error generate PDF', 'Erro: ');
+      });
+
+  }
+
   get isCompany() {
     return this.user.roles.includes('company');
   }
 
   newOrder() {
-    this.router.navigate(['/user-profile']);
+    this.router.navigate(['/user-profile', 'new']);
   }
 
   detailOrder(idOrder) {

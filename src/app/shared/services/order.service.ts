@@ -15,6 +15,14 @@ export class OrderService {
     return this.http.post<any>(`/api/order`, form);
   }
 
+  updateOrder(form: any, id) {
+    return this.http.post<any>(`/api/order/${id}/update`, form);
+  }
+
+  finalizeOrder(form: any, id) {
+    return this.http.post<any>(`/api/order/${id}/finalize`, form);
+  }
+
   getOrdersFromUser() {
     return this.http.get<any>(`/api/order`);
   }
@@ -25,6 +33,10 @@ export class OrderService {
 
   detailOrder(id: any) {
     return this.http.get<any>(`/api/order/${id}`);
+  }
+
+  generatePDF(id: any) {
+    return this.http.get<any>(`/api/order/${id}/generatePDF`);
   }
 
 }

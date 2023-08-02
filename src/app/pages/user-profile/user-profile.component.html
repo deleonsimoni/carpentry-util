@@ -139,7 +139,7 @@
                 <div class="col-lg-12">
                   <div class="form-group">
                     <button *ngIf="!idOrder" (click)="saveOrder()" [disabled]="!orderForm.valid"
-                      class="btn btn-success">New Order</button>
+                      class="btn btn-success">Create Order</button>
 
                   </div>
                 </div>
@@ -537,7 +537,7 @@
                             formControlName="type6">
                         </div>
                       </div>
-                      <div class="col-1">
+                      <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">8`</label>
                           <input type="text" id="input-last-name" class="form-control form-control-alternative"
@@ -558,7 +558,7 @@
                             formControlName="type12">
                         </div>
                       </div>
-                      <div class="col-1">
+                      <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
                           <input type="text" id="input-last-name" class="form-control form-control-alternative"
@@ -637,6 +637,7 @@
                       </div>
                       <div class="col-4">
                         <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
                           <input type="text" id="input-last-name" class="form-control form-control-alternative"
                             formControlName="desc">
                         </div>
@@ -686,16 +687,34 @@
                 </div>
               </div>
 
-
-
-
-
-
-
-
             </div>
 
 
+            <div *ngIf="mobile" class="box-top row">
+
+              <div>
+                <span class="input-group-text"><i class="ni ni-bold-left"></i>
+                  <button (click)="back()" class="btn btn-secondary">Back</button>
+                </span>
+              </div>
+
+            </div>
+
+            <div class="box-bottom row">
+
+              <div>
+                <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="updateOrder()"
+                  class="btn btn-primary">Save Order</button>
+                <button *ngIf="this.isCompany && this.orderStatus" (click)="finalizeOrder()"
+                  class="btn btn-warning">Save Order</button>
+              </div>
+
+              <div class="right">
+                <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="finalizeOrderPopUp(content)"
+                  class="btn btn-warning">Complete Order</button>
+              </div>
+
+            </div>
 
 
           </form>
@@ -704,3 +723,22 @@
     </div>
   </div>
 </div>
+
+
+
+
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Are you sure complete order?</h4>
+    <button type="button" class="ni ni-fat-remove" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>Once you complete the order you will no longer be able to modify it&hellip;</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-info" (click)="modal.close('Close click')">Back</button>
+    <button type="button" class="btn btn-light" (click)="finalizeOrder();modal.close('Close click')">Complete
+      Order</button>
+  </div>
+</ng-template>

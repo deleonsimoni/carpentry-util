@@ -3,6 +3,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
 import { OrderService } from '@app/shared/services/order.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
@@ -17,32 +18,44 @@ export class UserProfileComponent implements OnInit {
   carpentrys;
   user;
   idOrder;
+  mobile;
+  orderStatus;
 
   constructor(
+
     private router: Router,
     private orderService: OrderService,
     private builder: FormBuilder,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService: NgbModal
 
   ) {
     this.createForm();
-
   }
 
   ngOnInit() {
+
+    if (window.screen.width === 360) { // 768px portrait
+      this.mobile = true;
+    }
+
     this.listAllCarpentrys();
 
-    this.authService.getUser().subscribe(user => this.user = user);
-
     this.route.params.subscribe(params => {
-      if (params['id']) {
+      if (params['id'] && params['id'] != 'new') {
         this.idOrder = params['id'];
         this.detailOrder(this.idOrder);
       }
     });
+
+    this.fillForm();
+
+  }
+
+  fillForm() {
 
     this.preFillCantinaDoors();
     this.preFillFrenchDoors();
@@ -63,14 +76,25 @@ export class UserProfileComponent implements OnInit {
 
     this.orderService.detailOrder(id)
       .subscribe((data) => {
-        this.spinner.hide();
 
         if (data.errors) {
+          this.spinner.hide();
           this.toastr.error('Error get detail order', 'Atenção');
         } else {
+
           this.carpentrys = data;
           this.orderForm.patchValue(data[0]);
+          this.orderStatus = data[0].status;
 
+          if (this.orderStatus > 1) {
+            this.orderForm.controls['carpentry'].disable();
+          }
+
+          if (!this.isCompany && this.orderStatus == 3) {
+            this.orderForm.disable();
+          }
+
+          this.spinner.hide();
         }
 
       }, err => {
@@ -98,9 +122,12 @@ export class UserProfileComponent implements OnInit {
       });
   }
 
+  back() {
+
+  }
+
   saveOrder() {
     this.spinner.show();
-    console.table(this.orderForm.value);
 
     this.orderService.saveOrder(this.orderForm.value)
       .subscribe((data) => {
@@ -110,12 +137,56 @@ export class UserProfileComponent implements OnInit {
           this.toastr.success('Order Created', 'Success');
           this.router.navigate(['/tables']);
         } else {
-          this.toastr.error('Erro ao registrar o inventário', 'Atenção');
+          this.toastr.error('Error create order', 'Atenção');
         }
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Problema ao realizar o cadastro. ', 'Erro: ');
+        this.toastr.error('Error create order', 'Erro: ');
+      });
+  }
+
+  updateOrder() {
+    this.spinner.show();
+
+    this.orderService.updateOrder(this.orderForm.value, this.idOrder)
+      .subscribe((data) => {
+        this.spinner.hide();
+
+        if (!data.errors) {
+          this.toastr.success('Order Updated', 'Success');
+
+        } else {
+          this.toastr.error('Error update order', 'Error');
+        }
+
+      }, err => {
+        this.spinner.hide();
+        this.toastr.error('Error update order. ', 'Erro: ');
+      });
+  }
+
+  finalizeOrderPopUp(content) {
+    this.modalService.open(content, { centered: true, backdrop: false });
+  }
+
+  finalizeOrder() {
+    this.spinner.show();
+
+    this.orderService.finalizeOrder(this.orderForm.value, this.idOrder)
+      .subscribe((data) => {
+        this.spinner.hide();
+
+        if (!data.errors) {
+          this.toastr.success('Order Completed', 'Success');
+          this.router.navigate(['/tables']);
+        } else {
+          this.toastr.error('Error finalize order', 'Atenção');
+        }
+
+      }, err => {
+        this.spinner.hide();
+        this.toastr.error('Error finalize order', 'Erro: ');
       });
   }
 
@@ -123,25 +194,28 @@ export class UserProfileComponent implements OnInit {
     return field && field != '';
   }
 
-
   get isCompany() {
     return this.user.roles.includes('company');
   }
 
 
   private createForm(): void {
+    this.authService.getUser().subscribe(user => this.user = user);
+
     this.orderForm = this.builder.group({
-      carpentry: [null, [Validators.required]],
-      custumerName: [null, [Validators.required]],
-      foremen: [null],
-      extrasChecked: [null],
-      carpInvoice: [null],
-      shipTo: [null],
-      lot: [null],
-      type: [null],
-      elev: [null],
-      sqFootage: [null],
-      streetName: [null],
+      carpentry: [{ value: null, disabled: this.user.roles.includes('carpentry') }, [Validators.required]],
+      custumerName: [{ value: null, disabled: this.user.roles.includes('carpentry') }, [Validators.required]],
+      foremen: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      extrasChecked: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      carpInvoice: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      shipTo: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      lot: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      type: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      elev: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      sqFootage: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      streetName: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+
+      status: [null],
 
       cantinaDoors: this.builder.array([]),
 
@@ -166,7 +240,6 @@ export class UserProfileComponent implements OnInit {
       rodSupport: this.builder.array([]),
 
       roundWindow: this.builder.array([]),
-
 
       comment: [null],
 
@@ -243,8 +316,8 @@ export class UserProfileComponent implements OnInit {
 
   preFillRodSupport() {
     const dadosPrePreenchidos = [
-      { type: '', desc: '', qty: '' },
-      { type: '', desc: '', qty: '' }
+      { type: 'W - HOOK', desc: '', qty: '' },
+      { type: 'N - HOOK', desc: '', qty: '' }
     ];
 
     const arrayForm = this.orderForm.get('rodSupport') as FormArray;
@@ -264,7 +337,7 @@ export class UserProfileComponent implements OnInit {
 
   preFillClosetRods() {
     const dadosPrePreenchidos = [
-      { type1: '48', type2: '72', type3: '96', type4: '120' },
+
       { type1: '', type2: '', type3: '', type4: '' },
     ];
 
@@ -358,35 +431,35 @@ export class UserProfileComponent implements OnInit {
 
   preFillTrim() {
     const dadosPrePreenchidos = [
-      { item: 'Base', detalis: '', qty: '' },
-      { item: 'Casing', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'Handrail', detalis: '', qty: '' },
-      { item: 'Brackets', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'Burlap', detalis: '', qty: '' },
-      { item: 'Burlap', detalis: '', qty: '' },
-      { item: 'Doorstop', detalis: '', qty: '' },
-      { item: '1/4 Round', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: '1X3', detalis: '', qty: '' },
-      { item: '1X2', detalis: '', qty: '' },
-      { item: 'Attic Hatch', detalis: '', qty: '' },
-      { item: 'Filler', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'Window Seat', detalis: '', qty: '' },
-      { item: 'Capping', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'Build out', detalis: '', qty: '' },
-      { item: 'Build out', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'Crown/Cove', detalis: '', qty: '' },
-      { item: 'Flex Base', detalis: '', qty: '' },
-      { item: 'Columns', detalis: '', qty: '' },
-      { item: '', detalis: '', qty: '' },
-      { item: 'SHOEMOULD', detalis: '', qty: '' },
-      { item: '1/4 ROUND', detalis: '', qty: '' },
-      { item: 'Doorstop', detalis: '', qty: '' },
+      { item: 'Base', details: '', qty: '' },
+      { item: 'Casing', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'Handrail', details: '', qty: '' },
+      { item: 'Brackets', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'Burlap', details: '', qty: '' },
+      { item: 'Burlap', details: '', qty: '' },
+      { item: 'Doorstop', details: '', qty: '' },
+      { item: '1/4 Round', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '1X3', details: '', qty: '' },
+      { item: '1X2', details: '', qty: '' },
+      { item: 'Attic Hatch', details: '', qty: '' },
+      { item: 'Filler', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'Window Seat', details: '', qty: '' },
+      { item: 'Capping', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'Build out', details: '', qty: '' },
+      { item: 'Build out', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'Crown/Cove', details: '', qty: '' },
+      { item: 'Flex Base', details: '', qty: '' },
+      { item: 'Columns', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: 'SHOEMOULD', details: '', qty: '' },
+      { item: '1/4 ROUND', details: '', qty: '' },
+      { item: 'Doorstop', details: '', qty: '' },
     ];
 
     const arrayForm = this.orderForm.get('trim') as FormArray;
@@ -394,7 +467,7 @@ export class UserProfileComponent implements OnInit {
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
         item: [{ value: dados.item, disabled: this.disableField(dados.item) }, []],
-        detalis: '',
+        details: '',
         qty: ''
       });
 
@@ -573,7 +646,7 @@ export class UserProfileComponent implements OnInit {
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        name: [{ value: dados.name, disabled: true }, []],
+        name: [{ value: dados.name, disabled: true }],
         qty: '',
         swing: ''
       });
