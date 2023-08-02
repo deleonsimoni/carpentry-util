@@ -720,7 +720,7 @@
               <div>
                 <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="updateOrder()" class="btn btn-primary">
                   Save Order</button>
-                <button *ngIf="this.isCompany && this.orderStatus != 2" (click)="finalizeOrderWithoutStatus()"
+                <button *ngIf="this.isCompany && this.orderStatus" (click)="finalizeOrderWithoutStatus()"
                   class="btn btn-primary">
                   Save Order</button>
               </div>
