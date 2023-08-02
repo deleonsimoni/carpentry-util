@@ -68,7 +68,7 @@ export class UserProfileComponent implements OnInit {
     this.preFillClosetRods();
     this.preFillRodSupport();
     this.preFillArches();
-
+    this.preFillRoundWindow();
   }
 
   detailOrder(id) {
@@ -215,6 +215,7 @@ export class UserProfileComponent implements OnInit {
       sqFootage: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
       streetName: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
 
+      preHugs: [null],
       status: [null],
 
       cantinaDoors: this.builder.array([]),

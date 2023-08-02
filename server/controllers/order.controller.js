@@ -1004,7 +1004,7 @@ async function generatePDF(user, idOrder) {
         break;
 
       default:
-        console.log('Field not found!')
+        console.log('Field not found => ' + field.getName())
         break;
     }
 

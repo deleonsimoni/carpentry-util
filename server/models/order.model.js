@@ -47,7 +47,7 @@ const OrderSchema = new mongoose.Schema(
     },
 
     preHugs: {
-      type: Number,
+      type: String,
     },
 
     createdAt: {
