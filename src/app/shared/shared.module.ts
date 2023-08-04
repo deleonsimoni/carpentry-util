@@ -19,6 +19,7 @@ import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @NgModule({
   exports: [
@@ -42,6 +43,7 @@ import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/mat
     MatExpansionModule,
     MatFormFieldModule,
     MatProgressBarModule,
+    MatButtonToggleModule,
   ],
 })
-export class SharedModule {}
+export class SharedModule { }

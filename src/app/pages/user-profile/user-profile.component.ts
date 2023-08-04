@@ -6,11 +6,28 @@ import { OrderService } from '@app/shared/services/order.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-user-profile',
   templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.scss']
+  styleUrls: ['./user-profile.component.scss'],
+  animations: [
+    // Definindo a animação
+    trigger('fadeAnimation', [
+      // Estado inicial da animação
+      state('in', style({ opacity: 1, height: '*' })),
+      // Transição de visível para escondido
+      transition(':leave', [
+        animate('300ms ease-out', style({ opacity: 0, height: '0' }))
+      ]),
+      // Transição de escondido para visível
+      transition(':enter', [
+        style({ opacity: 0, height: '0' }),
+        animate('300ms ease-in', style({ opacity: 1, height: '*' }))
+      ])
+    ])
+  ]
 })
 export class UserProfileComponent implements OnInit {
 
@@ -20,6 +37,15 @@ export class UserProfileComponent implements OnInit {
   idOrder;
   mobile;
   orderStatus;
+
+  isVisibleCantinaDoors = false;
+  isVisibleFrenchDoors = false;
+  isVisibleDoubleDoors = false;
+  isVisibleSingleDoors = false;
+  isVisibleArches = false;
+  isVisibleTrim = false;
+  isVisibleHardware = false;
+  isVisibleLabour = false;
 
   constructor(
 
@@ -90,7 +116,7 @@ export class UserProfileComponent implements OnInit {
           this.toastr.error('Error get detail order', 'Atenção');
         } else {
 
-          this.carpentrys = data;
+          //this.carpentrys = data;
           this.orderForm.patchValue(data[0]);
           this.orderStatus = data[0].status;
 
@@ -278,6 +304,39 @@ export class UserProfileComponent implements OnInit {
 
     });
   }
+
+  showHideFormCantina() {
+    this.isVisibleCantinaDoors = !this.isVisibleCantinaDoors;
+  }
+
+  showHideFormFrench() {
+    this.isVisibleFrenchDoors = !this.isVisibleFrenchDoors;
+  }
+
+  showHideFormDouble() {
+    this.isVisibleDoubleDoors = !this.isVisibleDoubleDoors;
+  }
+
+  showHideFormSingle() {
+    this.isVisibleSingleDoors = !this.isVisibleSingleDoors;
+  }
+
+  showHideFormArches() {
+    this.isVisibleArches = !this.isVisibleArches;
+  }
+
+  showHideFormTrim() {
+    this.isVisibleTrim = !this.isVisibleTrim;
+  }
+
+  showHideFormHardware() {
+    this.isVisibleHardware = !this.isVisibleHardware;
+  }
+
+  showHideFormLabour() {
+    this.isVisibleLabour = !this.isVisibleLabour;
+  }
+
 
   preFillDoubleDoors() {
     const dadosPrePreenchidos = [
@@ -640,7 +699,7 @@ export class UserProfileComponent implements OnInit {
         size: [{ value: dados.size, disabled: this.disableField(dados.size) }, []],
         left: [{ value: dados.left, disabled: this.disableField(dados.left) }, []],
         right: [{ value: dados.right, disabled: this.disableField(dados.right) }, []],
-        jamb: [{ value: dados.jamb, disabled: this.disableField(dados.jamb) }, []],
+        jamb: dados.jamb,
       });
 
       arrayForm.push(formGroup);
@@ -671,8 +730,8 @@ export class UserProfileComponent implements OnInit {
 
   preFillCantinaDoors() {
     const dadosPrePreenchidos = [
-      { name: 'STEEL STD' },
-      { name: 'STEEL STD' }
+      { name: 'SOLID STD' },
+      { name: 'SOLID STD' }
     ];
 
     const cantinaDoorsArray = this.orderForm.get('cantinaDoors') as FormArray;

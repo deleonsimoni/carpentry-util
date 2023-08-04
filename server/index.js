@@ -5,11 +5,17 @@ require('./config/mongoose');
 const https = require('https');
 const fs = require('fs');
 
-const https_options = {
-  ca: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/ca_bundle.crt"),
-  key: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/private.key"),
-  cert: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/certificate.crt")
-};
+let https_options;
+
+try {
+  https_options = {
+    ca: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/ca_bundle.crt"),
+    key: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/private.key"),
+    cert: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/certificate.crt")
+  };
+} catch (err) {
+  console.log('Certificados não encontrados')
+}
 
 const httpsServer = https.createServer(https_options, app);
 
@@ -21,7 +27,7 @@ if (!module.parent) {
   });
 
   httpsServer.listen(8443, () => {
-    console.log('HTTPS Server running on port 443');
+    console.log('HTTPS Server running on port 8443');
   });
 }
 

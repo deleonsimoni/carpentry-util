@@ -4,8 +4,8 @@
   <div class="container-fluid d-flex align-items-center">
     <div class="row">
       <div class="col-lg-12 col-md-10">
-        <h1 class="display-2 text-white">Create your order</h1>
-        <p class="text-white mt-0 mb-5">This is your order page. Here link you and</p>
+        <h1 class="display-2 text-white">Create your takeoff</h1>
+        <p class="text-white mt-0 mb-5">This is your takeoff page. Here link you and</p>
       </div>
     </div>
   </div>
@@ -18,7 +18,7 @@
         <div class="card-header bg-white border-0">
           <div class="row align-items-center">
             <div class="col-8">
-              <h3 class="mb-0">Order</h3>
+              <h3 class="mb-0">Takeoff</h3>
             </div>
             <div class="col-4 text-right">
               <a href="#!" class="btn btn-sm btn-primary">Recall email to carpentry</a>
@@ -35,23 +35,21 @@
                     <label class="form-control-label" for="input-username">Carpentry</label>
                     <select class="form-control form-control-alternative" formControlName="carpentry">
                       <option [ngValue]="null" disabled>Select Carpentry</option>
-                      <option *ngFor="let carpentry of carpentrys" [ngValue]="carpentry._id">{{carpentry.fullname + ' -
-                        '
-                        +
-                        carpentry.email}}</option>
+                      <option *ngFor="let carpentry of carpentrys" [ngValue]="carpentry._id">
+                        {{carpentry.fullname + ' - ' + carpentry.email}}</option>
                     </select>
                   </div>
                 </div>
               </div>
             </div>
-            <h6 class="heading-small text-muted mb-4">Custumer information</h6>
+            <h6 class="heading-small text-muted mb-4">Customer information</h6>
             <div class="pl-lg-4">
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
-                    <label class="form-control-label" for="input-username">Custumer Name</label>
+                    <label class="form-control-label" for="input-username">Customer Name</label>
                     <input type="text" id="input-username" class="form-control form-control-alternative"
-                      placeholder="Custumer Name" formControlName="custumerName">
+                      placeholder="Customer Name" formControlName="custumerName">
                   </div>
                 </div>
 
@@ -139,7 +137,7 @@
                 <div class="col-lg-12">
                   <div class="form-group">
                     <button *ngIf="!idOrder" (click)="saveOrder()" [disabled]="!orderForm.valid"
-                      class="btn btn-success">Create Order</button>
+                      class="btn btn-success">Create Takeoff</button>
 
                   </div>
                 </div>
@@ -164,8 +162,20 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">CANTINA DOORS</h6>
-              <div formArrayName="cantinaDoors">
+              <h6 class="heading-small text mb-4">
+
+                <button *ngIf="!isVisibleCantinaDoors" (click)="showHideFormCantina()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> CANTINA DOORS - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleCantinaDoors" (click)="showHideFormCantina()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> CANTINA DOORS - Click to
+                  Hide</button>
+
+
+              </h6>
+              <div [@fadeAnimation]="isVisibleCantinaDoors ? 'in' : 'out'" *ngIf="isVisibleCantinaDoors"
+                formArrayName="cantinaDoors">
 
                 <div *ngFor="let cantinaDoorsForm of orderForm?.get('cantinaDoors').controls; let i = index"
                   class="pl-4">
@@ -184,13 +194,14 @@
                           <label class="form-control-label" for="input-city">SWING</label>
                           <input type="text" id="input-last-name" class="form-control form-control-alternative"
                             formControlName="swing">
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+                          <input type="text" maxlength="2" id="input-last-name"
+                            class="form-control form-control-alternative" formControlName="qty">
                         </div>
                       </div>
 
@@ -204,8 +215,18 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">FRENCH DOORS</h6>
-              <div formArrayName="frenchDoors">
+              <h6 class="heading-small text mb-4">
+                <button *ngIf="!isVisibleFrenchDoors" (click)="showHideFormFrench()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> FRENCH DOORS - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleFrenchDoors" (click)="showHideFormFrench()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> FRENCH DOORS - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleFrenchDoors ? 'in' : 'out'" *ngIf="isVisibleFrenchDoors"
+                formArrayName="frenchDoors">
 
                 <div *ngFor="let frenchDoorsForm of orderForm?.get('frenchDoors').controls; let i = index" class="pl-4">
                   <div [formGroup]="frenchDoorsForm">
@@ -235,8 +256,8 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+                          <input type="text" maxlength="2" id="input-last-name"
+                            class="form-control form-control-alternative" formControlName="qty">
                         </div>
                       </div>
 
@@ -247,8 +268,18 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">DOUBLE DOORS</h6>
-              <div formArrayName="doubleDoors">
+              <h6 class="heading-small text-muted mb-4">
+                <button *ngIf="!isVisibleDoubleDoors" (click)="showHideFormDouble()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> DOUBLE DOORS - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleDoubleDoors" (click)="showHideFormDouble()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> DOUBLE DOORS - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleDoubleDoors ? 'in' : 'out'" *ngIf="isVisibleDoubleDoors"
+                formArrayName="doubleDoors">
 
                 <div *ngFor="let doubleDoorsForm of orderForm?.get('doubleDoors').controls; let i = index" class="pl-4">
                   <div [formGroup]="doubleDoorsForm">
@@ -297,8 +328,18 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">SINGLE DOORS</h6>
-              <div formArrayName="singleDoors">
+              <h6 class="heading-small text-muted mb-4">
+                <button *ngIf="!isVisibleSingleDoors" (click)="showHideFormSingle()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> SINGLE DOORS - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleSingleDoors" (click)="showHideFormSingle()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> SINGLE DOORS - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleSingleDoors ? 'in' : 'out'" *ngIf="isVisibleSingleDoors"
+                formArrayName="singleDoors">
 
                 <div *ngFor="let singleDoorsForm of orderForm?.get('singleDoors').controls; let i = index" class="pl-4">
                   <div [formGroup]="singleDoorsForm">
@@ -362,8 +403,17 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">ARCHES</h6>
-              <div formArrayName="arches">
+              <h6 class="heading-small text-muted mb-4">
+                <button *ngIf="!isVisibleArches" (click)="showHideFormArches()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> ARCHES - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleArches" (click)="showHideFormArches()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> ARCHES - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleArches ? 'in' : 'out'" *ngIf="isVisibleArches" formArrayName="arches">
 
                 <div *ngFor="let archesForm of orderForm?.get('arches').controls; let i = index" class="pl-4">
                   <div [formGroup]="archesForm">
@@ -420,8 +470,18 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">TRIM</h6>
-              <div formArrayName="trim">
+              <h6 class="heading-small text-muted mb-4">
+
+                <button *ngIf="!isVisibleTrim" (click)="showHideFormTrim()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> TRIM - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleTrim" (click)="showHideFormTrim()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> TRIM - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleTrim ? 'in' : 'out'" *ngIf="isVisibleTrim" formArrayName="trim">
 
                 <div *ngFor="let trimForm of orderForm?.get('trim').controls; let i = index" class="pl-4">
                   <div [formGroup]="trimForm">
@@ -457,8 +517,18 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">HARDWARE</h6>
-              <div formArrayName="hardware">
+              <h6 class="heading-small text-muted mb-4">
+                <button *ngIf="!isVisibleHardware" (click)="showHideFormHardware()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> HARDWARE - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleHardware" (click)="showHideFormHardware()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> HARDWARE - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleHardware ? 'in' : 'out'" *ngIf="isVisibleHardware"
+                formArrayName="hardware">
 
                 <div *ngFor="let hardwareForm of orderForm?.get('hardware').controls; let i = index" class="pl-4">
                   <div [formGroup]="hardwareForm">
@@ -495,8 +565,17 @@
 
               <hr class="my-4" />
               <!-- Address -->
-              <h6 class="heading-small text-muted mb-4">LABOUR</h6>
-              <div formArrayName="labour">
+              <h6 class="heading-small text-muted mb-4">
+                <button *ngIf="!isVisibleLabour" (click)="showHideFormLabour()" class="btn btn-warning"><i
+                    class="ni ni-bold-down"></i> LABOUR - Click to
+                  Show</button>
+
+                <button *ngIf="isVisibleLabour" (click)="showHideFormLabour()" class="btn btn-warning"><i
+                    class="ni ni-bold-up"></i> LABOUR - Click to
+                  Hide</button>
+              </h6>
+
+              <div [@fadeAnimation]="isVisibleLabour ? 'in' : 'out'" *ngIf="isVisibleLabour" formArrayName="labour">
 
                 <div *ngFor="let labourForm of orderForm?.get('labour').controls; let i = index" class="pl-4">
                   <div [formGroup]="labourForm">
@@ -727,7 +806,7 @@
 
               <div class="right">
                 <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="finalizeOrderPopUp(content)"
-                  class="btn btn-warning">Complete Order</button>
+                  class="btn btn-warning">Complete Takeoff</button>
                 <button *ngIf="this.isCompany && this.orderStatus == 3" (click)="backOrderToCarpentry()"
                   class="btn btn-warning">
                   Back to Carpentry</button>
@@ -749,15 +828,15 @@
 
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">Are you sure complete order?</h4>
+    <h4 class="modal-title">Are you sure complete takeoff?</h4>
     <button type="button" class="ni ni-fat-remove" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
   </div>
   <div class="modal-body">
-    <p>Once you complete the order you will no longer be able to modify it&hellip;</p>
+    <p>Once you complete the takeoff you will no longer be able to modify it&hellip;</p>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-info" (click)="modal.close('Close click')">Back</button>
     <button type="button" class="btn btn-light" (click)="finalizeOrder();modal.close('Close click')">Complete
-      Order</button>
+      Takeoff</button>
   </div>
 </ng-template>

@@ -21,6 +21,7 @@ import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component
 import { ToastrModule } from 'ngx-toastr';
 import { NgxSpinnerModule } from "ngx-spinner";
 
+
 export function appInitializerFactory(authService: AuthService) {
   return () => authService.checkTheUserOnTheFirstLoad();
 }
@@ -40,7 +41,7 @@ export function appInitializerFactory(authService: AuthService) {
     AppRoutingModule,
     ReactiveFormsModule,
     ToastrModule.forRoot(),
-    NgxSpinnerModule
+    NgxSpinnerModule,
   ],
   exports: [
     NgxSpinnerModule
