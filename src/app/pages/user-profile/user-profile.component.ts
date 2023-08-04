@@ -37,6 +37,9 @@ export class UserProfileComponent implements OnInit {
   idOrder;
   mobile;
   orderStatus;
+  emailRegex: RegExp = /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
+  emailCarpentry;
+  nameCarpentry;
 
   isVisibleCantinaDoors = false;
   isVisibleFrenchDoors = false;
@@ -46,6 +49,7 @@ export class UserProfileComponent implements OnInit {
   isVisibleTrim = false;
   isVisibleHardware = false;
   isVisibleLabour = false;
+  isCarpentryFound = false;
 
   constructor(
 
@@ -67,8 +71,6 @@ export class UserProfileComponent implements OnInit {
     if (window.screen.width === 360) { // 768px portrait
       this.mobile = true;
     }
-
-    this.listAllCarpentrys();
 
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] != 'new') {
@@ -105,6 +107,46 @@ export class UserProfileComponent implements OnInit {
     this.preFillRoundWindow();
   }
 
+  findCarpentry() {
+    if (this.orderForm.value.carpentryEmail && this.emailValid(this.orderForm.value.carpentryEmail)) {
+
+      this.spinner.show();
+
+      this.orderService.findCarpentry(this.orderForm.value.carpentryEmail)
+        .subscribe((data) => {
+
+          if (!data) {
+            this.spinner.hide();
+            this.toastr.warning('Carpentry not found', 'Warning');
+          }
+          else if (data.errors) {
+            this.spinner.hide();
+            this.toastr.error('Error get email carpentry', 'Error');
+          } else {
+            this.toastr.success('Carpenter found and linked to takeoff ', 'Success: ');
+
+            this.emailCarpentry = data.email;
+            this.nameCarpentry = data.fullname;
+
+            this.orderForm?.get("carpentry")?.setValue(data._id);
+            this.isCarpentryFound = true;
+            this.spinner.hide();
+          }
+
+        }, err => {
+          this.spinner.hide();
+          this.toastr.error('Error get carpentry by email ', 'Erro: ');
+        });
+    } else {
+      this.toastr.warning('Enter the email correctly', 'Erro: ');
+
+    }
+  }
+
+  emailValid(email) {
+    return this.emailRegex.test(email);
+  }
+
   detailOrder(id) {
     this.spinner.show();
 
@@ -113,11 +155,17 @@ export class UserProfileComponent implements OnInit {
 
         if (data.errors) {
           this.spinner.hide();
-          this.toastr.error('Error get detail order', 'Atenção');
+          this.toastr.error('Error get detail takeoff', 'Atenção');
         } else {
 
           //this.carpentrys = data;
           this.orderForm.patchValue(data[0]);
+          this.orderForm?.get("carpentry")?.setValue(data[0].carpentry._id);
+
+          this.orderForm?.get("carpentryEmail")?.setValue(data[0].carpentry.email);
+          this.emailCarpentry = data[0].carpentry.email;
+          this.nameCarpentry = data[0].carpentry.fullname;
+
           this.orderStatus = data[0].status;
 
           if (this.orderStatus > 1) {
@@ -133,7 +181,7 @@ export class UserProfileComponent implements OnInit {
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Error get detail order. ', 'Erro: ');
+        this.toastr.error('Error get detail takeoff. ', 'Erro: ');
       });
   }
 
@@ -168,15 +216,15 @@ export class UserProfileComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Order Created', 'Success');
+          this.toastr.success('Takeoff Created', 'Success');
           this.router.navigate(['/tables']);
         } else {
-          this.toastr.error('Error create order', 'Atenção');
+          this.toastr.error('Error create Takeoff', 'Atenção');
         }
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Error create order', 'Erro: ');
+        this.toastr.error('Error create Takeoff', 'Erro: ');
       });
   }
 
@@ -188,15 +236,15 @@ export class UserProfileComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Order Updated', 'Success');
+          this.toastr.success('Takeoff Updated', 'Success');
 
         } else {
-          this.toastr.error('Error update order', 'Error');
+          this.toastr.error('Error update Takeoff', 'Error');
         }
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Error update order. ', 'Erro: ');
+        this.toastr.error('Error update Takeoff. ', 'Erro: ');
       });
   }
 
@@ -216,15 +264,15 @@ export class UserProfileComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Order Completed', 'Success');
+          this.toastr.success('Takeoff Completed', 'Success');
           this.router.navigate(['/tables']);
         } else {
-          this.toastr.error('Error finalize order', 'Atenção');
+          this.toastr.error('Error finalize Takeoff', 'Atenção');
         }
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Error finalize order', 'Erro: ');
+        this.toastr.error('Error finalize Takeoff', 'Erro: ');
       });
   }
 
@@ -236,15 +284,15 @@ export class UserProfileComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Order released for the carpenter', 'Success');
+          this.toastr.success('Takeoff released for the carpenter', 'Success');
           this.router.navigate(['/tables']);
         } else {
-          this.toastr.error('Error finalize order', 'Atenção');
+          this.toastr.error('Error finalize Takeoff', 'Atenção');
         }
 
       }, err => {
         this.spinner.hide();
-        this.toastr.error('Error finalize order', 'Erro: ');
+        this.toastr.error('Error finalize Takeoff', 'Erro: ');
       });
   }
 
@@ -275,6 +323,7 @@ export class UserProfileComponent implements OnInit {
 
       preHugs: [null],
       status: [null],
+      carpentryEmail: [null],
 
       cantinaDoors: this.builder.array([]),
 
@@ -606,49 +655,49 @@ export class UserProfileComponent implements OnInit {
   preFillSingleDoors() {
     const dadosPrePreenchidos = [
       {
-        size: '1/4',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '1/6',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '1/8',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '2/0',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '2/2',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '2/4',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '2/6',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
       },
       {
-        size: '2/8',
+        size: '',
         left: '',
         right: '',
         jamb: '475',
@@ -660,19 +709,19 @@ export class UserProfileComponent implements OnInit {
         jamb: '',
       },
       {
-        size: '2/4 (8\')',
+        size: '',
         left: '',
         right: '',
         jamb: '',
       },
       {
-        size: '2/6 (8\')',
+        size: '',
         left: '',
         right: '',
         jamb: '',
       },
       {
-        size: '2/8 (8\')',
+        size: '',
         left: '',
         right: '',
         jamb: '',
@@ -696,9 +745,9 @@ export class UserProfileComponent implements OnInit {
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        size: [{ value: dados.size, disabled: this.disableField(dados.size) }, []],
-        left: [{ value: dados.left, disabled: this.disableField(dados.left) }, []],
-        right: [{ value: dados.right, disabled: this.disableField(dados.right) }, []],
+        size: [{ value: dados.size, disabled: false }, []],
+        left: [{ value: dados.left, disabled: false }, []],
+        right: [{ value: dados.right, disabled: false }, []],
         jamb: dados.jamb,
       });
 
@@ -709,8 +758,8 @@ export class UserProfileComponent implements OnInit {
 
   preFillFrenchDoors() {
     const dadosPrePreenchidos = [
-      { size: '', height: '', jamb: '', qty: '' },
-      { size: '', height: '', jamb: '', qty: '' }
+      { size: '', swing: '', height: '', jamb: '', qty: '' },
+      { size: '', swing: '', height: '', jamb: '', qty: '' }
     ];
 
     const arrayForm = this.orderForm.get('frenchDoors') as FormArray;
@@ -718,6 +767,7 @@ export class UserProfileComponent implements OnInit {
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
         size: '',
+        swing: '',
         height: '',
         jamb: '',
         qty: ''
@@ -730,7 +780,7 @@ export class UserProfileComponent implements OnInit {
 
   preFillCantinaDoors() {
     const dadosPrePreenchidos = [
-      { name: 'SOLID STD' },
+      { name: 'STEEL STD' },
       { name: 'SOLID STD' }
     ];
 

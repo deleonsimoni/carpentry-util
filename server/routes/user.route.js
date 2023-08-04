@@ -18,6 +18,6 @@ async function insert(req, res) {
 }
 
 async function teste(req, res) {
-  let user = await userCtrl.teste(req.body);
+  //let user = await userCtrl.teste(req.body);
   res.json(user);
 }

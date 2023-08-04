@@ -94,6 +94,8 @@
             <thead class="thead-light">
               <tr>
                 <th scope="col">Customer</th>
+                <th *ngIf="!isCompany" scope="col">Job Site</th>
+
                 <th scope="col">Status</th>
                 <th scope="col">{{isCompany ? 'Carpentry' : 'Company'}}</th>
                 <th scope="col">Completion</th>
@@ -114,6 +116,12 @@
                     </div>
                   </div>
                 </th>
+
+                <td *ngIf="!isCompany">
+                  <div class="media-body">
+                    <span class="mb-0 text-sm">{{myOrder.shipTo | titlecase}}</span>
+                  </div>
+                </td>
 
                 <td>
                   <span class="badge badge-dot mr-4">

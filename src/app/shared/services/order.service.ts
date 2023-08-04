@@ -39,6 +39,10 @@ export class OrderService {
     return this.http.get<any>(`/api/order/${id}`);
   }
 
+  findCarpentry(email) {
+    return this.http.get<any>(`/api/order/findCarpentryByEmail/${email}`);
+  }
+
   generatePDF(id: any) {
     return this.http.get<any>(`/api/order/${id}/generatePDF`);
   }

@@ -30,20 +30,39 @@
             <h6 class="heading-small text-muted mb-4">Carpentry information</h6>
             <div class="pl-lg-4">
               <div class="row">
-                <div class="col-lg-12">
+                <div class="col-8">
                   <div class="form-group">
                     <label class="form-control-label" for="input-username">Carpentry</label>
-                    <select class="form-control form-control-alternative" formControlName="carpentry">
-                      <option [ngValue]="null" disabled>Select Carpentry</option>
-                      <option *ngFor="let carpentry of carpentrys" [ngValue]="carpentry._id">
-                        {{carpentry.fullname + ' - ' + carpentry.email}}</option>
-                    </select>
+                    <br>
+                    <label *ngIf="isCompany && (!orderStatus || orderStatus < 2)" class="form-control-label"
+                      for="input-username">Enter
+                      email to locate
+                      carpenter</label>
+
+                    <input *ngIf="isCompany && (!orderStatus || orderStatus < 2)" type="email" id="input-username"
+                      class="form-control form-control-alternative" placeholder="Email"
+                      formControlName="carpentryEmail">
+                    <br>
+                    <div *ngIf="isCarpentryFound || idOrder">
+                      {{emailCarpentry + ' - ' + nameCarpentry}}
+                      <br>
+                      <br>
+
+                    </div>
+                    <button *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      class="form-control form-control-alternative" (click)="findCarpentry()" class="btn btn-primary"><i
+                        class="ni ni-settings"></i>
+                      Find</button>
+
+
                   </div>
                 </div>
+
               </div>
             </div>
-            <h6 class="heading-small text-muted mb-4">Customer information</h6>
-            <div class="pl-lg-4">
+            <h6 *ngIf="isCarpentryFound || idOrder" class="heading-small text mb-4">Customer information</h6>
+            <div *ngIf="isCarpentryFound || idOrder" [@fadeAnimation]="isCarpentryFound || idOrder ? 'in' : 'out'"
+              class="pl-lg-4">
               <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
@@ -81,9 +100,9 @@
 
                 <div class="col-lg-3">
                   <div class="form-group">
-                    <label class="form-control-label" for="input-last-name">Ship To</label>
+                    <label class="form-control-label" for="input-last-name">Job Site</label><!--SHIP TO OLD-->
                     <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                      placeholder="Ship to" formControlName="shipTo">
+                      placeholder="Job Site" formControlName="shipTo">
                   </div>
                 </div>
 
@@ -192,16 +211,32 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SWING</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="swing">
+
+                          <select class="form-control form-control-alternative" formControlName="swing">
+                            <option value="RH">RH</option>
+                            <option value="LH">LH</option>
+                          </select>
+
 
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">QTY</label>
-                          <input type="text" maxlength="2" id="input-last-name"
-                            class="form-control form-control-alternative" formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
 
@@ -234,30 +269,68 @@
                     <div class="row">
                       <div class="col-3">
                         <div class="form-group">
-                          <label class="form-control-label" for="input-city">SIZE</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="size">
+                          <label class="form-control-label" for="input-city">SIZE/SWING</label>
+                          <div>
+                            <select class="form-control form-control-alternative" formControlName="size">
+                              <option value="18">18"</option>
+                              <option value="24">24"</option>
+                              <option value="26">26"</option>
+                              <option value="28">28"</option>
+                              <option value="30">30"</option>
+                              <option value="32">32"</option>
+                            </select>
+
+                            <select class="form-control form-control-alternative" formControlName="swing">
+                              <option value="RH">RH</option>
+                              <option value="LH">LH</option>
+                            </select>
+                          </div>
+
                         </div>
                       </div>
+
+
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">HEIGHT</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="height">
+
+                          <select class="form-control form-control-alternative" formControlName="height">
+                            <option value="80">80"</option>
+                            <option value="84">84"</option>
+                            <option value="96">96"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">JAMB</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="jamb">
+
+                          <select class="form-control form-control-alternative" formControlName="jamb">
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">QTY</label>
-                          <input type="text" maxlength="2" id="input-last-name"
-                            class="form-control form-control-alternative" formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
+
                         </div>
                       </div>
 
@@ -288,29 +361,58 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="size">
+
+                          <select class="form-control form-control-alternative" formControlName="size">
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">HEIGHT</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="height">
+
+                          <select class="form-control form-control-alternative" formControlName="height">
+                            <option value="80">80"</option>
+                            <option value="84">84"</option>
+                            <option value="96">96"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">JAMB</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="jamb">
+
+                          <select class="form-control form-control-alternative" formControlName="jamb">
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
 
@@ -348,8 +450,18 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="size">
+
+                          <select class="form-control form-control-alternative" formControlName="size">
+                            <option value="1/4 - 18&quot;">18"</option>
+                            <option value="1/6 - 24&quot;">24"</option>
+                            <option value="1/8 - 26&quot;">26"</option>
+                            <option value="2/0 - 28&quot;">28"</option>
+                            <option value="2/2 - 30&quot;">30"</option>
+                            <option value="2/4 - 32&quot;">32"</option>
+                            <option value="2/6 - 34&quot;">34"</option>
+                            <option value="2/8 - 36&quot;">36"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-3">
@@ -369,8 +481,11 @@
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country">JAMB</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="jamb">
+
+                          <select class="form-control form-control-alternative" formControlName="jamb">
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
                         </div>
                       </div>
 
@@ -387,8 +502,8 @@
 
             <hr class="my-4" />
             <!-- Description -->
-            <h6 class="heading-small text-muted mb-4">Extras</h6>
-            <div class="pl-lg-4">
+            <h6 *ngIf="isCarpentryFound || idOrder" class="heading-small text-muted mb-4">Extras</h6>
+            <div *ngIf="isCarpentryFound || idOrder" class="pl-lg-4">
               <div class="form-group">
                 <label>Comments</label>
                 <textarea rows="4" class="form-control form-control-alternative" formControlName="comment"
@@ -422,8 +537,16 @@
                       <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="size">
+
+                          <select class="form-control form-control-alternative" formControlName="size">
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-2">
@@ -504,8 +627,20 @@
                       <div class="col-4">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -551,8 +686,20 @@
                       <div class="col-4">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -591,8 +738,20 @@
                       <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -613,8 +772,16 @@
                       <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="size">
+
+                          <select class="form-control form-control-alternative" formControlName="size">
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+
                         </div>
                       </div>
                       <div class="col-2">
@@ -655,8 +822,20 @@
                       <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -740,8 +919,20 @@
                       <div class="col-4">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
 
@@ -771,8 +962,20 @@
                       <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">QTY</label>
-                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
-                            formControlName="qty">
+
+                          <select class="form-control form-control-alternative" formControlName="qty">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+
+                          </select>
                         </div>
                       </div>
 
@@ -798,10 +1001,10 @@
 
               <div>
                 <button *ngIf="!this.isCompany && this.orderStatus < 3" (click)="updateOrder()" class="btn btn-primary">
-                  Save Order</button>
+                  Save Progress</button>
                 <button *ngIf="this.isCompany && this.orderStatus" (click)="finalizeOrderWithoutStatus()"
                   class="btn btn-primary">
-                  Save Order</button>
+                  Save Progress</button>
               </div>
 
               <div class="right">

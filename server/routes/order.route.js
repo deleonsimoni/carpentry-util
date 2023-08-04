@@ -14,6 +14,7 @@ router.route('/:idOrder/generatePDF').get(asyncHandler(generatePDF));
 router.route('/:idOrder/update').post(asyncHandler(updateOrder));
 router.route('/:idOrder/finalize').post(asyncHandler(finalizeOrder));
 router.route('/:idOrder/backOrderToCarpentry').post(asyncHandler(backOrderToCarpentry));
+router.route('/findCarpentryByEmail/:email').get(asyncHandler(findCarpentryByEmail));
 
 
 router.route('/').post(asyncHandler(createOrder));
@@ -35,6 +36,11 @@ async function finalizeOrder(req, res) {
 
 async function backOrderToCarpentry(req, res) {
   let response = await orderCtrl.backOrderToCarpentry(req.user, req.body, req.params.idOrder);
+  res.json(response);
+}
+
+async function findCarpentryByEmail(req, res) {
+  let response = await orderCtrl.findCarpentryByEmail(req.user, req.params.email);
   res.json(response);
 }
 

@@ -1,4 +1,4 @@
-
+const User = require('../models/user.model');
 const Order = require('../models/order.model');
 const { PDFDocument, setFontAndSize, rgb } = require('pdf-lib');
 const fs = require('fs');
@@ -10,6 +10,7 @@ module.exports = {
   finalizeOrder,
   getOrders,
   backOrderToCarpentry,
+  findCarpentryByEmail,
   generatePDF
 };
 
@@ -24,9 +25,9 @@ async function getOrders(idUSer) {
   return await Order.find({ $or: [{ user: idUSer }, { carpentry: idUSer }] })
     .populate("carpentry", 'fullname email')
     .populate("user", 'fullname email')
-    .select('custumerName carpentry user status')
+    .select('custumerName carpentry user status shipTo')
     .sort({
-      createAt: -1
+      createdAt: -1
     });
 }
 
@@ -37,6 +38,8 @@ async function detailOrder(idUser, idOrder) {
       $or: [{ 'user': idUser }, { 'carpentry': idUser }]
     }
   )
+    .populate("carpentry", 'fullname email')
+
 }
 
 async function updateOrder(user, body, idOrder) {
@@ -67,6 +70,15 @@ async function finalizeOrder(user, body, idOrder) {
   )
 }
 
+async function findCarpentryByEmail(user, email) {
+
+  return await User.findOne(
+    {
+      email: email.toLowerCase(),
+      roles: 'carpentry'
+    }
+  )
+}
 
 async function backOrderToCarpentry(user, body, idOrder) {
 
@@ -153,6 +165,12 @@ async function generatePDF(user, idOrder) {
         break;
 
       //cantinaDoors
+      case 'cantina1':
+        field.setText(order.cantinaDoors[0].name);
+        break;
+      case 'cantina2':
+        field.setText(order.cantinaDoors[1].name);
+        break;
       case 'cantinaSwing1':
         field.setText(order.cantinaDoors[0].swing);
         break;
@@ -169,7 +187,7 @@ async function generatePDF(user, idOrder) {
 
       //frenchDoors
       case 'frenchSize1':
-        field.setText(order.frenchDoors[0].size);
+        field.setText(order.frenchDoors[0].size + ' ' + order.frenchDoors[0].swing);
         break;
       case 'frenchHeight1':
         field.setText(order.frenchDoors[0].height);
@@ -181,7 +199,7 @@ async function generatePDF(user, idOrder) {
         field.setText(order.frenchDoors[0].jamb);
         break;
       case 'frenchSize2':
-        field.setText(order.frenchDoors[1].size);
+        field.setText(order.frenchDoors[1].size + ' ' + order.frenchDoors[1].swing);
         break;
       case 'frenchHeight2':
         field.setText(order.frenchDoors[1].height);
@@ -256,67 +274,109 @@ async function generatePDF(user, idOrder) {
         break;
 
       //SingleDoors
+      case 'singleSize1':
+        field.setText(order.singleDoors[0].size);
+        break;
       case 'singleLeft1':
         field.setText(order.singleDoors[0].left);
         break;
       case 'singleRight1':
         field.setText(order.singleDoors[0].right);
         break;
+      case 'singleJamb1':
+        field.setText(order.singleDoors[0].jamb);
+        break;
 
-
+      case 'singleSize2':
+        field.setText(order.singleDoors[1].size);
+        break;
       case 'singleLeft2':
         field.setText(order.singleDoors[1].left);
         break;
       case 'singleRight2':
         field.setText(order.singleDoors[1].right);
         break;
+      case 'singleJamb2':
+        field.setText(order.singleDoors[1].jamb);
+        break;
 
-
+      case 'singleSize3':
+        field.setText(order.singleDoors[2].size);
+        break;
       case 'singleLeft3':
         field.setText(order.singleDoors[2].left);
         break;
       case 'singleRight3':
         field.setText(order.singleDoors[2].right);
         break;
+      case 'singleJamb3':
+        field.setText(order.singleDoors[2].jamb);
+        break;
 
-
+      case 'singleSize4':
+        field.setText(order.singleDoors[3].size);
+        break;
       case 'singleLeft4':
         field.setText(order.singleDoors[3].left);
         break;
       case 'singleRight4':
         field.setText(order.singleDoors[3].right);
         break;
+      case 'singleJamb4':
+        field.setText(order.singleDoors[3].jamb);
+        break;
 
-
+      case 'singleSize5':
+        field.setText(order.singleDoors[4].size);
+        break;
       case 'singleLeft5':
         field.setText(order.singleDoors[4].left);
         break;
       case 'singleRight5':
         field.setText(order.singleDoors[4].right);
         break;
+      case 'singleJamb5':
+        field.setText(order.singleDoors[4].jamb);
+        break;
 
-
+      case 'singleSize6':
+        field.setText(order.singleDoors[5].size);
+        break;
       case 'singleLeft6':
         field.setText(order.singleDoors[5].left);
         break;
       case 'singleRight6':
         field.setText(order.singleDoors[5].right);
         break;
+      case 'singleJamb6':
+        field.setText(order.singleDoors[5].jamb);
+        break;
 
-
+      case 'singleSize7':
+        field.setText(order.singleDoors[6].size);
+        break;
       case 'singleLeft7':
         field.setText(order.singleDoors[6].left);
         break;
       case 'singleRight7':
         field.setText(order.singleDoors[6].right);
         break;
+      case 'singleJamb7':
+        field.setText(order.singleDoors[6].jamb);
+        break;
 
 
+      case 'singleSize8':
+        field.setText(order.singleDoors[7].size);
+        break;
       case 'singleLeft8':
         field.setText(order.singleDoors[7].left);
         break;
       case 'singleRight8':
         field.setText(order.singleDoors[7].right);
+        break;
+      case 'singleJamb8':
+        field.setText(order.singleDoors[7].jamb);
         break;
 
       case 'singleSize9':
@@ -332,6 +392,9 @@ async function generatePDF(user, idOrder) {
         field.setText(order.singleDoors[8].jamb);
         break;
 
+      case 'singleSize10':
+        field.setText(order.singleDoors[9].size);
+        break;
       case 'singleLeft10':
         field.setText(order.singleDoors[9].left);
         break;
@@ -342,6 +405,9 @@ async function generatePDF(user, idOrder) {
         field.setText(order.singleDoors[9].jamb);
         break;
 
+      case 'singleSize11':
+        field.setText(order.singleDoors[10].size);
+        break;
       case 'singleLeft11':
         field.setText(order.singleDoors[10].left);
         break;
@@ -352,6 +418,9 @@ async function generatePDF(user, idOrder) {
         field.setText(order.singleDoors[10].jamb);
         break;
 
+      case 'singleSize12':
+        field.setText(order.singleDoors[11].size);
+        break;
       case 'singleLeft12':
         field.setText(order.singleDoors[11].left);
         break;

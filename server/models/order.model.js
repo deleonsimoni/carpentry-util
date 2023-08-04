@@ -84,6 +84,7 @@ const OrderSchema = new mongoose.Schema(
     frenchDoors: [
       {
         size: { type: String },
+        swing: { type: String },
         height: { type: String },
         qty: { type: String },
         jamb: { type: String },

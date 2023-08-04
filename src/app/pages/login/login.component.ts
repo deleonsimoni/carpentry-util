@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loginForm = this.builder.group({
       // tslint:disable-next-line: max-line-length
       email: [null, [Validators.required, Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
-      password: [null, [Validators.required, Validators.minLength(6)]]
+      password: [null, [Validators.required, Validators.minLength(3)]]
     });
   }
 
@@ -39,17 +39,17 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       this.authService.login(this.loginForm.value)
         .subscribe((res: any) => {
-          this.spinner.hide();
 
           this.toastr.success('Nice to see you', 'Welcome :)');
           this.router.navigate(['/tables']);
+          this.spinner.hide();
 
 
         }, err => {
           this.spinner.hide();
 
           if (err.status === 401) {
-            this.toastr.error('Email ou senha inválidos', 'Erro: ');
+            this.toastr.error('Invalid email or password', 'Erro: ');
           }
         });
     }
