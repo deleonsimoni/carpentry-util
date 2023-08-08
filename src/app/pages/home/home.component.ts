@@ -6,12 +6,11 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-  selector: 'app-tables',
-  templateUrl: './tables.component.html',
-  styleUrls: ['./tables.component.scss']
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class TablesComponent implements OnInit {
-
+export class HomeComponent implements OnInit {
   myOrders;
   user;
 
@@ -20,19 +19,19 @@ export class TablesComponent implements OnInit {
     private orderService: OrderService,
     private authService: AuthService,
     private toastr: ToastrService,
-    private spinner: NgxSpinnerService,
-  ) { }
+    private spinner: NgxSpinnerService
+  ) {}
 
   ngOnInit() {
     this.listMyOrders();
-    this.authService.getUser().subscribe(user => this.user = user);
+    this.authService.getUser().subscribe(user => (this.user = user));
   }
 
   listMyOrders() {
     this.spinner.show();
 
-    this.orderService.getOrdersFromUser()
-      .subscribe((data) => {
+    this.orderService.getOrdersFromUser().subscribe(
+      data => {
         this.spinner.hide();
 
         if (data.errors) {
@@ -40,37 +39,36 @@ export class TablesComponent implements OnInit {
         } else {
           this.myOrders = data;
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error get orders. ', 'Erro: ');
-      });
+      }
+    );
   }
 
   geratePDF(idOrder, custumerName) {
     this.spinner.show();
 
-    this.orderService.generatePDF(idOrder)
-      .subscribe((data) => {
-
+    this.orderService.generatePDF(idOrder).subscribe(
+      data => {
         if (data.errors) {
           this.spinner.hide();
           this.toastr.error('Error generate PDF', 'Atenção');
         } else {
-
-          const link = document.createElement("a");
+          const link = document.createElement('a');
           link.href = data;
-          link.download = `${custumerName}.pdf`
+          link.download = `${custumerName}.pdf`;
           link.click();
 
           this.spinner.hide();
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error generate PDF', 'Erro: ');
-      });
-
+      }
+    );
   }
 
   get isCompany() {
@@ -84,5 +82,4 @@ export class TablesComponent implements OnInit {
   detailOrder(idOrder) {
     this.router.navigate(['/user-profile', idOrder]);
   }
-
 }

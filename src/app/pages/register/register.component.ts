@@ -7,10 +7,9 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
-
   public registerForm: FormGroup;
   public carregando = false;
 
@@ -23,16 +22,23 @@ export class RegisterComponent implements OnInit {
     this.createForm();
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   private createForm(): void {
     this.registerForm = this.builder.group({
       fullname: [null, [Validators.required]],
-      email: [null, [Validators.required, Validators.pattern(/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/)]],
+      email: [
+        null,
+        [
+          Validators.required,
+          Validators.pattern(
+            /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          ),
+        ],
+      ],
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
-      roles: ['company']
+      roles: ['company'],
 
       /*address: this.builder.group({
         street: [null, [Validators.required]],
@@ -53,7 +59,6 @@ export class RegisterComponent implements OnInit {
   }
 
   register(): void {
-
     const form = this.registerForm.value;
 
     if (form.password != form.repeatPassword) {
@@ -67,30 +72,31 @@ export class RegisterComponent implements OnInit {
     }
 
     if (this.registerForm.valid && form != null) {
-
       this.carregando = true;
-      this.registerForm.value.email = this.registerForm.value.email.toLowerCase().trim();
+      this.registerForm.value.email = this.registerForm.value.email
+        .toLowerCase()
+        .trim();
       this.registerForm.removeControl('cf-password');
 
-      this.authService
-        .register(this.registerForm.value)
-        .subscribe((res: any) => {
+      this.authService.register(this.registerForm.value).subscribe(
+        (res: any) => {
           this.toastr.success('Cadastro realizado com sucesso.', 'Bem-vindo');
-          this.router.navigate(['/tables']);
-        }, err => {
+          this.router.navigate(['/home']);
+        },
+        err => {
           this.carregando = false;
           if (err.status === 500) {
             if (err.error.message.match('email')) {
               this.toastr.error('Email já registrado.', 'Erro: ');
             }
           }
-        });
+        }
+      );
     } else {
-      this.toastr.error('Verifique os campos do formulário para checar o correto preenchimento.', 'Erro: ');
+      this.toastr.error(
+        'Verifique os campos do formulário para checar o correto preenchimento.',
+        'Erro: '
+      );
     }
-
-
   }
-
-
 }

@@ -6,7 +6,13 @@ import { OrderService } from '@app/shared/services/order.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
-import { trigger, state, style, transition, animate } from '@angular/animations';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 
 @Component({
   selector: 'app-user-profile',
@@ -19,25 +25,25 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
       state('in', style({ opacity: 1, height: '*' })),
       // Transição de visível para escondido
       transition(':leave', [
-        animate('300ms ease-out', style({ opacity: 0, height: '0' }))
+        animate('300ms ease-out', style({ opacity: 0, height: '0' })),
       ]),
       // Transição de escondido para visível
       transition(':enter', [
         style({ opacity: 0, height: '0' }),
-        animate('300ms ease-in', style({ opacity: 1, height: '*' }))
-      ])
-    ])
-  ]
+        animate('300ms ease-in', style({ opacity: 1, height: '*' })),
+      ]),
+    ]),
+  ],
 })
 export class UserProfileComponent implements OnInit {
-
   public orderForm: FormGroup;
   carpentrys;
   user;
   idOrder;
   mobile;
   orderStatus;
-  emailRegex: RegExp = /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
+  emailRegex: RegExp =
+    /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
   emailCarpentry;
   nameCarpentry;
 
@@ -52,7 +58,6 @@ export class UserProfileComponent implements OnInit {
   isCarpentryFound = false;
 
   constructor(
-
     private router: Router,
     private orderService: OrderService,
     private builder: FormBuilder,
@@ -61,14 +66,13 @@ export class UserProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private modalService: NgbModal
-
   ) {
     this.createForm();
   }
 
   ngOnInit() {
-
-    if (window.screen.width === 360) { // 768px portrait
+    if (window.screen.width === 360) {
+      // 768px portrait
       this.mobile = true;
     }
 
@@ -80,19 +84,21 @@ export class UserProfileComponent implements OnInit {
     });
 
     this.fillForm();
-
   }
 
   @HostListener('window:beforeunload', ['$event'])
   handleBeforeUnload(event: Event) {
     event.returnValue = false;
-    if (this.idOrder && (!this.isCompany && this.orderForm.value.status == 2 || this.isCompany && this.orderForm.value.status == 3)) {
-      alert("You have unsaved data changes. Are you sure to close the page?")
+    if (
+      this.idOrder &&
+      ((!this.isCompany && this.orderForm.value.status == 2) ||
+        (this.isCompany && this.orderForm.value.status == 3))
+    ) {
+      alert('You have unsaved data changes. Are you sure to close the page?');
     }
   }
 
   fillForm() {
-
     this.preFillCantinaDoors();
     this.preFillFrenchDoors();
     this.preFillDoubleDoors();
@@ -108,38 +114,43 @@ export class UserProfileComponent implements OnInit {
   }
 
   findCarpentry() {
-    if (this.orderForm.value.carpentryEmail && this.emailValid(this.orderForm.value.carpentryEmail)) {
-
+    if (
+      this.orderForm.value.carpentryEmail &&
+      this.emailValid(this.orderForm.value.carpentryEmail)
+    ) {
       this.spinner.show();
 
-      this.orderService.findCarpentry(this.orderForm.value.carpentryEmail)
-        .subscribe((data) => {
+      this.orderService
+        .findCarpentry(this.orderForm.value.carpentryEmail)
+        .subscribe(
+          data => {
+            if (!data) {
+              this.spinner.hide();
+              this.toastr.warning('Carpentry not found', 'Warning');
+            } else if (data.errors) {
+              this.spinner.hide();
+              this.toastr.error('Error get email carpentry', 'Error');
+            } else {
+              this.toastr.success(
+                'Carpenter found and linked to takeoff ',
+                'Success: '
+              );
 
-          if (!data) {
+              this.emailCarpentry = data.email;
+              this.nameCarpentry = data.fullname;
+
+              this.orderForm?.get('carpentry')?.setValue(data._id);
+              this.isCarpentryFound = true;
+              this.spinner.hide();
+            }
+          },
+          err => {
             this.spinner.hide();
-            this.toastr.warning('Carpentry not found', 'Warning');
+            this.toastr.error('Error get carpentry by email ', 'Erro: ');
           }
-          else if (data.errors) {
-            this.spinner.hide();
-            this.toastr.error('Error get email carpentry', 'Error');
-          } else {
-            this.toastr.success('Carpenter found and linked to takeoff ', 'Success: ');
-
-            this.emailCarpentry = data.email;
-            this.nameCarpentry = data.fullname;
-
-            this.orderForm?.get("carpentry")?.setValue(data._id);
-            this.isCarpentryFound = true;
-            this.spinner.hide();
-          }
-
-        }, err => {
-          this.spinner.hide();
-          this.toastr.error('Error get carpentry by email ', 'Erro: ');
-        });
+        );
     } else {
       this.toastr.warning('Enter the email correctly', 'Erro: ');
-
     }
   }
 
@@ -150,19 +161,19 @@ export class UserProfileComponent implements OnInit {
   detailOrder(id) {
     this.spinner.show();
 
-    this.orderService.detailOrder(id)
-      .subscribe((data) => {
-
+    this.orderService.detailOrder(id).subscribe(
+      data => {
         if (data.errors) {
           this.spinner.hide();
           this.toastr.error('Error get detail takeoff', 'Atenção');
         } else {
-
           //this.carpentrys = data;
           this.orderForm.patchValue(data[0]);
-          this.orderForm?.get("carpentry")?.setValue(data[0].carpentry._id);
+          this.orderForm?.get('carpentry')?.setValue(data[0].carpentry._id);
 
-          this.orderForm?.get("carpentryEmail")?.setValue(data[0].carpentry.email);
+          this.orderForm
+            ?.get('carpentryEmail')
+            ?.setValue(data[0].carpentry.email);
           this.emailCarpentry = data[0].carpentry.email;
           this.nameCarpentry = data[0].carpentry.fullname;
 
@@ -178,18 +189,19 @@ export class UserProfileComponent implements OnInit {
 
           this.spinner.hide();
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error get detail takeoff. ', 'Erro: ');
-      });
+      }
+    );
   }
 
   listAllCarpentrys() {
     this.spinner.show();
 
-    this.orderService.listAllCarpentrys()
-      .subscribe((data) => {
+    this.orderService.listAllCarpentrys().subscribe(
+      data => {
         this.spinner.hide();
 
         if (data.errors) {
@@ -197,55 +209,57 @@ export class UserProfileComponent implements OnInit {
         } else {
           this.carpentrys = data;
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error get carpentry. ', 'Erro: ');
-      });
+      }
+    );
   }
 
   back() {
-    this.router.navigate(['/tables']);
+    this.router.navigate(['/home']);
   }
 
   saveOrder() {
     this.spinner.show();
 
-    this.orderService.saveOrder(this.orderForm.value)
-      .subscribe((data) => {
+    this.orderService.saveOrder(this.orderForm.value).subscribe(
+      data => {
         this.spinner.hide();
 
         if (!data.errors) {
           this.toastr.success('Takeoff Created', 'Success');
-          this.router.navigate(['/tables']);
+          this.router.navigate(['/home']);
         } else {
           this.toastr.error('Error create Takeoff', 'Atenção');
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error create Takeoff', 'Erro: ');
-      });
+      }
+    );
   }
 
   updateOrder() {
     this.spinner.show();
 
-    this.orderService.updateOrder(this.orderForm.value, this.idOrder)
-      .subscribe((data) => {
+    this.orderService.updateOrder(this.orderForm.value, this.idOrder).subscribe(
+      data => {
         this.spinner.hide();
 
         if (!data.errors) {
           this.toastr.success('Takeoff Updated', 'Success');
-
         } else {
           this.toastr.error('Error update Takeoff', 'Error');
         }
-
-      }, err => {
+      },
+      err => {
         this.spinner.hide();
         this.toastr.error('Error update Takeoff. ', 'Erro: ');
-      });
+      }
+    );
   }
 
   finalizeOrderPopUp(content) {
@@ -259,41 +273,50 @@ export class UserProfileComponent implements OnInit {
   finalizeOrder() {
     this.spinner.show();
 
-    this.orderService.finalizeOrder(this.orderForm.value, this.idOrder)
-      .subscribe((data) => {
-        this.spinner.hide();
+    this.orderService
+      .finalizeOrder(this.orderForm.value, this.idOrder)
+      .subscribe(
+        data => {
+          this.spinner.hide();
 
-        if (!data.errors) {
-          this.toastr.success('Takeoff Completed', 'Success');
-          this.router.navigate(['/tables']);
-        } else {
-          this.toastr.error('Error finalize Takeoff', 'Atenção');
+          if (!data.errors) {
+            this.toastr.success('Takeoff Completed', 'Success');
+            this.router.navigate(['/home']);
+          } else {
+            this.toastr.error('Error finalize Takeoff', 'Atenção');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.toastr.error('Error finalize Takeoff', 'Erro: ');
         }
-
-      }, err => {
-        this.spinner.hide();
-        this.toastr.error('Error finalize Takeoff', 'Erro: ');
-      });
+      );
   }
 
   backOrderToCarpentry() {
     this.spinner.show();
 
-    this.orderService.backOrderToCarpentry(this.orderForm.value, this.idOrder)
-      .subscribe((data) => {
-        this.spinner.hide();
+    this.orderService
+      .backOrderToCarpentry(this.orderForm.value, this.idOrder)
+      .subscribe(
+        data => {
+          this.spinner.hide();
 
-        if (!data.errors) {
-          this.toastr.success('Takeoff released for the carpenter', 'Success');
-          this.router.navigate(['/tables']);
-        } else {
-          this.toastr.error('Error finalize Takeoff', 'Atenção');
+          if (!data.errors) {
+            this.toastr.success(
+              'Takeoff released for the carpenter',
+              'Success'
+            );
+            this.router.navigate(['/home']);
+          } else {
+            this.toastr.error('Error finalize Takeoff', 'Atenção');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.toastr.error('Error finalize Takeoff', 'Erro: ');
         }
-
-      }, err => {
-        this.spinner.hide();
-        this.toastr.error('Error finalize Takeoff', 'Erro: ');
-      });
+      );
   }
 
   disableField(field) {
@@ -304,22 +327,39 @@ export class UserProfileComponent implements OnInit {
     return this.user.roles.includes('company');
   }
 
-
   private createForm(): void {
-    this.authService.getUser().subscribe(user => this.user = user);
+    this.authService.getUser().subscribe(user => (this.user = user));
 
     this.orderForm = this.builder.group({
-      carpentry: [{ value: null, disabled: this.user.roles.includes('carpentry') }, [Validators.required]],
-      custumerName: [{ value: null, disabled: this.user.roles.includes('carpentry') }, [Validators.required]],
-      foremen: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      extrasChecked: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      carpInvoice: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      shipTo: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      carpentry: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+        [Validators.required],
+      ],
+      custumerName: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+        [Validators.required],
+      ],
+      foremen: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
+      extrasChecked: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
+      carpInvoice: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
+      shipTo: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
       lot: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
       type: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
       elev: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      sqFootage: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      streetName: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      sqFootage: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
+      streetName: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
 
       preHugs: [null],
       status: [null],
@@ -350,7 +390,6 @@ export class UserProfileComponent implements OnInit {
       roundWindow: this.builder.array([]),
 
       comment: [null],
-
     });
   }
 
@@ -386,7 +425,6 @@ export class UserProfileComponent implements OnInit {
     this.isVisibleLabour = !this.isVisibleLabour;
   }
 
-
   preFillDoubleDoors() {
     const dadosPrePreenchidos = [
       { size: '', height: '', jamb: '', qty: '' },
@@ -403,12 +441,11 @@ export class UserProfileComponent implements OnInit {
         size: '',
         height: '',
         jamb: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillArches() {
@@ -417,68 +454,67 @@ export class UserProfileComponent implements OnInit {
       { size: '675', col1: '', col2: '', col3: '', col4: '', col5: '' },
       { size: '', col1: '', col2: '', col3: '', col4: '', col5: '' },
       { size: '', col1: '', col2: '', col3: '', col4: '', col5: '' },
-      { size: '(8\')', col1: '', col2: '', col3: '', col4: '', col5: '' },
+      { size: "(8')", col1: '', col2: '', col3: '', col4: '', col5: '' },
     ];
 
     const arrayForm = this.orderForm.get('arches') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        size: [{ value: dados.size, disabled: this.disableField(dados.size) }, []],
+        size: [
+          { value: dados.size, disabled: this.disableField(dados.size) },
+          [],
+        ],
         col1: '',
         col2: '',
         col3: '',
         col4: '',
-        col5: ''
+        col5: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillRoundWindow() {
-    const dadosPrePreenchidos = [
-      { type: '', qty: '' }
-    ];
+    const dadosPrePreenchidos = [{ type: '', qty: '' }];
 
     const arrayForm = this.orderForm.get('roundWindow') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
         type: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillRodSupport() {
     const dadosPrePreenchidos = [
       { type: 'W - HOOK', desc: '', qty: '' },
-      { type: 'N - HOOK', desc: '', qty: '' }
+      { type: 'N - HOOK', desc: '', qty: '' },
     ];
 
     const arrayForm = this.orderForm.get('rodSupport') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        type: [{ value: dados.type, disabled: this.disableField(dados.type) }, []],
+        type: [
+          { value: dados.type, disabled: this.disableField(dados.type) },
+          [],
+        ],
         desc: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
-
 
   preFillClosetRods() {
     const dadosPrePreenchidos = [
-
       { type1: '', type2: '', type3: '', type4: '' },
     ];
 
@@ -486,52 +522,79 @@ export class UserProfileComponent implements OnInit {
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        type1: [{ value: dados.type1, disabled: this.disableField(dados.type1) }, []],
-        type2: [{ value: dados.type2, disabled: this.disableField(dados.type2) }, []],
-        type3: [{ value: dados.type3, disabled: this.disableField(dados.type3) }, []],
-        type4: [{ value: dados.type4, disabled: this.disableField(dados.type4) }, []]
+        type1: [
+          { value: dados.type1, disabled: this.disableField(dados.type1) },
+          [],
+        ],
+        type2: [
+          { value: dados.type2, disabled: this.disableField(dados.type2) },
+          [],
+        ],
+        type3: [
+          { value: dados.type3, disabled: this.disableField(dados.type3) },
+          [],
+        ],
+        type4: [
+          { value: dados.type4, disabled: this.disableField(dados.type4) },
+          [],
+        ],
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillShelves() {
     const dadosPrePreenchidos = [
-      { size: '1X12', type4: '', type6: '', type8: '', type10: '', type12: '', qty: '' },
-      { size: '1X16', type4: '', type6: '', type8: '', type10: '', type12: '', qty: '' },
-
+      {
+        size: '1X12',
+        type4: '',
+        type6: '',
+        type8: '',
+        type10: '',
+        type12: '',
+        qty: '',
+      },
+      {
+        size: '1X16',
+        type4: '',
+        type6: '',
+        type8: '',
+        type10: '',
+        type12: '',
+        qty: '',
+      },
     ];
 
     const arrayForm = this.orderForm.get('shelves') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        size: [{ value: dados.size, disabled: this.disableField(dados.size) }, []],
+        size: [
+          { value: dados.size, disabled: this.disableField(dados.size) },
+          [],
+        ],
         type4: '',
         type6: '',
         type8: '',
         type10: '',
         type12: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
-
 
   preFillLabour() {
     const dadosPrePreenchidos = [
       { item: 'SINGLE DOORS', qty: '' },
-      { item: '8\'DOOR', qty: '' },
+      { item: "8'DOOR", qty: '' },
       { item: 'DOUBLE DOOR', qty: '' },
       { item: 'SOLID DOOR', qty: '' },
       { item: 'CANTINA DOOR', qty: '' },
       { item: 'STD. ARCHWAYS', qty: '' },
-      { item: '8\' ARCHWAYS', qty: '' },
+      { item: "8' ARCHWAYS", qty: '' },
       { item: 'REGULAR WINDOWS', qty: '' },
       { item: 'ROUND WINDOWS', qty: '' },
       { item: 'OPEN TO ABOVE WIND', qty: '' },
@@ -544,8 +607,8 @@ export class UserProfileComponent implements OnInit {
       { item: 'STAIRS (1/2 FLIGHT)', qty: '' },
       { item: 'DOOR CLOSER', qty: '' },
       { item: 'SHOE MOULDING', qty: '' },
-      { item: 'BUILD OUT (UP TO 4\")', qty: '' },
-      { item: 'BUILD OUT (OVER 4\")', qty: '' },
+      { item: 'BUILD OUT (UP TO 4")', qty: '' },
+      { item: 'BUILD OUT (OVER 4")', qty: '' },
       { item: 'HIGH FLOOR', qty: '' },
       { item: 'WINDOW SEAT', qty: '' },
       { item: 'EXTERIOR LOCKS', qty: '' },
@@ -560,15 +623,16 @@ export class UserProfileComponent implements OnInit {
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        item: [{ value: dados.item, disabled: this.disableField(dados.item) }, []],
-        qty: ''
+        item: [
+          { value: dados.item, disabled: this.disableField(dados.item) },
+          [],
+        ],
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
-
 
   preFillTrim() {
     const dadosPrePreenchidos = [
@@ -607,14 +671,16 @@ export class UserProfileComponent implements OnInit {
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        item: [{ value: dados.item, disabled: this.disableField(dados.item) }, []],
+        item: [
+          { value: dados.item, disabled: this.disableField(dados.item) },
+          [],
+        ],
         details: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillHardware() {
@@ -634,23 +700,23 @@ export class UserProfileComponent implements OnInit {
       { item: 'Chain', type: '', qty: '' },
       { item: 'Door Bumper', type: '', qty: '' },
       { item: 'Power Bolt', type: '', qty: '' },
-
     ];
 
     const arrayForm = this.orderForm.get('hardware') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        item: [{ value: dados.item, disabled: this.disableField(dados.item) }, []],
+        item: [
+          { value: dados.item, disabled: this.disableField(dados.item) },
+          [],
+        ],
         type: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
-
 
   preFillSingleDoors() {
     const dadosPrePreenchidos = [
@@ -738,7 +804,6 @@ export class UserProfileComponent implements OnInit {
         right: '',
         jamb: '',
       },
-
     ];
 
     const arrayForm = this.orderForm.get('singleDoors') as FormArray;
@@ -753,13 +818,12 @@ export class UserProfileComponent implements OnInit {
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillFrenchDoors() {
     const dadosPrePreenchidos = [
       { size: '', swing: '', height: '', jamb: '', qty: '' },
-      { size: '', swing: '', height: '', jamb: '', qty: '' }
+      { size: '', swing: '', height: '', jamb: '', qty: '' },
     ];
 
     const arrayForm = this.orderForm.get('frenchDoors') as FormArray;
@@ -770,19 +834,15 @@ export class UserProfileComponent implements OnInit {
         swing: '',
         height: '',
         jamb: '',
-        qty: ''
+        qty: '',
       });
 
       arrayForm.push(formGroup);
     });
-
   }
 
   preFillCantinaDoors() {
-    const dadosPrePreenchidos = [
-      { name: 'STEEL STD' },
-      { name: 'SOLID STD' }
-    ];
+    const dadosPrePreenchidos = [{ name: 'STEEL STD' }, { name: 'SOLID STD' }];
 
     const cantinaDoorsArray = this.orderForm.get('cantinaDoors') as FormArray;
 
@@ -790,13 +850,10 @@ export class UserProfileComponent implements OnInit {
       const formGroup = this.builder.group({
         name: [{ value: dados.name, disabled: true }],
         qty: '',
-        swing: ''
+        swing: '',
       });
 
       cantinaDoorsArray.push(formGroup);
     });
-
   }
-
-
 }

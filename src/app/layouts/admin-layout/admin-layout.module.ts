@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http'; import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
@@ -10,7 +11,7 @@ import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
 import { IconsComponent } from '../../pages/icons/icons.component';
 import { MapsComponent } from '../../pages/maps/maps.component';
 import { UserProfileComponent } from '../../pages/user-profile/user-profile.component';
-import { TablesComponent } from '../../pages/tables/tables.component';
+import { HomeComponent } from '../../pages/home/home.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@app/shared/shared.module';
 // import { ToastrModule } from 'ngx-toastr';
@@ -24,15 +25,14 @@ import { SharedModule } from '@app/shared/shared.module';
     NgbModule,
     ReactiveFormsModule,
     ClipboardModule,
-    SharedModule
+    SharedModule,
   ],
   declarations: [
     DashboardComponent,
     UserProfileComponent,
-    TablesComponent,
+    HomeComponent,
     IconsComponent,
-    MapsComponent
-  ]
+    MapsComponent,
+  ],
 })
-
-export class AdminLayoutModule { }
+export class AdminLayoutModule {}

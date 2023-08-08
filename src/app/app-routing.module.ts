@@ -18,9 +18,12 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('src/app/layouts/auth-layout/auth-layout.module').then(m => m.AuthLayoutModule)
-      }
-    ]
+        loadChildren: () =>
+          import('src/app/layouts/auth-layout/auth-layout.module').then(
+            m => m.AuthLayoutModule
+          ),
+      },
+    ],
   },
   {
     path: '',
@@ -29,9 +32,12 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        loadChildren: () => import('src/app/layouts/admin-layout/admin-layout.module').then(m => m.AdminLayoutModule)
-      }
-    ]
+        loadChildren: () =>
+          import('src/app/layouts/admin-layout/admin-layout.module').then(
+            m => m.AdminLayoutModule
+          ),
+      },
+    ],
   },
   {
     path: 'auth',
@@ -43,12 +49,12 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'tables'
-  }
+    redirectTo: 'home',
+  },
 ];
 
 @NgModule({
   imports: [CommonModule, BrowserModule, RouterModule.forRoot(routes, {})],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
