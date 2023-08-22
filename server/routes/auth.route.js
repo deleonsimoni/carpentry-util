@@ -15,6 +15,11 @@ router.post(
   login
 );
 router.get('/me', passport.authenticate('jwt', { session: false }), login);
+router.post(
+  '/me',
+  passport.authenticate('jwt', { session: false }),
+  updateUser
+);
 
 async function register(req, res, next) {
   let user = await userCtrl.insert(req.body);
@@ -28,4 +33,10 @@ function login(req, res) {
   let user = req.user;
   let token = authCtrl.generateToken(user);
   res.json({ user, token });
+}
+
+function updateUser(req, res) {
+  let user = req.user;
+  let token = authCtrl.updateUser(user, req.body);
+  res.json(token);
 }

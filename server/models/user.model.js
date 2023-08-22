@@ -20,6 +20,43 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+    },
+    mobilePhone: {
+      type: String,
+    },
+    homePhone: {
+      type: String,
+    },
+    address: {
+      street: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+      postalCode: {
+        type: String,
+      },
+    },
+    socialMedia: {
+      facebook: {
+        type: String,
+      },
+      youtube: {
+        type: String,
+      },
+      instagram: {
+        type: String,
+      },
+      website: {
+        type: String,
+      },
+    },
     createdAt: {
       type: Date,
       default: Date.now,

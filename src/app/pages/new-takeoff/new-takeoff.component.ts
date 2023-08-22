@@ -15,9 +15,9 @@ import {
 } from '@angular/animations';
 
 @Component({
-  selector: 'app-user-profile',
-  templateUrl: './user-profile.component.html',
-  styleUrls: ['./user-profile.component.scss'],
+  selector: 'app-take-off',
+  templateUrl: './new-takeoff.component.html',
+  styleUrls: ['./new-takeoff.component.scss'],
   animations: [
     // Definindo a animação
     trigger('fadeAnimation', [
@@ -35,7 +35,7 @@ import {
     ]),
   ],
 })
-export class UserProfileComponent implements OnInit {
+export class TakeOffComponent implements OnInit {
   public orderForm: FormGroup;
   carpentrys;
   user;

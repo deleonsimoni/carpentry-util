@@ -76,10 +76,10 @@ export class HomeComponent implements OnInit {
   }
 
   newOrder() {
-    this.router.navigate(['/user-profile', 'new']);
+    this.router.navigate(['/take-off', 'new']);
   }
 
   detailOrder(idOrder) {
-    this.router.navigate(['/user-profile', idOrder]);
+    this.router.navigate(['/take-off', idOrder]);
   }
 }

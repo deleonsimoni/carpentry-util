@@ -17,32 +17,26 @@ interface AuthResponse {
 export class AuthService {
   private user$ = new BehaviorSubject<User | null>(null);
 
-  constructor(private http: HttpClient, private tokenStorage: TokenStorage) { }
+  constructor(private http: HttpClient, private tokenStorage: TokenStorage) {}
 
   login(form: any): Observable<User> {
-    return this.http
-      .post<AuthResponse>('/api/auth/login', form)
-      .pipe(
-        tap(({ token, user }) => {
-          this.setUser(user);
-          this.tokenStorage.saveToken(token);
-        }),
-        pluck('user')
-      );
+    return this.http.post<AuthResponse>('/api/auth/login', form).pipe(
+      tap(({ token, user }) => {
+        this.setUser(user);
+        this.tokenStorage.saveToken(token);
+      }),
+      pluck('user')
+    );
   }
 
-  register(
-    form: any
-  ): Observable<User> {
-    return this.http
-      .post<AuthResponse>('/api/auth/register', form)
-      .pipe(
-        tap(({ token, user }) => {
-          this.setUser(user);
-          this.tokenStorage.saveToken(token);
-        }),
-        pluck('user')
-      );
+  register(form: any): Observable<User> {
+    return this.http.post<AuthResponse>('/api/auth/register', form).pipe(
+      tap(({ token, user }) => {
+        this.setUser(user);
+        this.tokenStorage.saveToken(token);
+      }),
+      pluck('user')
+    );
   }
 
   setUser(user: User | null): void {
@@ -57,12 +51,23 @@ export class AuthService {
     return this.user$.asObservable();
   }
 
-  me(): Observable<User | null> {
+  me(): Observable<any | null> {
     return this.http.get<AuthResponse>('/api/auth/me').pipe(
       tap(({ user }) => this.setUser(user)),
       pluck('user'),
       catchError(() => of(null))
     );
+  }
+
+  updateUser(form): Observable<any | null> {
+    return this.http.post<any>(`/api/auth/me`, form);
+  }
+
+  updateImageUser(profilePicName: any, profilePic: any) {
+    return this.http.put<any>(`/api/user/updateProfilePic`, {
+      name: profilePicName,
+      content: profilePic,
+    });
   }
 
   signOut(): void {

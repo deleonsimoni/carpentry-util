@@ -1,0 +1,1512 @@
+<div class="header bg-gradient-danger pb-8 pt-5 pt-md-8">
+  <!-- Header container -->
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-12 col-md-10">
+        <h1 class="display-2 text-white">Create your takeoff</h1>
+        <p class="text-white mt-0 mb-5">
+          This is your takeoff page. Here link you and
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col-xl-12 order-xl-1">
+      <div class="card bg-secondary shadow">
+        <div class="card-header bg-white border-0">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">Takeoff</h3>
+            </div>
+            <div class="col-4 text-right">
+              <a href="#!" class="btn btn-sm btn-primary"
+                >Recall email to carpentry</a
+              >
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="orderForm">
+            <h6 class="heading-small text-muted mb-4">Carpentry information</h6>
+            <div class="pl-lg-4">
+              <div class="row">
+                <div class="col-8">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-username"
+                      >Carpentry</label
+                    >
+                    <br />
+                    <label
+                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      class="form-control-label"
+                      for="input-username"
+                      >Enter email to locate carpenter</label
+                    >
+
+                    <input
+                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      type="email"
+                      id="input-username"
+                      class="form-control form-control-alternative"
+                      placeholder="Email"
+                      formControlName="carpentryEmail"
+                    />
+                    <br />
+                    <div *ngIf="isCarpentryFound || idOrder">
+                      {{ emailCarpentry + ' - ' + nameCarpentry }}
+                      <br />
+                      <br />
+                    </div>
+                    <button
+                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      class="form-control form-control-alternative"
+                      (click)="findCarpentry()"
+                      class="btn btn-primary"
+                    >
+                      <i class="ni ni-settings"></i> Find
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <h6
+              *ngIf="isCarpentryFound || idOrder"
+              class="heading-small text mb-4"
+            >
+              Customer information
+            </h6>
+            <div
+              *ngIf="isCarpentryFound || idOrder"
+              [@fadeAnimation]="isCarpentryFound || idOrder ? 'in' : 'out'"
+              class="pl-lg-4"
+            >
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-username"
+                      >Customer Name</label
+                    >
+                    <input
+                      type="text"
+                      id="input-username"
+                      class="form-control form-control-alternative"
+                      placeholder="Customer Name"
+                      formControlName="custumerName"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-email"
+                      >Foremen</label
+                    >
+                    <input
+                      type="email"
+                      id="input-email"
+                      class="form-control form-control-alternative"
+                      placeholder="Foremen"
+                      formControlName="foremen"
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-first-name"
+                      >Extras Checked</label
+                    >
+                    <input
+                      type="text"
+                      id="input-first-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Extras Checked"
+                      formControlName="extrasChecked"
+                    />
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Carp. Invoice #</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Carp. Invoice #"
+                      formControlName="carpInvoice"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Job Site</label
+                    ><!--SHIP TO OLD-->
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Job Site"
+                      formControlName="shipTo"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Lot.</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Lot"
+                      formControlName="lot"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Type</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Type"
+                      formControlName="type"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-3">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Elev.</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Elev"
+                      formControlName="elev"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >SQ Footage</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="SQ Footage"
+                      formControlName="sqFootage"
+                    />
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >Street Name</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      placeholder="Street Name"
+                      formControlName="streetName"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <button
+                      *ngIf="!idOrder"
+                      (click)="saveOrder()"
+                      [disabled]="!orderForm.valid"
+                      class="btn btn-success"
+                    >
+                      Create Takeoff
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="idOrder">
+              <div class="row">
+                <hr class="my-4" />
+
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >PRE HUNGS-TYPE</label
+                    >
+                    <input
+                      type="text"
+                      id="input-last-name"
+                      class="form-control form-control-alternative"
+                      formControlName="preHugs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text mb-4">
+                <button
+                  *ngIf="!isVisibleCantinaDoors"
+                  (click)="showHideFormCantina()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> CANTINA DOORS - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleCantinaDoors"
+                  (click)="showHideFormCantina()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> CANTINA DOORS - Click to Hide
+                </button>
+              </h6>
+              <div
+                [@fadeAnimation]="isVisibleCantinaDoors ? 'in' : 'out'"
+                *ngIf="isVisibleCantinaDoors"
+                formArrayName="cantinaDoors"
+              >
+                <div
+                  *ngFor="
+                    let cantinaDoorsForm of orderForm?.get('cantinaDoors')
+                      .controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="cantinaDoorsForm">
+                    <div class="row">
+                      <div class="col-5">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="name"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SWING</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="swing"
+                          >
+                            <option value="RH">RH</option>
+                            <option value="LH">LH</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text mb-4">
+                <button
+                  *ngIf="!isVisibleFrenchDoors"
+                  (click)="showHideFormFrench()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> FRENCH DOORS - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleFrenchDoors"
+                  (click)="showHideFormFrench()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> FRENCH DOORS - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleFrenchDoors ? 'in' : 'out'"
+                *ngIf="isVisibleFrenchDoors"
+                formArrayName="frenchDoors"
+              >
+                <div
+                  *ngFor="
+                    let frenchDoorsForm of orderForm?.get('frenchDoors')
+                      .controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="frenchDoorsForm">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SIZE/SWING</label
+                          >
+                          <div>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="size"
+                            >
+                              <option value="18">18"</option>
+                              <option value="24">24"</option>
+                              <option value="26">26"</option>
+                              <option value="28">28"</option>
+                              <option value="30">30"</option>
+                              <option value="32">32"</option>
+                            </select>
+
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="swing"
+                            >
+                              <option value="RH">RH</option>
+                              <option value="LH">LH</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >HEIGHT</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="height"
+                          >
+                            <option value="80">80"</option>
+                            <option value="84">84"</option>
+                            <option value="96">96"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >JAMB</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="jamb"
+                          >
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleDoubleDoors"
+                  (click)="showHideFormDouble()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> DOUBLE DOORS - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleDoubleDoors"
+                  (click)="showHideFormDouble()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> DOUBLE DOORS - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleDoubleDoors ? 'in' : 'out'"
+                *ngIf="isVisibleDoubleDoors"
+                formArrayName="doubleDoors"
+              >
+                <div
+                  *ngFor="
+                    let doubleDoorsForm of orderForm?.get('doubleDoors')
+                      .controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="doubleDoorsForm">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SIZE</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="size"
+                          >
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >HEIGHT</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="height"
+                          >
+                            <option value="80">80"</option>
+                            <option value="84">84"</option>
+                            <option value="96">96"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >JAMB</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="jamb"
+                          >
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleSingleDoors"
+                  (click)="showHideFormSingle()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> SINGLE DOORS - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleSingleDoors"
+                  (click)="showHideFormSingle()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> SINGLE DOORS - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleSingleDoors ? 'in' : 'out'"
+                *ngIf="isVisibleSingleDoors"
+                formArrayName="singleDoors"
+              >
+                <div
+                  *ngFor="
+                    let singleDoorsForm of orderForm?.get('singleDoors')
+                      .controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="singleDoorsForm">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SIZE</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="size"
+                          >
+                            <option value='1/4 - 18"'>18"</option>
+                            <option value='1/6 - 24"'>24"</option>
+                            <option value='1/8 - 26"'>26"</option>
+                            <option value='2/0 - 28"'>28"</option>
+                            <option value='2/2 - 30"'>30"</option>
+                            <option value='2/4 - 32"'>32"</option>
+                            <option value='2/6 - 34"'>34"</option>
+                            <option value='2/8 - 36"'>36"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >LEFT</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="left"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >RIGHT</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="right"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-country"
+                            >JAMB</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="jamb"
+                          >
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+            <!-- Description -->
+            <h6
+              *ngIf="isCarpentryFound || idOrder"
+              class="heading-small text-muted mb-4"
+            >
+              Extras
+            </h6>
+            <div *ngIf="isCarpentryFound || idOrder" class="pl-lg-4">
+              <div class="form-group">
+                <label>Comments</label>
+                <textarea
+                  rows="4"
+                  class="form-control form-control-alternative"
+                  formControlName="comment"
+                  placeholder="Comments from work"
+                ></textarea>
+              </div>
+            </div>
+
+            <div *ngIf="idOrder">
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleArches"
+                  (click)="showHideFormArches()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> ARCHES - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleArches"
+                  (click)="showHideFormArches()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> ARCHES - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleArches ? 'in' : 'out'"
+                *ngIf="isVisibleArches"
+                formArrayName="arches"
+              >
+                <div
+                  *ngFor="
+                    let archesForm of orderForm?.get('arches').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="archesForm">
+                    <div class="row">
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SIZE</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="size"
+                          >
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="col1"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="col2"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="col3"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="col4"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="col5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleTrim"
+                  (click)="showHideFormTrim()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> TRIM - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleTrim"
+                  (click)="showHideFormTrim()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> TRIM - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleTrim ? 'in' : 'out'"
+                *ngIf="isVisibleTrim"
+                formArrayName="trim"
+              >
+                <div
+                  *ngFor="
+                    let trimForm of orderForm?.get('trim').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="trimForm">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >ITEM</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="item"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >DETAILS</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="details"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleHardware"
+                  (click)="showHideFormHardware()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> HARDWARE - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleHardware"
+                  (click)="showHideFormHardware()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> HARDWARE - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleHardware ? 'in' : 'out'"
+                *ngIf="isVisibleHardware"
+                formArrayName="hardware"
+              >
+                <div
+                  *ngFor="
+                    let hardwareForm of orderForm?.get('hardware').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="hardwareForm">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >ITEM</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="item"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >TYPE</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                <button
+                  *ngIf="!isVisibleLabour"
+                  (click)="showHideFormLabour()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-down"></i> LABOUR - Click to Show
+                </button>
+
+                <button
+                  *ngIf="isVisibleLabour"
+                  (click)="showHideFormLabour()"
+                  class="btn btn-warning"
+                >
+                  <i class="ni ni-bold-up"></i> LABOUR - Click to Hide
+                </button>
+              </h6>
+
+              <div
+                [@fadeAnimation]="isVisibleLabour ? 'in' : 'out'"
+                *ngIf="isVisibleLabour"
+                formArrayName="labour"
+              >
+                <div
+                  *ngFor="
+                    let labourForm of orderForm?.get('labour').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="labourForm">
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >ITEM</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="item"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">
+                SHELVES - WIRE/METAL
+              </h6>
+              <div formArrayName="shelves">
+                <div
+                  *ngFor="
+                    let shelvesForm of orderForm?.get('shelves').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="shelvesForm">
+                    <div class="row">
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >SIZE</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="size"
+                          >
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >4`</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type4"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >6`</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type6"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >8`</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type8"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >10`</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type10"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >12`</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type12"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">CLOSET RODS</h6>
+              <div formArrayName="closetRods">
+                <div
+                  *ngFor="
+                    let closetRodsForm of orderForm?.get('closetRods').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="closetRodsForm">
+                    <div class="row">
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >48</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type1"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >72</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type2"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >96</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type3"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-3">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >120</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type4"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">ROD SUPPORT</h6>
+              <div formArrayName="rodSupport">
+                <div
+                  *ngFor="
+                    let rodSupportForm of orderForm?.get('rodSupport').controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="rodSupportForm">
+                    <div class="row">
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label
+                            class="form-control-label"
+                            for="input-city"
+                          ></label>
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="desc"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4" />
+              <!-- Address -->
+              <h6 class="heading-small text-muted mb-4">ROUND WINDOW</h6>
+              <div formArrayName="roundWindow">
+                <div
+                  *ngFor="
+                    let roundWindowForm of orderForm?.get('roundWindow')
+                      .controls;
+                    let i = index
+                  "
+                  class="pl-4"
+                >
+                  <div [formGroup]="roundWindowForm">
+                    <div class="row">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >TYPE</label
+                          >
+                          <input
+                            type="text"
+                            id="input-last-name"
+                            class="form-control form-control-alternative"
+                            formControlName="type"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-6">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >QTY</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="qty"
+                          >
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="mobile" class="box-top row">
+              <div>
+                <span class="input-group-text"
+                  ><i class="ni ni-bold-left"></i>
+                  <button (click)="back()" class="btn btn-secondary">
+                    Back
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <div class="box-bottom row">
+              <div>
+                <button
+                  *ngIf="!this.isCompany && this.orderStatus < 3"
+                  (click)="updateOrder()"
+                  class="btn btn-primary"
+                >
+                  Save Progress
+                </button>
+                <button
+                  *ngIf="this.isCompany && this.orderStatus"
+                  (click)="finalizeOrderWithoutStatus()"
+                  class="btn btn-primary"
+                >
+                  Save Progress
+                </button>
+              </div>
+
+              <div class="right">
+                <button
+                  *ngIf="!this.isCompany && this.orderStatus < 3"
+                  (click)="finalizeOrderPopUp(content)"
+                  class="btn btn-warning"
+                >
+                  Complete Takeoff
+                </button>
+                <button
+                  *ngIf="this.isCompany && this.orderStatus == 3"
+                  (click)="backOrderToCarpentry()"
+                  class="btn btn-warning"
+                >
+                  Back to Carpentry
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Are you sure complete takeoff?</h4>
+    <button
+      type="button"
+      class="ni ni-fat-remove"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <p>
+      Once you complete the takeoff you will no longer be able to modify
+      it&hellip;
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-info"
+      (click)="modal.close('Close click')"
+    >
+      Back
+    </button>
+    <button
+      type="button"
+      class="btn btn-light"
+      (click)="finalizeOrder(); modal.close('Close click')"
+    >
+      Complete Takeoff
+    </button>
+  </div>
+</ng-template>

@@ -20,6 +20,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
 import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { ImagePathUrlPipe } from './pipes/image-path-url.pipe';
 
 @NgModule({
   exports: [
@@ -44,6 +45,9 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatFormFieldModule,
     MatProgressBarModule,
     MatButtonToggleModule,
+    ImagePathUrlPipe,
   ],
+  providers: [ImagePathUrlPipe],
+  declarations: [ImagePathUrlPipe],
 })
-export class SharedModule { }
+export class SharedModule {}

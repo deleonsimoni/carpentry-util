@@ -10,10 +10,11 @@ import { AdminLayoutRoutes } from './admin-layout.routing';
 import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
 import { IconsComponent } from '../../pages/icons/icons.component';
 import { MapsComponent } from '../../pages/maps/maps.component';
-import { UserProfileComponent } from '../../pages/user-profile/user-profile.component';
+import { TakeOffComponent } from '../../pages/new-takeoff/new-takeoff.component';
 import { HomeComponent } from '../../pages/home/home.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@app/shared/shared.module';
+import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.component';
 // import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
@@ -29,7 +30,8 @@ import { SharedModule } from '@app/shared/shared.module';
   ],
   declarations: [
     DashboardComponent,
-    UserProfileComponent,
+    TakeOffComponent,
+    ProfileUserComponent,
     HomeComponent,
     IconsComponent,
     MapsComponent,
