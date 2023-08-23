@@ -1,16 +1,16 @@
 const mongoose = require('mongoose');
 
-const OrderSchema = new mongoose.Schema(
+const TakeoffSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
     },
     carpentry: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
     },
     custumerName: {
       type: String,
@@ -46,7 +46,7 @@ const OrderSchema = new mongoose.Schema(
       type: Number,
     },
 
-    preHugs: {
+    doorsStyle: {
       type: String,
     },
 
@@ -68,6 +68,7 @@ const OrderSchema = new mongoose.Schema(
       {
         name: { type: String },
         swing: { type: String },
+        jamb: { type: String },
         qty: { type: String },
       },
     ],
@@ -107,7 +108,7 @@ const OrderSchema = new mongoose.Schema(
         col2: { type: String },
         col3: { type: String },
         col4: { type: String },
-        col5: { type: String }
+        col5: { type: String },
       },
     ],
 
@@ -115,7 +116,7 @@ const OrderSchema = new mongoose.Schema(
       {
         item: { type: String },
         details: { type: String },
-        qty: { type: String }
+        qty: { type: String },
       },
     ],
 
@@ -123,14 +124,14 @@ const OrderSchema = new mongoose.Schema(
       {
         item: { type: String },
         type: { type: String },
-        qty: { type: String }
+        qty: { type: String },
       },
     ],
 
     labour: [
       {
         item: { type: String },
-        qty: { type: String }
+        qty: { type: String },
       },
     ],
 
@@ -142,7 +143,7 @@ const OrderSchema = new mongoose.Schema(
         type8: { type: String },
         type10: { type: String },
         type12: { type: String },
-        qty: { type: String }
+        qty: { type: String },
       },
     ],
 
@@ -152,7 +153,6 @@ const OrderSchema = new mongoose.Schema(
         type2: { type: String },
         type3: { type: String },
         type4: { type: String },
-
       },
     ],
 
@@ -170,11 +170,10 @@ const OrderSchema = new mongoose.Schema(
         qty: { type: String },
       },
     ],
-
   },
   {
     versionKey: false,
   }
 );
 
-module.exports = mongoose.model('Order', OrderSchema);
+module.exports = mongoose.model('Takeoff', TakeoffSchema);

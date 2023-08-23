@@ -2,7 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
-import { OrderService } from '@app/shared/services/order.service';
+import { TakeoffService } from '@app/shared/services/takeoff.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
@@ -57,9 +57,26 @@ export class TakeOffComponent implements OnInit {
   isVisibleLabour = false;
   isCarpentryFound = false;
 
+  doorsStyleValueIsOther = false;
+
+  jambaOptions = ['475', '675'];
+
+  doorsStyleValues = [
+    'CARRERA',
+    'CARRETA SOLID',
+    'CLASSIC',
+    'LOGAN',
+    'LINCOLN PARK',
+    'LIVINGSTON',
+    '6 PANEL',
+    'RIVERSIDE',
+    'ROMAN',
+    'OTHER',
+  ];
+
   constructor(
     private router: Router,
-    private orderService: OrderService,
+    private takeoffService: TakeoffService,
     private builder: FormBuilder,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
@@ -120,7 +137,7 @@ export class TakeOffComponent implements OnInit {
     ) {
       this.spinner.show();
 
-      this.orderService
+      this.takeoffService
         .findCarpentry(this.orderForm.value.carpentryEmail)
         .subscribe(
           data => {
@@ -161,7 +178,7 @@ export class TakeOffComponent implements OnInit {
   detailOrder(id) {
     this.spinner.show();
 
-    this.orderService.detailOrder(id).subscribe(
+    this.takeoffService.detailOrder(id).subscribe(
       data => {
         if (data.errors) {
           this.spinner.hide();
@@ -200,7 +217,7 @@ export class TakeOffComponent implements OnInit {
   listAllCarpentrys() {
     this.spinner.show();
 
-    this.orderService.listAllCarpentrys().subscribe(
+    this.takeoffService.listAllCarpentrys().subscribe(
       data => {
         this.spinner.hide();
 
@@ -221,10 +238,22 @@ export class TakeOffComponent implements OnInit {
     this.router.navigate(['/home']);
   }
 
+  checkDoorsStyleValueIsOther() {
+    if (
+      this.orderForm.value.doorsStyle &&
+      this.orderForm.value.doorsStyle == 'OTHER'
+    ) {
+      this.orderForm?.get('doorsStyle')?.setValue(null);
+      this.doorsStyleValueIsOther = true;
+    } else {
+      this.doorsStyleValueIsOther = false;
+    }
+  }
+
   saveOrder() {
     this.spinner.show();
 
-    this.orderService.saveOrder(this.orderForm.value).subscribe(
+    this.takeoffService.saveOrder(this.orderForm.value).subscribe(
       data => {
         this.spinner.hide();
 
@@ -245,21 +274,23 @@ export class TakeOffComponent implements OnInit {
   updateOrder() {
     this.spinner.show();
 
-    this.orderService.updateOrder(this.orderForm.value, this.idOrder).subscribe(
-      data => {
-        this.spinner.hide();
+    this.takeoffService
+      .updateOrder(this.orderForm.value, this.idOrder)
+      .subscribe(
+        data => {
+          this.spinner.hide();
 
-        if (!data.errors) {
-          this.toastr.success('Takeoff Updated', 'Success');
-        } else {
-          this.toastr.error('Error update Takeoff', 'Error');
+          if (!data.errors) {
+            this.toastr.success('Takeoff Updated', 'Success');
+          } else {
+            this.toastr.error('Error update Takeoff', 'Error');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.toastr.error('Error update Takeoff. ', 'Erro: ');
         }
-      },
-      err => {
-        this.spinner.hide();
-        this.toastr.error('Error update Takeoff. ', 'Erro: ');
-      }
-    );
+      );
   }
 
   finalizeOrderPopUp(content) {
@@ -273,7 +304,7 @@ export class TakeOffComponent implements OnInit {
   finalizeOrder() {
     this.spinner.show();
 
-    this.orderService
+    this.takeoffService
       .finalizeOrder(this.orderForm.value, this.idOrder)
       .subscribe(
         data => {
@@ -296,7 +327,7 @@ export class TakeOffComponent implements OnInit {
   backOrderToCarpentry() {
     this.spinner.show();
 
-    this.orderService
+    this.takeoffService
       .backOrderToCarpentry(this.orderForm.value, this.idOrder)
       .subscribe(
         data => {
@@ -361,7 +392,9 @@ export class TakeOffComponent implements OnInit {
         { value: null, disabled: this.user.roles.includes('carpentry') },
       ],
 
-      preHugs: [null],
+      doorsStyle: [
+        { value: null, disabled: this.user.roles.includes('carpentry') },
+      ],
       status: [null],
       carpentryEmail: [null],
 
@@ -851,6 +884,7 @@ export class TakeOffComponent implements OnInit {
         name: [{ value: dados.name, disabled: true }],
         qty: '',
         swing: '',
+        jamb: '',
       });
 
       cantinaDoorsArray.push(formGroup);

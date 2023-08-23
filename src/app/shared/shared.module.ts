@@ -21,6 +21,7 @@ import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/materia
 import { MatLegacyProgressBarModule as MatProgressBarModule } from '@angular/material/legacy-progress-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ImagePathUrlPipe } from './pipes/image-path-url.pipe';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   exports: [
@@ -46,6 +47,7 @@ import { ImagePathUrlPipe } from './pipes/image-path-url.pipe';
     MatProgressBarModule,
     MatButtonToggleModule,
     ImagePathUrlPipe,
+    MatAutocompleteModule,
   ],
   providers: [ImagePathUrlPipe],
   declarations: [ImagePathUrlPipe],

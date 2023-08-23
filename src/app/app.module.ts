@@ -1,5 +1,9 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule, APP_INITIALIZER, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import {
+  NgModule,
+  APP_INITIALIZER,
+  CUSTOM_ELEMENTS_SCHEMA,
+} from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { SharedModule } from './shared/shared.module';
@@ -19,8 +23,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { ToastrModule } from 'ngx-toastr';
-import { NgxSpinnerModule } from "ngx-spinner";
-
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { MaterialRequestComponent } from './pages/material-request/material-request.component';
+import { ListMaterialRequestComponent } from './pages/list-material-request/list-material-request.component';
 
 export function appInitializerFactory(authService: AuthService) {
   return () => authService.checkTheUserOnTheFirstLoad();
@@ -43,11 +48,17 @@ export function appInitializerFactory(authService: AuthService) {
     ToastrModule.forRoot(),
     NgxSpinnerModule,
   ],
-  exports: [
-    NgxSpinnerModule
-  ],
+  exports: [NgxSpinnerModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  declarations: [AppComponent, HeaderComponent, HomeComponent, AdminLayoutComponent, AuthLayoutComponent],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    HomeComponent,
+    AdminLayoutComponent,
+    AuthLayoutComponent,
+    MaterialRequestComponent,
+    ListMaterialRequestComponent,
+  ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
@@ -68,4 +79,4 @@ export function appInitializerFactory(authService: AuthService) {
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

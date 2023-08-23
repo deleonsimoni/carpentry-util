@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
-import { OrderService } from '@app/shared/services/order.service';
+import { TakeoffService } from '@app/shared/services/takeoff.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private orderService: OrderService,
+    private takeoffService: TakeoffService,
     private authService: AuthService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit {
   listMyOrders() {
     this.spinner.show();
 
-    this.orderService.getOrdersFromUser().subscribe(
+    this.takeoffService.getOrdersFromUser().subscribe(
       data => {
         this.spinner.hide();
 
@@ -50,7 +50,7 @@ export class HomeComponent implements OnInit {
   geratePDF(idOrder, custumerName) {
     this.spinner.show();
 
-    this.orderService.generatePDF(idOrder).subscribe(
+    this.takeoffService.generatePDF(idOrder).subscribe(
       data => {
         if (data.errors) {
           this.spinner.hide();

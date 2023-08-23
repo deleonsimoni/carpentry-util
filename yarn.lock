@@ -4603,6 +4603,11 @@
   dependencies:
     "delayed-stream" "~1.0.0"
 
+"combobox@^1.0.1":
+  "integrity" "sha512-LyU03k3AwIe6JzfYD0cMHIJ6iNYAmeARJ7HoVQ4KV3FNcNDmf/UnMXMc9EU1lHawUxavcSuAMg5QEZNRAvT+tg=="
+  "resolved" "https://registry.npmjs.org/combobox/-/combobox-1.0.1.tgz"
+  "version" "1.0.1"
+
 "commander@^2.11.0", "commander@^2.20.0":
   "integrity" "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
   "resolved" "https://registry.npmjs.org/commander/-/commander-2.20.3.tgz"

@@ -22,20 +22,20 @@
             </div>
             <div class="col-4 text-right">
               <a href="#!" class="btn btn-sm btn-primary"
-                >Recall email to carpentry</a
+                >Recall email to carpenter</a
               >
             </div>
           </div>
         </div>
         <div class="card-body">
           <form [formGroup]="orderForm">
-            <h6 class="heading-small text-muted mb-4">Carpentry information</h6>
+            <h6 class="heading-small text-muted mb-4">Carpenter information</h6>
             <div class="pl-lg-4">
               <div class="row">
                 <div class="col-8">
                   <div class="form-group">
                     <label class="form-control-label" for="input-username"
-                      >Carpentry</label
+                      >Carpenter</label
                     >
                     <br />
                     <label
@@ -55,7 +55,7 @@
                     />
                     <br />
                     <div *ngIf="isCarpentryFound || idOrder">
-                      {{ emailCarpentry + ' - ' + nameCarpentry }}
+                      {{ nameCarpentry + ' - ' + emailCarpentry }}
                       <br />
                       <br />
                     </div>
@@ -86,7 +86,7 @@
                 <div class="col-lg-12">
                   <div class="form-group">
                     <label class="form-control-label" for="input-username"
-                      >Customer Name</label
+                      >Builder Name</label
                     >
                     <input
                       type="text"
@@ -237,6 +237,40 @@
               </div>
 
               <div class="row">
+                <hr class="my-4" />
+
+                <div class="col-lg-12">
+                  <div class="form-group">
+                    <label class="form-control-label" for="input-last-name"
+                      >DOORS STYLE</label
+                    >
+                    <input
+                      *ngIf="doorsStyleValueIsOther"
+                      type="text"
+                      id="input-last-name"
+                      placeholder="Enter specific doors style"
+                      class="form-control form-control-alternative"
+                      formControlName="doorsStyle"
+                    />
+
+                    <select
+                      *ngIf="!doorsStyleValueIsOther"
+                      (change)="checkDoorsStyleValueIsOther()"
+                      class="form-control form-control-alternative"
+                      formControlName="doorsStyle"
+                    >
+                      <option
+                        *ngFor="let doorsStyleValue of doorsStyleValues"
+                        [ngValue]="doorsStyleValue"
+                      >
+                        {{ doorsStyleValue }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
                 <div class="col-lg-12">
                   <div class="form-group">
                     <button
@@ -252,24 +286,6 @@
               </div>
             </div>
             <div *ngIf="idOrder">
-              <div class="row">
-                <hr class="my-4" />
-
-                <div class="col-lg-12">
-                  <div class="form-group">
-                    <label class="form-control-label" for="input-last-name"
-                      >PRE HUNGS-TYPE</label
-                    >
-                    <input
-                      type="text"
-                      id="input-last-name"
-                      class="form-control form-control-alternative"
-                      formControlName="preHugs"
-                    />
-                  </div>
-                </div>
-              </div>
-
               <hr class="my-4" />
               <!-- Address -->
               <h6 class="heading-small text mb-4">
@@ -318,7 +334,7 @@
                           />
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city"
                             >SWING</label
@@ -333,6 +349,37 @@
                           </select>
                         </div>
                       </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"
+                            >JAMB</label
+                          >
+
+                          <select
+                            class="form-control form-control-alternative"
+                            formControlName="jamb"
+                          >
+                            <option value="475">475</option>
+                            <option value="675">675</option>
+                          </select>
+
+                          <input
+                            type="text"
+                            class="form-control form-control-alternative"
+                            matInput
+                            formControlName="jamb"
+                            [matAutocomplete]="auto"
+                          />
+                          <mat-autocomplete #auto="matAutocomplete">
+                            <mat-option
+                              *ngFor="let option of jambaOptions"
+                              [value]="option"
+                            >
+                              {{ option }}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </div>
+                      </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country"
@@ -343,16 +390,12 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
                             <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
                           </select>
                         </div>
                       </div>
@@ -466,6 +509,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -579,6 +623,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -919,6 +964,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -1007,6 +1053,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -1082,6 +1129,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -1209,6 +1257,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -1349,6 +1398,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -1405,6 +1455,7 @@
                             class="form-control form-control-alternative"
                             formControlName="qty"
                           >
+                            <option value="">0</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
