@@ -302,20 +302,6 @@
                 </div>
               </div>
 
-              <div class="row">
-                <div class="col-lg-12">
-                  <div class="form-group">
-                    <button
-                      *ngIf="!idOrder"
-                      (click)="saveOrder()"
-                      [disabled]="!orderForm.valid"
-                      class="btn btn-success"
-                    >
-                      Create Takeoff
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
             <div *ngIf="idOrder">
               <hr class="my-4" />
@@ -794,6 +780,18 @@
                   formControlName="comment"
                   placeholder="Comments from work"
                 ></textarea>
+              </div>
+
+              <!-- Create Takeoff Button - appears after comments -->
+              <div *ngIf="!idOrder" class="form-group mt-4">
+                <button
+                  (click)="saveOrder()"
+                  [disabled]="!orderForm.valid"
+                  class="btn btn-success btn-lg"
+                >
+                  <i class="fas fa-plus mr-2"></i>
+                  Create Takeoff
+                </button>
               </div>
             </div>
 
