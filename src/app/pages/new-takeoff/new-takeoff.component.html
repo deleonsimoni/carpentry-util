@@ -380,7 +380,7 @@
                             <option value="475">475</option>
                             <option value="675">675</option>
                           </select>
-
+<br/>
                           <input
                             type="text"
                             class="form-control form-control-alternative"
@@ -398,23 +398,13 @@
                           </mat-autocomplete>
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="5" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -474,13 +464,14 @@
                               <option value="30">30"</option>
                               <option value="32">32"</option>
                             </select>
-
+<br/>
                             <select
                               class="form-control form-control-alternative"
                               formControlName="swing"
                             >
                               <option value="RH">RH</option>
                               <option value="LH">LH</option>
+                              <option value="LH">DOUBLE</option>
                             </select>
                           </div>
                         </div>
@@ -517,28 +508,13 @@
                           </select>
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -591,12 +567,18 @@
                             class="form-control form-control-alternative"
                             formControlName="size"
                           >
-                            <option value="18">18"</option>
+                            <option value="18">20"</option>
                             <option value="24">24"</option>
-                            <option value="26">26"</option>
-                            <option value="28">28"</option>
-                            <option value="30">30"</option>
-                            <option value="32">32"</option>
+                            <option value="26">28"</option>
+                            <option value="28">32"</option>
+                            <option value="30">36"</option>
+                            <option value="32">40"</option>
+                            <option value="32">44"</option>
+                            <option value="32">48"</option>
+                            <option value="32">56"</option>
+                            <option value="32">64"</option>
+                            <option value="32">68"</option>
+                            <option value="32">72"</option>
                           </select>
                         </div>
                       </div>
@@ -631,28 +613,13 @@
                           </select>
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-country"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -721,12 +688,7 @@
                           <label class="form-control-label" for="input-city"
                             >LEFT</label
                           >
-                          <input
-                            type="text"
-                            id="input-last-name"
-                            class="form-control form-control-alternative"
-                            formControlName="left"
-                          />
+                          <app-number-input formControlName="left" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                       <div class="col-3">
@@ -734,12 +696,7 @@
                           <label class="form-control-label" for="input-city"
                             >RIGHT</label
                           >
-                          <input
-                            type="text"
-                            id="input-last-name"
-                            class="form-control form-control-alternative"
-                            formControlName="right"
-                          />
+                          <app-number-input formControlName="right" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                       <div class="col-3">
@@ -984,28 +941,13 @@
                           />
                         </div>
                       </div>
-                      <div class="col-4">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -1073,28 +1015,13 @@
                           />
                         </div>
                       </div>
-                      <div class="col-4">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -1155,22 +1082,7 @@
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -1277,28 +1189,13 @@
                           />
                         </div>
                       </div>
-                      <div class="col-2">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -1389,21 +1286,8 @@
                 >
                   <div [formGroup]="rodSupportForm">
                     <div class="row">
-                      <div class="col-4">
-                        <div class="form-group">
-                          <label
-                            class="form-control-label"
-                            for="input-city"
-                          ></label>
-                          <input
-                            type="text"
-                            id="input-last-name"
-                            class="form-control form-control-alternative"
-                            formControlName="type"
-                          />
-                        </div>
-                      </div>
-                      <div class="col-4">
+
+                      <div class="col-6">
                         <div class="form-group">
                           <label
                             class="form-control-label"
@@ -1418,28 +1302,13 @@
                         </div>
                       </div>
 
-                      <div class="col-4">
+                      <div class="col-6">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city"
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>
@@ -1481,22 +1350,7 @@
                             >QTY</label
                           >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="qty"
-                          >
-                            <option value="">0</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                          </select>
+                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
                         </div>
                       </div>
                     </div>

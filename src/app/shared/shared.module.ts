@@ -22,8 +22,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ImagePathUrlPipe } from './pipes/image-path-url.pipe';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { NumberInputComponent } from './components/number-input/number-input.component';
 
 @NgModule({
+  imports: [
+    NumberInputComponent,
+  ],
   exports: [
     FormsModule,
     ReactiveFormsModule,
@@ -48,6 +52,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatButtonToggleModule,
     ImagePathUrlPipe,
     MatAutocompleteModule,
+    NumberInputComponent,
   ],
   providers: [ImagePathUrlPipe],
   declarations: [ImagePathUrlPipe],

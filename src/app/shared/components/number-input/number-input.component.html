@@ -1,0 +1,45 @@
+<div class="input-group" *ngIf="!readonly">
+  <div class="input-group-prepend">
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm"
+      (click)="decrement()"
+      [disabled]="disabled">
+      <i class="fas fa-minus"></i>
+    </button>
+  </div>
+  <input
+    type="number"
+    class="form-control form-control-alternative text-center"
+    [value]="value"
+    [min]="min"
+    [max]="max"
+    [step]="step"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    [readonly]="readonly"
+    (input)="onInputChange($event)"
+    (blur)="onTouched()" />
+  <div class="input-group-append">
+    <button
+      type="button"
+      class="btn btn-outline-primary btn-sm"
+      (click)="increment()"
+      [disabled]="disabled">
+      <i class="fas fa-plus"></i>
+    </button>
+  </div>
+</div>
+
+<input
+  *ngIf="readonly"
+  type="number"
+  class="form-control form-control-alternative text-center"
+  [value]="value"
+  [min]="min"
+  [max]="max"
+  [step]="step"
+  [placeholder]="placeholder"
+  [disabled]="disabled"
+  [readonly]="readonly"
+  (blur)="onTouched()" />

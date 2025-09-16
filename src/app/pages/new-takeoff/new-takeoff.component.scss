@@ -1,3 +1,72 @@
+// Mobile form field consistency
+@media only screen and (max-width: 576px) {
+  .form-control {
+    min-width: 80px; // Consistent size for all form controls
+    font-size: 0.875rem;
+
+    &.form-control-alternative {
+      min-width: 80px;
+      font-size: 0.875rem;
+    }
+  }
+
+  // Ensure select dropdowns have consistent sizing
+  select.form-control {
+    min-width: 80px;
+    font-size: 0.875rem;
+  }
+
+  // Input groups should maintain consistency
+  .input-group .form-control {
+    min-width: 80px;
+    font-size: 0.875rem;
+  }
+
+  // Text inputs should also be consistent
+  input[type="text"].form-control {
+    min-width: 80px;
+    font-size: 0.875rem;
+  }
+
+  // Force maximum 2 columns on mobile for better layout
+  .row {
+    // For sections with 4 columns (col-3), make them 2x2 on mobile
+    .col-3 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    // For sections with 3 columns (col-4), make them 2+1 on mobile
+    .col-4 {
+      flex: 0 0 50%;
+      max-width: 50%;
+
+      &:nth-child(3) {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+
+    // For sections with 6 columns (col-2), make them 2x3 on mobile
+    .col-2 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    // Keep col-6 as is (already 2 columns)
+    .col-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+
+    // For col-5 + col-2 + col-2 + col-3 layout, make it 2x2
+    .col-5 {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+}
+
 .box-top {
   position: fixed;
   z-index: 1000;

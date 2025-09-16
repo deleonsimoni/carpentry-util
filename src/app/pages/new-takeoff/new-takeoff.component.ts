@@ -363,6 +363,11 @@ export class TakeOffComponent implements OnInit {
     return this.user.roles.includes('company');
   }
 
+  get isReadonly() {
+    // Form is readonly when takeoff is completed (status >= 3) and user is not company
+    return !this.isCompany && this.orderStatus >= 3;
+  }
+
   private createForm(): void {
     this.authService.getUser().subscribe(user => (this.user = user));
 
@@ -723,8 +728,8 @@ export class TakeOffComponent implements OnInit {
 
   preFillHardware() {
     const dadosPrePreenchidos = [
-      { item: 'Grupset', type: '', qty: '' },
-      { item: 'Dummy Grupset', type: '', qty: '' },
+      { item: 'Gripset', type: '', qty: '' },
+      { item: 'Dummy Gripset', type: '', qty: '' },
       { item: 'Deadbolt/Pass', type: '', qty: '' },
       { item: 'Privacy', type: '', qty: '' },
       { item: 'Passage', type: '', qty: '' },
@@ -895,4 +900,5 @@ export class TakeOffComponent implements OnInit {
       cantinaDoorsArray.push(formGroup);
     });
   }
+
 }
