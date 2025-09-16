@@ -19,12 +19,13 @@ export const ROUTES: RouteInfo[] = [
     icon: 'ni-delivery-fast text-blue',
     class: '',
   },
-  {
-    path: '/user-profile',
-    title: 'Your Profile',
-    icon: 'ni-single-02 text-yellow',
-    class: '',
-  },
+  // Moved to navbar avatar dropdown
+  // {
+  //   path: '/user-profile',
+  //   title: 'Your Profile',
+  //   icon: 'ni-single-02 text-yellow',
+  //   class: '',
+  // },
 
   //{ path: '/user-profile/new', title: 'New Order', icon: 'ni-single-02 text-yellow', class: '' }
   // { path: '/login', title: 'Login', icon: 'ni-key-25 text-info', class: '' },

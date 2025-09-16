@@ -1,0 +1,104 @@
+// Account Type Cards
+.account-type-card {
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fff;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+
+  // Add subtle animation to draw attention
+  animation: subtle-pulse 3s ease-in-out infinite;
+
+  &:hover {
+    border-color: #5e72e4;
+    box-shadow: 0 4px 12px rgba(94, 114, 228, 0.15);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    border-color: #5e72e4;
+    background: rgba(94, 114, 228, 0.05);
+    box-shadow: 0 4px 20px rgba(94, 114, 228, 0.2);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: #5e72e4;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+
+  .card-icon {
+    margin-bottom: 12px;
+
+    i {
+      font-size: 28px;
+    }
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #32325d;
+  }
+
+  .card-description {
+    font-size: 12px;
+    color: #8898aa;
+    margin-bottom: 0;
+    line-height: 1.4;
+  }
+}
+
+// Subtle pulse animation to draw attention
+@keyframes subtle-pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(94, 114, 228, 0.1);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(94, 114, 228, 0.2);
+  }
+}
+
+// Stop animation when selected
+.account-type-card.selected {
+  animation: none;
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .account-type-card {
+    height: 140px;
+    padding: 15px 10px;
+
+    .card-icon i {
+      font-size: 24px;
+    }
+
+    .card-title {
+      font-size: 14px;
+    }
+
+    .card-description {
+      font-size: 11px;
+    }
+  }
+}

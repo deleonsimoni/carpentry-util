@@ -1,5 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import Chart from 'chart.js';
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+// Register Chart.js components
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 // core components
 import {
@@ -31,7 +53,7 @@ export class DashboardComponent implements OnInit {
     this.data = this.datasets[0];
 
 
-    var chartOrders = document.getElementById('chart-orders');
+    var chartOrders = document.getElementById('chart-orders') as HTMLCanvasElement;
 
     parseOptions(Chart, chartOptions());
 
@@ -42,7 +64,7 @@ export class DashboardComponent implements OnInit {
       data: chartExample2.data
     });
 
-    var chartSales = document.getElementById('chart-sales');
+    var chartSales = document.getElementById('chart-sales') as HTMLCanvasElement;
 
     this.salesChart = new Chart(chartSales, {
 			type: 'line',

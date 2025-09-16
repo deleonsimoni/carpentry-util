@@ -3,6 +3,20 @@
   <div class="container-fluid d-flex align-items-center">
     <div class="row">
       <div class="col-lg-12 col-md-10">
+        <!-- Navigation breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb bg-transparent p-0 mb-2">
+            <li class="breadcrumb-item">
+              <a routerLink="/home" class="text-white">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Home
+              </a>
+            </li>
+            <li class="breadcrumb-item active text-white-50" aria-current="page">
+              Takeoff
+            </li>
+          </ol>
+        </nav>
+
         <h1 class="display-2 text-white">Create your takeoff</h1>
         <p class="text-white mt-0 mb-5">
           This is your takeoff page. Here link you and
@@ -19,11 +33,29 @@
           <div class="row align-items-center">
             <div class="col-8">
               <h3 class="mb-0">Takeoff</h3>
+              <!-- Read-only indicator for completed takeoffs -->
+              <div *ngIf="!isCompany && orderStatus >= 3" class="mt-2">
+                <span class="badge badge-success">
+                  <i class="fas fa-lock mr-1"></i>
+                  Completed - Read Only
+                </span>
+              </div>
             </div>
             <div class="col-4 text-right">
-              <a href="#!" class="btn btn-sm btn-primary"
-                >Recall email to carpenter</a
+              <a
+                *ngIf="isCompany || (!isCompany && orderStatus < 3)"
+                href="#!"
+                class="btn btn-sm btn-primary"
               >
+                Recall email to carpenter
+              </a>
+              <!-- Show status for read-only mode -->
+              <div *ngIf="!isCompany && orderStatus >= 3" class="text-muted">
+                <small>
+                  <i class="fas fa-check-circle text-success mr-1"></i>
+                  Takeoff completed
+                </small>
+              </div>
             </div>
           </div>
         </div>

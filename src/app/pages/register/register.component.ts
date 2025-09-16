@@ -22,7 +22,22 @@ export class RegisterComponent implements OnInit {
     this.createForm();
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    // Check if user is already logged in
+    this.authService.getUser().subscribe(
+      user => {
+        if (user && user._id) {
+          // User is already logged in, redirect to home
+          this.router.navigate(['/home']);
+          this.toastr.info('You are already logged in', 'Redirected');
+        }
+      },
+      err => {
+        // User not logged in, stay on register page
+        console.log('User not logged in');
+      }
+    );
+  }
 
   private createForm(): void {
     this.registerForm = this.builder.group({
@@ -38,7 +53,8 @@ export class RegisterComponent implements OnInit {
       ],
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
-      roles: ['company'],
+      roles: [null, [Validators.required]],
+      privacyAccepted: [false, [Validators.requiredTrue]],
 
       /*address: this.builder.group({
         street: [null, [Validators.required]],
@@ -71,6 +87,11 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
+    if (!this.registerForm.value.roles) {
+      this.toastr.error('Selecione o tipo de conta.', 'Atenção: ');
+      return;
+    }
+
     if (this.registerForm.valid && form != null) {
       this.carregando = true;
       this.registerForm.value.email = this.registerForm.value.email
@@ -98,5 +119,16 @@ export class RegisterComponent implements OnInit {
         'Erro: '
       );
     }
+  }
+
+  passwordMismatch(): boolean {
+    const password = this.registerForm.get('password')?.value;
+    const repeatPassword = this.registerForm.get('repeatPassword')?.value;
+    return password !== repeatPassword && repeatPassword?.length > 0;
+  }
+
+  selectAccountType(type: string): void {
+    this.registerForm.get('roles')?.setValue(type);
+    this.registerForm.get('roles')?.markAsTouched();
   }
 }

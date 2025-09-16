@@ -200,8 +200,13 @@ export class TakeOffComponent implements OnInit {
             this.orderForm.controls['carpentry'].disable();
           }
 
-          if (!this.isCompany && this.orderStatus == 3) {
+          // Disable entire form for carpentry when takeoff is completed (status >= 3)
+          if (!this.isCompany && this.orderStatus >= 3) {
             this.orderForm.disable();
+            this.toastr.info(
+              'This takeoff is completed and can no longer be edited.',
+              'Read-only mode'
+            );
           }
 
           this.spinner.hide();

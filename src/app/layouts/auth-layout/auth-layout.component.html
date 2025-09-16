@@ -1,4 +1,4 @@
-<div class="main-content">
+<div class="main-content d-flex flex-column min-vh-100">
   <nav class="navbar navbar-top navbar-horizontal navbar-expand-md navbar-dark">
     <div class="container px-4">
       <a class="navbar-brand" routerLinkActive="active">
@@ -55,7 +55,9 @@
       </div>
     </div>
   </nav>
-  <router-outlet></router-outlet>
+  <div class="flex-grow-1">
+    <router-outlet></router-outlet>
+  </div>
 </div>
 <footer class="py-5">
   <div class="container">

@@ -8,11 +8,14 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: [],
 })
 export class HomeComponent implements OnInit {
   myOrders;
+  filteredOrders;
   user;
+  searchTerm = '';
+  selectedStatus = '';
 
   constructor(
     private router: Router,
@@ -38,6 +41,7 @@ export class HomeComponent implements OnInit {
           this.toastr.error('Error get orders', 'Atenção');
         } else {
           this.myOrders = data;
+          this.filteredOrders = data;
         }
       },
       err => {
@@ -81,5 +85,61 @@ export class HomeComponent implements OnInit {
 
   detailOrder(idOrder) {
     this.router.navigate(['/take-off', idOrder]);
+  }
+
+  onSearchChange() {
+    this.applyFilters();
+  }
+
+  onStatusFilterChange() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    if (!this.myOrders) {
+      this.filteredOrders = [];
+      return;
+    }
+
+    let filtered = [...this.myOrders];
+
+    // Apply search filter
+    if (this.searchTerm?.trim()) {
+      const searchLower = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(order =>
+        order.custumerName?.toLowerCase().includes(searchLower) ||
+        order.shipTo?.toLowerCase().includes(searchLower) ||
+        order.lot?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply status filter
+    if (this.selectedStatus !== '') {
+      const statusValue = parseInt(this.selectedStatus);
+      filtered = filtered.filter(order => {
+        if (statusValue >= 3) {
+          return order.status >= 3; // Completed includes status 3 and above
+        }
+        return order.status === statusValue;
+      });
+    }
+
+    this.filteredOrders = filtered;
+  }
+
+  clearFilters() {
+    this.searchTerm = '';
+    this.selectedStatus = '';
+    this.filteredOrders = this.myOrders || [];
+  }
+
+  getEmptyStateMessage(): string {
+    if (this.searchTerm || this.selectedStatus) {
+      return 'Try adjusting your filters to see more results.';
+    }
+    if (this.isCompany) {
+      return 'Create your first takeoff to get started.';
+    }
+    return 'No takeoffs assigned to you yet.';
   }
 }

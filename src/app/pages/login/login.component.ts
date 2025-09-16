@@ -35,7 +35,22 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    // Check if user is already logged in
+    this.authService.getUser().subscribe(
+      user => {
+        if (user && user._id) {
+          // User is already logged in, redirect to home
+          this.router.navigate(['/home']);
+          this.toastr.info('You are already logged in', 'Redirected');
+        }
+      },
+      err => {
+        // User not logged in, stay on login page
+        console.log('User not logged in');
+      }
+    );
+  }
 
   login(): void {
     if (this.loginForm.valid) {

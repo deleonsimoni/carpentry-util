@@ -70,6 +70,65 @@
 .table-hover {
     tr {
         @include transition($transition-base);
+
+        &:hover {
+            background-color: $table-hover-bg;
+
+            td, th {
+                background-color: transparent;
+            }
+        }
+    }
+
+    // Clickable rows
+    .clickable-row {
+        cursor: pointer;
+
+        &:hover {
+            background-color: rgba($primary, 0.05);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    }
+}
+
+// Responsive table improvements for dropdown menus
+.table-responsive {
+    min-height: 200px; // Minimum height to prevent dropdown menu clipping
+
+    .table {
+        // Ensure dropdown menus are visible by adding z-index to last column
+        td:last-child {
+            position: relative;
+            z-index: 10;
+        }
+
+        // Dropdown menu positioning
+        .dropdown-menu {
+            z-index: 1050; // Higher than table content
+            position: absolute;
+            right: 0;
+            min-width: 140px;
+        }
+    }
+}
+
+// Dark table hover
+.table-dark.table-hover {
+    tr {
+        &:hover {
+            background-color: $table-dark-hover-bg;
+
+            td, th {
+                background-color: transparent;
+            }
+        }
+    }
+
+    .clickable-row {
+        &:hover {
+            background-color: rgba($white, 0.1);
+        }
     }
 }
 
