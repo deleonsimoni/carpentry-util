@@ -25,7 +25,7 @@ async function getTakeoffs(idUSer) {
   return await Takeoff.find({ $or: [{ user: idUSer }, { carpentry: idUSer }] })
     .populate('carpentry', 'fullname email')
     .populate('user', 'fullname email')
-    .select('custumerName carpentry user status shipTo')
+    .select('custumerName carpentry user status shipTo lot')
     .sort({
       createdAt: -1,
     });

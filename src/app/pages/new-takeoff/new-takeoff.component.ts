@@ -493,26 +493,25 @@ export class TakeOffComponent implements OnInit {
 
   preFillArches() {
     const dadosPrePreenchidos = [
-      { size: '475', col1: '', col2: '', col3: '', col4: '', col5: '' },
-      { size: '675', col1: '', col2: '', col3: '', col4: '', col5: '' },
-      { size: '', col1: '', col2: '', col3: '', col4: '', col5: '' },
-      { size: '', col1: '', col2: '', col3: '', col4: '', col5: '' },
-      { size: "(8')", col1: '', col2: '', col3: '', col4: '', col5: '' },
+      { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
+      { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
+      { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
+      { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
+      { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
     ];
 
     const arrayForm = this.orderForm.get('arches') as FormArray;
 
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
-        size: [
-          { value: dados.size, disabled: this.disableField(dados.size) },
-          [],
-        ],
-        col1: '',
-        col2: '',
+        size: '',
+        height: '',
+        heightCustom: '',
+        jamb: '',
+        jambCustom: '',
         col3: '',
         col4: '',
-        col5: '',
+        qty: '',
       });
 
       arrayForm.push(formGroup);

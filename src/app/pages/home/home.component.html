@@ -193,7 +193,10 @@
                           </span>
                         </h6>
                         <p class="text-sm text-muted mb-1">
-                          {{ order.shipTo | titlecase }} / {{ order.lot | titlecase }}
+                          <strong>Job Site:</strong> {{ order.shipTo | titlecase }}
+                        </p>
+                        <p class="text-sm text-muted mb-1">
+                          <strong>LOT:</strong> {{ order.lot | titlecase }}
                         </p>
                         <p class="text-sm text-muted mb-0">
                           {{ isCompany ? order.carpentry?.fullname : (order.user?.fullname | titlecase) }}
@@ -254,7 +257,8 @@
               <thead class="thead-light">
                 <tr>
                   <th scope="col">Customer</th>
-                  <th scope="col">Job Site / Lote</th>
+                  <th scope="col">Job Site</th>
+                  <th scope="col">LOT</th>
 
                   <th scope="col">Status</th>
                   <th scope="col">{{ isCompany ? 'Carpentry' : 'Company' }}</th>
@@ -285,7 +289,14 @@
                   <td>
                     <div class="media-body">
                       <span class="mb-0 text-sm">
-                        {{ myOrder.shipTo | titlecase }} /
+                        {{ myOrder.shipTo | titlecase }}
+                      </span>
+                    </div>
+                  </td>
+
+                  <td>
+                    <div class="media-body">
+                      <span class="mb-0 text-sm">
                         {{ myOrder.lot | titlecase }}
                       </span>
                     </div>
