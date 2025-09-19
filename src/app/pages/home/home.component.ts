@@ -6,6 +6,7 @@ import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '@app/shared/services';
 import { TakeoffService } from '@app/shared/services/takeoff.service';
 import { TakeoffStatusService } from '@app/shared/services/takeoff-status.service';
+import { DashboardService, DashboardData } from '@app/shared/services/dashboard.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 import { TakeoffStatusComponent } from '@app/shared/components/takeoff-status/takeoff-status.component';
@@ -24,18 +25,38 @@ export class HomeComponent implements OnInit {
   searchTerm = '';
   selectedStatus = '';
 
+  // Dashboard data properties
+  public dashboardData: DashboardData | null = null;
+  public isLoadingStats = true;
+
   constructor(
     private router: Router,
     private takeoffService: TakeoffService,
     private authService: AuthService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
-    private statusService: TakeoffStatusService
+    private statusService: TakeoffStatusService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit() {
     this.listMyOrders();
+    this.loadDashboardStats();
     this.authService.getUser().subscribe(user => (this.user = user));
+  }
+
+  loadDashboardStats(): void {
+    this.isLoadingStats = true;
+    this.dashboardService.getDashboardData().subscribe({
+      next: (response) => {
+        this.dashboardData = response.data;
+        this.isLoadingStats = false;
+      },
+      error: (error) => {
+        console.error('Error loading dashboard stats:', error);
+        this.isLoadingStats = false;
+      }
+    });
   }
 
   listMyOrders() {

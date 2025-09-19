@@ -4,6 +4,7 @@ const authRoutes = require('./auth.route');
 const takeoffRoutes = require('./takeoff.route');
 const materialRequestRoutes = require('./materialRequest.route');
 const carpentryRoutes = require('./carpentry.route');
+const dashboardRoutes = require('./dashboard.route');
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -15,5 +16,6 @@ router.use('/user', userRoutes);
 router.use('/takeoff', takeoffRoutes);
 router.use('/material-request', materialRequestRoutes);
 router.use('/carpentry', carpentryRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 module.exports = router;
