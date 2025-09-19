@@ -1,0 +1,229 @@
+<!-- Header -->
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row w-100">
+      <div class="col-lg-12 col-md-12">
+        <h1 class="display-2 text-white">User Management</h1>
+        <p class="text-white mt-0 mb-5">
+          Manage all system users: supervisors, carpenters and delivery personnel
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container-fluid mt--9">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+
+        <!-- Card Header with Filters -->
+        <div class="card-header bg-white border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">User List</h3>
+              <small class="text-muted">{{ totalUsers }} user(s) found</small>
+            </div>
+            <div class="col-auto">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                (click)="openCreateUserModal()">
+                <i class="fas fa-plus mr-2"></i>
+                New User
+              </button>
+            </div>
+          </div>
+
+          <!-- Filtros -->
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <div class="form-group mb-0">
+                <label class="form-control-label">Search</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  placeholder="Name or email..."
+                  [ngModel]="searchTerm"
+                  (ngModelChange)="onSearchChange($event)">
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group mb-0">
+                <label class="form-control-label">Profile</label>
+                <select
+                  class="form-control form-control-sm"
+                  [(ngModel)]="selectedProfile"
+                  (change)="onProfileFilterChange()">
+                  <option value="">All profiles</option>
+                  <option
+                    *ngFor="let profile of profileOptions"
+                    [value]="profile.value">
+                    {{ profile.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group mb-0">
+                <label class="form-control-label">Status</label>
+                <select
+                  class="form-control form-control-sm"
+                  [(ngModel)]="selectedStatus"
+                  (change)="onStatusFilterChange()">
+                  <option value="">All statuses</option>
+                  <option
+                    *ngFor="let status of statusOptions"
+                    [value]="status.value">
+                    {{ status.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm w-100"
+                (click)="clearFilters()">
+                <i class="fas fa-times mr-1"></i>
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Body with Table -->
+        <div class="card-body">
+
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-2">Loading users...</p>
+          </div>
+
+          <!-- Users Table -->
+          <div *ngIf="!isLoading" class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">User</th>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Profile</th>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Status</th>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Last Login</th>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Created</th>
+                  <th class="border-0 text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let user of users; let i = index" class="border-bottom" [class.dropdown-open]="openDropdownIndex === i">
+                  <td class="ps-2">
+                    <div class="d-flex align-items-center py-2">
+                      <div class="d-flex flex-column">
+                        <h6 class="mb-1 text-sm font-weight-bold">{{ user.fullname }}</h6>
+                        <p class="text-xs text-muted mb-0">{{ user.email }}</p>
+                        <p *ngIf="user.mobilePhone" class="text-xs text-muted mb-0">
+                          <i class="fas fa-phone mr-1"></i>{{ user.mobilePhone }}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      class="badge badge-sm px-2 py-1"
+                      [ngClass]="getProfileClass(user.profile)">
+                      {{ userService.getProfileLabel(user.profile) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="d-flex flex-column gap-1">
+                      <span
+                        class="badge badge-sm px-2 py-1"
+                        [ngClass]="getStatusClass(user.status)">
+                        {{ userService.getStatusLabel(user.status) }}
+                      </span>
+                      <span *ngIf="user.requirePasswordChange" class="badge badge-warning badge-sm px-2 py-1">
+                        <i class="fas fa-key mr-1"></i>
+                        Change Password
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">{{ formatDate(user.lastLogin!) }}</p>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">{{ formatDate(user.createdAt) }}</p>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group" ngbDropdown placement="bottom-right"
+                         (openChange)="onDropdownToggle($event, i)">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-secondary px-3"
+                        ngbDropdownToggle>
+                        <i class="fas fa-ellipsis-v"></i>
+                      </button>
+                      <div ngbDropdownMenu class="shadow border-0">
+                        <button
+                          class="dropdown-item d-flex align-items-center py-2"
+                          (click)="openEditUserModal(user); $event.stopPropagation()">
+                          <i class="fas fa-edit mr-2 text-info"></i>
+                          Edit
+                        </button>
+                        <button
+                          class="dropdown-item d-flex align-items-center py-2"
+                          (click)="toggleUserStatus(user); $event.stopPropagation()">
+                          <i class="fas mr-2"
+                             [ngClass]="user.status === 'active' ? 'fa-ban text-warning' : 'fa-check-circle text-success'"></i>
+                          {{ user.status === 'active' ? 'Deactivate' : 'Activate' }}
+                        </button>
+                        <div class="dropdown-divider my-1"></div>
+                        <button
+                          class="dropdown-item d-flex align-items-center py-2"
+                          (click)="resetUserPassword(user); $event.stopPropagation()">
+                          <i class="fas fa-key mr-2 text-primary"></i>
+                          Reset Password
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Empty State -->
+            <div *ngIf="users.length === 0" class="text-center py-5">
+              <i class="fas fa-users fa-3x text-muted mb-3"></i>
+              <h5>No users found</h5>
+              <p class="text-muted">
+                There are no users matching the applied filters.
+              </p>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="clearFilters()">
+                Clear Filters
+              </button>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div *ngIf="!isLoading && totalPages > 1" class="d-flex justify-content-center mt-4">
+            <ngb-pagination
+              [(page)]="currentPage"
+              [pageSize]="pageSize"
+              [collectionSize]="totalUsers"
+              [maxSize]="5"
+              [rotate]="true"
+              [boundaryLinks]="true"
+              (pageChange)="onPageChange($event)">
+            </ngb-pagination>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

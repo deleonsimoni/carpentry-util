@@ -13,6 +13,7 @@ router.route('/:idTakeoff').get(asyncHandler(detailTakeoff));
 router.route('/:idTakeoff/generatePDF').get(asyncHandler(generatePDF));
 router.route('/:idTakeoff/update').post(asyncHandler(updateTakeoff));
 router.route('/:idTakeoff/finalize').post(asyncHandler(finalizeTakeoff));
+router.route('/:idTakeoff/status').patch(asyncHandler(updateTakeoffStatus));
 router
   .route('/:idTakeoff/backTakeoffToCarpentry')
   .post(asyncHandler(backTakeoffToCarpentry));
@@ -78,4 +79,17 @@ async function detailTakeoff(req, res) {
 async function getTakeoffs(req, res) {
   let response = await takeoffCtrl.getTakeoffs(req.user._id);
   res.json(response);
+}
+
+async function updateTakeoffStatus(req, res) {
+  try {
+    let response = await takeoffCtrl.updateTakeoffStatus(
+      req.user,
+      req.params.idTakeoff,
+      req.body.status
+    );
+    res.json(response);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 }

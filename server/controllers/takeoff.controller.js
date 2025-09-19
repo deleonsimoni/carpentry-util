@@ -12,6 +12,7 @@ module.exports = {
   backTakeoffToCarpentry,
   findCarpentryByEmail,
   generatePDF,
+  updateTakeoffStatus,
 };
 
 async function insert(idUser, body) {
@@ -50,7 +51,7 @@ async function updateTakeoff(user, body, idTakeoff) {
 }
 
 async function finalizeTakeoff(user, body, idTakeoff) {
-  if (user.roles.includes('company')) {
+  if (user.roles.includes('manager')) {
     delete body.status;
   } else {
     body.status = 3;
@@ -1076,4 +1077,21 @@ async function generatePDF(user, idTakeoff) {
   });
 
   return await pdfDoc.saveAsBase64({ dataUri: true });
+}
+
+async function updateTakeoffStatus(user, takeoffId, newStatus) {
+  const validStatuses = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  if (!validStatuses.includes(newStatus)) {
+    throw new Error('Invalid status value');
+  }
+
+  return await Takeoff.findOneAndUpdate(
+    {
+      $and: [{ _id: takeoffId }],
+      $or: [{ user: user._id }, { carpentry: user._id }],
+    },
+    { status: newStatus },
+    { new: true }
+  );
 }

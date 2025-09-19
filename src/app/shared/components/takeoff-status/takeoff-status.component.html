@@ -1,0 +1,56 @@
+<div class="takeoff-status-wrapper">
+  <!-- Read-only status badge -->
+  <div class="status-badge" *ngIf="!hasNextStatuses">
+    <span class="badge badge-{{statusInfo.color}} fs-6 px-3 py-2">
+      <i class="{{statusInfo.icon}} me-2"></i>
+      {{statusInfo.label}}
+    </span>
+  </div>
+
+  <!-- Manager: Interactive status dropdown -->
+  <div class="status-badge position-relative" *ngIf="hasNextStatuses && isManager" ngbDropdown>
+    <span
+      class="badge badge-{{statusInfo.color}} fs-6 px-3 py-2 dropdown-toggle"
+      ngbDropdownToggle
+      id="statusDropdown"
+      role="button">
+      <i class="{{statusInfo.icon}} me-2"></i>
+      {{statusInfo.label}}
+    </span>
+
+    <div
+      ngbDropdownMenu
+      aria-labelledby="statusDropdown"
+      class="dropdown-menu-end">
+      <h6 class="dropdown-header">{{getActionText()}}</h6>
+      <button
+        *ngFor="let nextStatus of nextStatuses"
+        type="button"
+        class="dropdown-item d-flex align-items-center"
+        (click)="changeStatus(nextStatus.id)">
+        <i class="{{nextStatus.icon}} me-2 text-{{nextStatus.color}}"></i>
+        <div>
+          <div class="fw-semibold">{{nextStatus.label}}</div>
+          <small class="text-muted">{{nextStatus.description}}</small>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Carpenter: Direct action button -->
+  <div class="status-action-wrapper" *ngIf="hasNextStatuses && !isManager">
+    <div class="status-badge mb-2">
+      <span class="badge badge-{{statusInfo.color}} fs-6 px-3 py-2">
+        <i class="{{statusInfo.icon}} me-2"></i>
+        {{statusInfo.label}}
+      </span>
+    </div>
+    <button
+      type="button"
+      class="btn btn-success btn-sm"
+      (click)="advanceToNextStatus()">
+      <i class="fas fa-check me-1"></i>
+      {{getActionText()}}
+    </button>
+  </div>
+</div>

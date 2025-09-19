@@ -1,0 +1,81 @@
+.takeoff-status-wrapper {
+  .status-badge {
+    .badge {
+      cursor: pointer;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease-in-out;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      &.dropdown-toggle::after {
+        margin-left: 0.5rem;
+      }
+    }
+
+    .dropdown-menu {
+      min-width: 280px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &:hover {
+          background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        i {
+          width: 20px;
+        }
+      }
+
+      .dropdown-header {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        padding: 0.5rem 1rem 0.25rem;
+      }
+    }
+  }
+}
+
+// Bootstrap badge color overrides to match status colors
+.badge-secondary {
+  background-color: #6c757d !important;
+  color: white !important;
+}
+
+.badge-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+}
+
+.badge-warning {
+  background-color: #ffc107 !important;
+  color: #212529 !important;
+}
+
+.badge-primary {
+  background-color: #007bff !important;
+  color: white !important;
+}
+
+.badge-success {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.badge-dark {
+  background-color: #343a40 !important;
+  color: white !important;
+}

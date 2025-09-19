@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@app/shared/services';
+import { UserService } from '@app/shared/services/user.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgxSpinnerService } from 'ngx-spinner';
@@ -16,6 +17,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
+    private userService: UserService,
     private builder: FormBuilder,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService
@@ -58,15 +60,42 @@ export class LoginComponent implements OnInit, OnDestroy {
 
       this.authService.login(this.loginForm.value).subscribe(
         (res: any) => {
-          this.toastr.success('Nice to see you', 'Welcome :)');
-          this.router.navigate(['/home']);
-          this.spinner.hide();
+          // Check if user needs to change password (except managers)
+          this.userService.checkPasswordStatus().subscribe({
+            next: (response) => {
+              // Managers are not required to change password
+              if (res.roles && res.roles.includes('manager')) {
+                this.toastr.success('Nice to see you', 'Welcome :)');
+                this.router.navigate(['/home']);
+                this.spinner.hide();
+                return;
+              }
+
+              if (response.data.requirePasswordChange) {
+                // Redirect to password change page
+                this.toastr.info('You must change your temporary password', 'Password Change Required');
+                this.router.navigate(['/change-password-required']);
+              } else {
+                // Normal login flow
+                this.toastr.success('Nice to see you', 'Welcome :)');
+                this.router.navigate(['/home']);
+              }
+              this.spinner.hide();
+            },
+            error: (error) => {
+              console.error('Error checking password status:', error);
+              // In case of error, proceed with normal flow
+              this.toastr.success('Nice to see you', 'Welcome :)');
+              this.router.navigate(['/home']);
+              this.spinner.hide();
+            }
+          });
         },
         err => {
           this.spinner.hide();
 
           if (err.status === 401) {
-            this.toastr.error('Invalid email or password', 'Erro: ');
+            this.toastr.error('Invalid email or password', 'Error: ');
           }
         }
       );

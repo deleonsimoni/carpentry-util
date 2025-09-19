@@ -33,8 +33,52 @@
           <div class="row align-items-center">
             <div class="col-8">
               <h3 class="mb-0">Takeoff</h3>
+              <!-- Current Status Display -->
+              <div *ngIf="orderStatus" class="mt-2">
+                <span class="badge" [ngClass]="'badge-' + (statusService.getStatusColor(orderStatus) || 'secondary')">
+                  <i [class]="'fas ' + (statusService.getStatusIcon(orderStatus) || 'fa-circle') + ' mr-1'"></i>
+                  {{ statusService.getStatusLabel(orderStatus) }}
+                </span>
+
+                <!-- Company Status Control Dropdown -->
+                <div class="mt-2" *ngIf="idOrder && isManager && canAdvanceStatus()">
+                  <div ngbDropdown placement="bottom-left">
+                    <button
+                      class="btn btn-sm btn-outline-primary"
+                      ngbDropdownToggle
+                      [disabled]="isAdvancingStatus">
+                      <i class="fas fa-exchange-alt mr-1"></i>
+                      <span *ngIf="!isAdvancingStatus">Change Status</span>
+                      <span *ngIf="isAdvancingStatus">
+                        <i class="fas fa-spinner fa-spin mr-1"></i>
+                        Updating...
+                      </span>
+                    </button>
+
+                    <div ngbDropdownMenu class="dropdown-menu-arrow">
+                      <h6 class="dropdown-header">Change Status To:</h6>
+                      <button
+                        *ngFor="let status of getAllStatuses()"
+                        type="button"
+                        class="dropdown-item d-flex align-items-center"
+                        [ngClass]="{'active': status.id === orderStatus, 'disabled': status.id === orderStatus}"
+                        (click)="advanceToSpecificStatus(status.id)"
+                        [disabled]="status.id === orderStatus">
+                        <i [class]="'fas ' + status.icon + ' mr-2 text-' + status.color"></i>
+                        <div>
+                          <div class="fw-semibold">
+                            {{status.label}}
+                            <span *ngIf="status.id === orderStatus" class="badge badge-sm badge-secondary ml-1">Current</span>
+                          </div>
+                          <small class="text-muted">{{status.description}}</small>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <!-- Read-only indicator for completed takeoffs -->
-              <div *ngIf="!isCompany && orderStatus >= 3" class="mt-2">
+              <div *ngIf="shouldShowReadOnlyIndicator()" class="mt-2">
                 <span class="badge badge-success">
                   <i class="fas fa-lock mr-1"></i>
                   Completed - Read Only
@@ -42,15 +86,16 @@
               </div>
             </div>
             <div class="col-4 text-right">
+
               <a
-                *ngIf="isCompany || (!isCompany && orderStatus < 3)"
+                *ngIf="shouldShowRecallEmailButton()"
                 href="#!"
                 class="btn btn-sm btn-primary"
               >
                 Recall email to carpenter
               </a>
               <!-- Show status for read-only mode -->
-              <div *ngIf="!isCompany && orderStatus >= 3" class="text-muted">
+              <div *ngIf="shouldShowCompletionStatus()" class="text-muted mt-2">
                 <small>
                   <i class="fas fa-check-circle text-success mr-1"></i>
                   Takeoff completed
@@ -71,14 +116,14 @@
                     >
                     <br />
                     <label
-                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      *ngIf="shouldShowCarpenterSearch()"
                       class="form-control-label"
                       for="input-username"
                       >Enter email to locate carpenter</label
                     >
 
                     <input
-                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      *ngIf="shouldShowCarpenterSearch()"
                       type="email"
                       id="input-username"
                       class="form-control form-control-alternative"
@@ -92,7 +137,7 @@
                       <br />
                     </div>
                     <button
-                      *ngIf="isCompany && (!orderStatus || orderStatus < 2)"
+                      *ngIf="shouldShowCarpenterSearch()"
                       class="form-control form-control-alternative"
                       (click)="findCarpentry()"
                       class="btn btn-primary"
@@ -308,7 +353,7 @@
               <!-- Address -->
               <h6 class="heading-small text mb-4">
                 <button
-                  *ngIf="!isVisibleCantinaDoors"
+                  *ngIf="!isVisibleCantinaDoors && !isReadonly"
                   (click)="showHideFormCantina()"
                   class="btn btn-warning"
                 >
@@ -316,7 +361,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleCantinaDoors"
+                  *ngIf="isVisibleCantinaDoors && !isReadonly"
                   (click)="showHideFormCantina()"
                   class="btn btn-warning"
                 >
@@ -327,84 +372,60 @@
                 [@fadeAnimation]="isVisibleCantinaDoors ? 'in' : 'out'"
                 *ngIf="isVisibleCantinaDoors"
                 formArrayName="cantinaDoors"
+                class="pl-4"
               >
-                <div
-                  *ngFor="
-                    let cantinaDoorsForm of orderForm?.get('cantinaDoors')
-                      .controls;
-                    let i = index
-                  "
-                  class="pl-4"
-                >
-                  <div [formGroup]="cantinaDoorsForm">
-                    <div class="row">
-                      <div class="col-5">
-                        <div class="form-group">
-                          <label
-                            class="form-control-label"
-                            for="input-city"
-                          ></label>
-                          <input
-                            type="text"
-                            id="input-last-name"
-                            class="form-control form-control-alternative"
-                            formControlName="name"
-                          />
-                        </div>
-                      </div>
-                      <div class="col-2">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >SWING</label
-                          >
+                <div class="row">
+                  <div
+                    *ngFor="
+                      let cantinaDoorsForm of orderForm?.get('cantinaDoors')
+                        .controls;
+                      let i = index
+                    "
+                    class="col-md-6 mb-3"
+                  >
+                    <div [formGroup]="cantinaDoorsForm" class="border rounded p-3 h-100">
+                      <h6 class="text-muted mb-3">Cantina Door {{i + 1}}</h6>
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="swing"
-                          >
-                            <option value="RH">RH</option>
-                            <option value="LH">LH</option>
-                          </select>
-                        </div>
+                      <div class="form-group">
+                        <label class="form-control-label">TYPE</label>
+                        <input
+                          type="text"
+                          class="form-control form-control-alternative"
+                          formControlName="name"
+                          readonly
+                        />
                       </div>
-                      <div class="col-2">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >JAMB</label
-                          >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="jamb"
-                          >
-                            <option value="475">475</option>
-                            <option value="675">675</option>
-                          </select>
-<br/>
-                          <input
-                            type="text"
-                            class="form-control form-control-alternative"
-                            matInput
-                            formControlName="jamb"
-                            [matAutocomplete]="auto"
-                          />
-                          <mat-autocomplete #auto="matAutocomplete">
-                            <mat-option
-                              *ngFor="let option of jambaOptions"
-                              [value]="option"
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">SWING</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="swing"
                             >
-                              {{ option }}
-                            </mat-option>
-                          </mat-autocomplete>
+                              <option value="RH">RH</option>
+                              <option value="LH">LH</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-country"
-                            >QTY</label
-                          >
-
-                          <app-number-input formControlName="qty" [min]="0" [max]="5" [readonly]="isReadonly"></app-number-input>
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">JAMB</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="jamb"
+                            >
+                              <option value="475">475</option>
+                              <option value="675">675</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">QTY</label>
+                            <app-number-input formControlName="qty" [min]="0" [max]="5" [readonly]="isReadonly"></app-number-input>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -416,7 +437,7 @@
               <!-- Address -->
               <h6 class="heading-small text mb-4">
                 <button
-                  *ngIf="!isVisibleFrenchDoors"
+                  *ngIf="!isVisibleFrenchDoors && !isReadonly"
                   (click)="showHideFormFrench()"
                   class="btn btn-warning"
                 >
@@ -424,7 +445,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleFrenchDoors"
+                  *ngIf="isVisibleFrenchDoors && !isReadonly"
                   (click)="showHideFormFrench()"
                   class="btn btn-warning"
                 >
@@ -436,23 +457,24 @@
                 [@fadeAnimation]="isVisibleFrenchDoors ? 'in' : 'out'"
                 *ngIf="isVisibleFrenchDoors"
                 formArrayName="frenchDoors"
+                class="pl-4"
               >
-                <div
-                  *ngFor="
-                    let frenchDoorsForm of orderForm?.get('frenchDoors')
-                      .controls;
-                    let i = index
-                  "
-                  class="pl-4"
-                >
-                  <div [formGroup]="frenchDoorsForm">
-                    <div class="row">
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >SIZE/SWING</label
-                          >
-                          <div>
+                <div class="row">
+                  <div
+                    *ngFor="
+                      let frenchDoorsForm of orderForm?.get('frenchDoors')
+                        .controls;
+                      let i = index
+                    "
+                    class="col-md-6 mb-3"
+                  >
+                    <div [formGroup]="frenchDoorsForm" class="border rounded p-3 h-100">
+                      <h6 class="text-muted mb-3">French Door {{i + 1}}</h6>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">SIZE</label>
                             <select
                               class="form-control form-control-alternative"
                               formControlName="size"
@@ -464,57 +486,54 @@
                               <option value="30">30"</option>
                               <option value="32">32"</option>
                             </select>
-<br/>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">SWING</label>
                             <select
                               class="form-control form-control-alternative"
                               formControlName="swing"
                             >
                               <option value="RH">RH</option>
                               <option value="LH">LH</option>
-                              <option value="LH">DOUBLE</option>
+                              <option value="DOUBLE">DOUBLE</option>
                             </select>
                           </div>
                         </div>
                       </div>
 
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >HEIGHT</label
-                          >
-
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="height"
-                          >
-                            <option value="80">80"</option>
-                            <option value="84">84"</option>
-                            <option value="96">96"</option>
-                          </select>
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">HEIGHT</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="height"
+                            >
+                              <option value="80">80"</option>
+                              <option value="84">84"</option>
+                              <option value="96">96"</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >JAMB</label
-                          >
-
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="jamb"
-                          >
-                            <option value="475">475</option>
-                            <option value="675">675</option>
-                          </select>
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">JAMB</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="jamb"
+                            >
+                              <option value="475">475</option>
+                              <option value="675">675</option>
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-6">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-country"
-                            >QTY</label
-                          >
-
-                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
+                        <div class="col-4">
+                          <div class="form-group">
+                            <label class="form-control-label">QTY</label>
+                            <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -526,7 +545,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleDoubleDoors"
+                  *ngIf="!isVisibleDoubleDoors && shouldShowSectionToggleButtons()"
                   (click)="showHideFormDouble()"
                   class="btn btn-warning"
                 >
@@ -534,7 +553,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleDoubleDoors"
+                  *ngIf="isVisibleDoubleDoors && shouldShowSectionToggleButtons()"
                   (click)="showHideFormDouble()"
                   class="btn btn-warning"
                 >
@@ -651,67 +670,95 @@
                 [@fadeAnimation]="isVisibleSingleDoors ? 'in' : 'out'"
                 *ngIf="isVisibleSingleDoors"
                 formArrayName="singleDoors"
+                class="pl-4"
               >
-                <div
-                  *ngFor="
-                    let singleDoorsForm of orderForm?.get('singleDoors')
-                      .controls;
-                    let i = index
-                  "
-                  class="pl-4"
-                >
-                  <div [formGroup]="singleDoorsForm">
-                    <div class="row">
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >SIZE</label
-                          >
+                <div class="row">
+                  <div
+                    *ngFor="
+                      let singleDoorsForm of orderForm?.get('singleDoors')
+                        .controls;
+                      let i = index
+                    "
+                    class="col-lg-4 col-md-6 mb-3"
+                  >
+                    <div [formGroup]="singleDoorsForm" class="border rounded p-3 h-100">
+                      <h6 class="text-muted mb-3">Single Door {{i + 1}}</h6>
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="size"
-                          >
-                            <option value='1/4 - 18"'>18"</option>
-                            <option value='1/6 - 24"'>24"</option>
-                            <option value='1/8 - 26"'>26"</option>
-                            <option value='2/0 - 28"'>28"</option>
-                            <option value='2/2 - 30"'>30"</option>
-                            <option value='2/4 - 32"'>32"</option>
-                            <option value='2/6 - 34"'>34"</option>
-                            <option value='2/8 - 36"'>36"</option>
-                          </select>
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">SIZE</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="size"
+                              (change)="updateSingleDoorSize(i)"
+                            >
+                              <option value='1/4 - 18"'>18"</option>
+                              <option value='1/6 - 24"'>24"</option>
+                              <option value='1/8 - 26"'>26"</option>
+                              <option value='2/0 - 28"'>28"</option>
+                              <option value='2/2 - 30"'>30"</option>
+                              <option value='2/4 - 32"'>32"</option>
+                              <option value='2/6 - 34"'>34"</option>
+                              <option value='2/8 - 36"'>36"</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">HEIGHT</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="height"
+                              (change)="updateSingleDoorSize(i)"
+                            >
+                              <option value="80">80"</option>
+                              <option value="84">84"</option>
+                              <option value="96">96"</option>
+                            </select>
+                          </div>
                         </div>
                       </div>
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >LEFT</label
-                          >
-                          <app-number-input formControlName="left" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-city"
-                            >RIGHT</label
-                          >
-                          <app-number-input formControlName="right" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
-                        </div>
-                      </div>
-                      <div class="col-3">
-                        <div class="form-group">
-                          <label class="form-control-label" for="input-country"
-                            >JAMB</label
-                          >
 
-                          <select
-                            class="form-control form-control-alternative"
-                            formControlName="jamb"
-                          >
-                            <option value="475">475</option>
-                            <option value="675">675</option>
-                          </select>
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">LEFT</label>
+                            <app-number-input formControlName="left" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">RIGHT</label>
+                            <app-number-input formControlName="right" [min]="0" [max]="999" [readonly]="isReadonly"></app-number-input>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">JAMB</label>
+                            <select
+                              class="form-control form-control-alternative"
+                              formControlName="jamb"
+                            >
+                              <option value="475">475</option>
+                              <option value="675">675</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="form-group">
+                            <label class="form-control-label">SIZE/HEIGHT</label>
+                            <input
+                              type="text"
+                              class="form-control form-control-alternative"
+                              formControlName="sizeHeight"
+                              readonly
+                              placeholder="Auto-filled"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -757,7 +804,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleArches"
+                  *ngIf="!isVisibleArches && shouldShowSectionToggleButtons()"
                   (click)="showHideFormArches()"
                   class="btn btn-warning"
                 >
@@ -765,7 +812,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleArches"
+                  *ngIf="isVisibleArches && shouldShowSectionToggleButtons()"
                   (click)="showHideFormArches()"
                   class="btn btn-warning"
                 >
@@ -899,7 +946,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleTrim"
+                  *ngIf="!isVisibleTrim && shouldShowSectionToggleButtons()"
                   (click)="showHideFormTrim()"
                   class="btn btn-warning"
                 >
@@ -907,7 +954,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleTrim"
+                  *ngIf="isVisibleTrim && shouldShowSectionToggleButtons()"
                   (click)="showHideFormTrim()"
                   class="btn btn-warning"
                 >
@@ -1384,40 +1431,24 @@
               </div>
             </div>
 
-            <div class="box-bottom row">
-              <div>
-                <button
-                  *ngIf="!this.isCompany && this.orderStatus < 3"
-                  (click)="updateOrder()"
-                  class="btn btn-primary"
-                >
-                  Save Progress
-                </button>
-                <button
-                  *ngIf="this.isCompany && this.orderStatus"
-                  (click)="finalizeOrderWithoutStatus()"
-                  class="btn btn-primary"
-                >
-                  Save Progress
-                </button>
-              </div>
-
-              <div class="right">
-                <button
-                  *ngIf="!this.isCompany && this.orderStatus < 3"
-                  (click)="finalizeOrderPopUp(content)"
-                  class="btn btn-warning"
-                >
-                  Complete Takeoff
-                </button>
-                <button
-                  *ngIf="this.isCompany && this.orderStatus == 3"
-                  (click)="backOrderToCarpentry()"
-                  class="btn btn-warning"
-                >
-                  Back to Carpentry
-                </button>
-              </div>
+            <div class="box-bottom row" *ngIf="idOrder">
+              <!-- New Centralized Actions Component -->
+              <app-takeoff-actions
+                [currentStatus]="orderStatus"
+                [isManager]="isManager"
+                [takeoffId]="idOrder"
+                [isFormValid]="orderForm.valid"
+                [isLoading]="isAdvancingStatus"
+                (onSaveProgress)="updateOrder()"
+                (onCompleteMeasurement)="finalizeOrderPopUp(content)"
+                (onApproveForShipping)="approveForShipping()"
+                (onBackToMeasurement)="backToMeasurement()"
+                (onMarkAsShipped)="markAsShipped()"
+                (onSendToCarpenter)="sendToCarpenter()"
+                (onMarkTrimmingCompleted)="markTrimmingCompleted()"
+                (onMarkBackTrimCompleted)="markBackTrimCompleted()"
+                (onCloseService)="closeService()"
+              ></app-takeoff-actions>
             </div>
           </form>
         </div>
@@ -1426,9 +1457,10 @@
   </div>
 </div>
 
+
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4 class="modal-title">Are you sure complete takeoff?</h4>
+    <h4 class="modal-title">⚠️ Complete Measurement - Final Confirmation</h4>
     <button
       type="button"
       class="ni ni-fat-remove"
@@ -1437,10 +1469,23 @@
     ></button>
   </div>
   <div class="modal-body">
-    <p>
-      Once you complete the takeoff you will no longer be able to modify
-      it&hellip;
-    </p>
+    <div class="alert alert-warning" role="alert">
+      <h6 class="alert-heading mb-2">
+        <i class="fas fa-exclamation-triangle mr-2"></i>
+        IMPORTANT NOTICE
+      </h6>
+      <p class="mb-2">
+        Once you complete the measurement and submit this takeoff:
+      </p>
+      <ul class="mb-2">
+        <li>You will <strong>NO LONGER</strong> be able to edit or modify any information</li>
+        <li>The takeoff will advance to "Under Review" status</li>
+        <li>All measurements and details will be locked</li>
+      </ul>
+      <p class="mb-0">
+        <strong>Please ensure all measurements and information are correct before proceeding.</strong>
+      </p>
+    </div>
   </div>
   <div class="modal-footer">
     <button

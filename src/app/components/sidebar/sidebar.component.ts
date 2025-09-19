@@ -19,7 +19,12 @@ export const ROUTES: RouteInfo[] = [
     icon: 'ni-delivery-fast text-blue',
     class: '',
   },
-  // Moved to navbar avatar dropdown
+  {
+    path: '/user-management',
+    title: 'Gestão de Usuários',
+    icon: 'ni-single-02 text-green',
+    class: '',
+  },
   // {
   //   path: '/user-profile',
   //   title: 'Your Profile',
@@ -32,13 +37,14 @@ export const ROUTES: RouteInfo[] = [
   // { path: '/register', title: 'Register', icon: 'ni-circle-08 text-pink', class: '' }
 ];
 
+
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  public menuItems: any[];
+  public menuItems: any[] = []; // Initialize as empty array
   public isCollapsed = true;
   user;
 
@@ -47,12 +53,93 @@ export class SidebarComponent implements OnInit {
   ngOnInit() {
     this.authService.getUser().subscribe(user => {
       this.user = user;
+      this.updateMenuItems();
     });
 
-    this.menuItems = ROUTES.filter(menuItem => menuItem);
     this.router.events.subscribe(event => {
       this.isCollapsed = true;
     });
+  }
+
+  private updateMenuItems() {
+    if (!this.user) {
+      this.menuItems = [];
+      return;
+    }
+
+    // Start with basic routes
+    this.menuItems = [...ROUTES];
+
+    // Remove user management for users who are not admin or manager
+    if (!this.isAdmin && !this.isManager) {
+      this.menuItems = this.menuItems.filter(item => item.path !== '/user-management');
+    }
+  }
+
+  get isManager() {
+    return this.user && this.user.roles && this.user.roles.includes('manager');
+  }
+
+  get isAdmin() {
+    return this.user && this.user.isAdmin;
+  }
+
+  get userRole() {
+    if (this.user?.isAdmin) {
+      return {
+        name: 'Admin Global',
+        icon: 'fa-crown',
+        badgeClass: 'badge-warning'
+      };
+    }
+
+    if (this.isManager) {
+      return {
+        name: 'Manager',
+        icon: 'fa-user-tie',
+        badgeClass: 'badge-primary'
+      };
+    }
+
+    // Para perfis de funcionários
+    const profile = this.user?.profile;
+    if (profile === 'manager') {
+      return {
+        name: 'Manager',
+        icon: 'fa-user-tie',
+        badgeClass: 'badge-primary'
+      };
+    }
+
+    if (profile === 'supervisor') {
+      return {
+        name: 'Supervisor',
+        icon: 'fa-user-tie',
+        badgeClass: 'badge-info'
+      };
+    }
+
+    if (profile === 'delivery') {
+      return {
+        name: 'Delivery',
+        icon: 'fa-truck',
+        badgeClass: 'badge-success'
+      };
+    }
+
+    if (profile === 'carpinter') {
+      return {
+        name: 'Carpinter',
+        icon: 'fa-hammer',
+        badgeClass: 'badge-warning'
+      };
+    }
+
+    return {
+      name: 'Usuário',
+      icon: 'fa-user',
+      badgeClass: 'badge-secondary'
+    };
   }
 
   logout() {

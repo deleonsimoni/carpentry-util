@@ -53,7 +53,7 @@ export class RegisterComponent implements OnInit {
       ],
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
-      roles: [null, [Validators.required]],
+      roles: ['manager'], // Sempre manager
       privacyAccepted: [false, [Validators.requiredTrue]],
 
       /*address: this.builder.group({
@@ -87,10 +87,6 @@ export class RegisterComponent implements OnInit {
       return;
     }
 
-    if (!this.registerForm.value.roles) {
-      this.toastr.error('Selecione o tipo de conta.', 'Atenção: ');
-      return;
-    }
 
     if (this.registerForm.valid && form != null) {
       this.carregando = true;
@@ -127,8 +123,4 @@ export class RegisterComponent implements OnInit {
     return password !== repeatPassword && repeatPassword?.length > 0;
   }
 
-  selectAccountType(type: string): void {
-    this.registerForm.get('roles')?.setValue(type);
-    this.registerForm.get('roles')?.markAsTouched();
-  }
 }

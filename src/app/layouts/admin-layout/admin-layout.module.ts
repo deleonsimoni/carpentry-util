@@ -11,7 +11,6 @@ import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
 import { IconsComponent } from '../../pages/icons/icons.component';
 import { MapsComponent } from '../../pages/maps/maps.component';
 import { TakeOffComponent } from '../../pages/new-takeoff/new-takeoff.component';
-import { HomeComponent } from '../../pages/home/home.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@app/shared/shared.module';
 import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.component';
@@ -32,7 +31,6 @@ import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.compo
     DashboardComponent,
     TakeOffComponent,
     ProfileUserComponent,
-    HomeComponent,
     IconsComponent,
     MapsComponent,
   ],

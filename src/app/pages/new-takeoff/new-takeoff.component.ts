@@ -3,9 +3,13 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
 import { TakeoffService } from '@app/shared/services/takeoff.service';
+import { TakeoffStatusService } from '@app/shared/services/takeoff-status.service';
+import { STATUS_CONSTANTS, TakeoffStatus } from '@app/shared/interfaces/takeoff-status.interface';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { TakeoffStatusComponent } from '@app/shared/components/takeoff-status/takeoff-status.component';
+import { TakeoffActionsComponent } from '@app/shared/components/takeoff-actions/takeoff-actions.component';
 import {
   trigger,
   state,
@@ -42,6 +46,11 @@ export class TakeOffComponent implements OnInit {
   idOrder;
   mobile;
   orderStatus;
+  isAdvancingStatus = false;
+
+  // Status constants for template use
+  readonly STATUS = STATUS_CONSTANTS;
+  readonly TakeoffStatus = TakeoffStatus;
   emailRegex: RegExp =
     /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
   emailCarpentry;
@@ -77,6 +86,7 @@ export class TakeOffComponent implements OnInit {
   constructor(
     private router: Router,
     private takeoffService: TakeoffService,
+    public statusService: TakeoffStatusService,
     private builder: FormBuilder,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService,
@@ -108,8 +118,8 @@ export class TakeOffComponent implements OnInit {
     event.returnValue = false;
     if (
       this.idOrder &&
-      ((!this.isCompany && this.orderForm.value.status == 2) ||
-        (this.isCompany && this.orderForm.value.status == 3))
+      ((!this.isManager && this.orderForm.value.status == TakeoffStatus.TO_MEASURE) ||
+        (this.isManager && this.orderForm.value.status == TakeoffStatus.UNDER_REVIEW))
     ) {
       alert('You have unsaved data changes. Are you sure to close the page?');
     }
@@ -200,8 +210,8 @@ export class TakeOffComponent implements OnInit {
             this.orderForm.controls['carpentry'].disable();
           }
 
-          // Disable entire form for carpentry when takeoff is completed (status >= 3)
-          if (!this.isCompany && this.orderStatus >= 3) {
+          // Disable entire form for carpentry when takeoff is completed (status >= UNDER_REVIEW)
+          if (STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager)) {
             this.orderForm.disable();
             this.toastr.info(
               'This takeoff is completed and can no longer be edited.',
@@ -299,11 +309,57 @@ export class TakeOffComponent implements OnInit {
   }
 
   finalizeOrderPopUp(content) {
-    this.modalService.open(content, { centered: true, backdrop: false });
+    console.log('🔔 MODAL DEBUG: finalizeOrderPopUp called', {
+      content: !!content,
+      contentType: typeof content,
+      modalService: !!this.modalService,
+      isCompany: this.isManager,
+      orderStatus: this.orderStatus
+    });
+
+    try {
+      const modalRef = this.modalService.open(content, {
+        centered: true,
+        backdrop: false,
+        size: 'lg'
+      });
+      console.log('✅ Modal opened successfully', modalRef);
+    } catch (error) {
+      console.error('❌ Modal error:', error);
+    }
   }
 
   finalizeOrderWithoutStatus() {
     this.finalizeOrder();
+  }
+
+  /**
+   * Save progress without changing status
+   * Allows carpenter to save work in progress during measurement phase
+   */
+  saveProgress() {
+    if (!this.shouldShowSaveProgressButton()) {
+      return;
+    }
+
+    this.spinner.show();
+
+    this.takeoffService
+      .updateOrder(this.orderForm.value, this.idOrder)
+      .subscribe(
+        data => {
+          this.spinner.hide();
+          if (!data.errors) {
+            this.toastr.success('Progress saved successfully', 'Saved');
+          } else {
+            this.toastr.error('Error saving progress', 'Error');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.toastr.error('Error saving progress', 'Error');
+        }
+      );
   }
 
   finalizeOrder() {
@@ -359,13 +415,13 @@ export class TakeOffComponent implements OnInit {
     return field && field != '';
   }
 
-  get isCompany() {
-    return this.user.roles.includes('company');
+  get isManager() {
+    return this.user.roles.includes('manager');
   }
 
   get isReadonly() {
-    // Form is readonly when takeoff is completed (status >= 3) and user is not company
-    return !this.isCompany && this.orderStatus >= 3;
+    // Form is readonly when takeoff is completed (status >= UNDER_REVIEW) and user is not company
+    return STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
   }
 
   private createForm(): void {
@@ -800,51 +856,67 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '475',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '475',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
       {
         size: '',
+        height: '80',
         left: '',
         right: '',
         jamb: '',
+        sizeHeight: '',
       },
     ];
 
@@ -853,10 +925,14 @@ export class TakeOffComponent implements OnInit {
     dadosPrePreenchidos.forEach(dados => {
       const formGroup = this.builder.group({
         size: [{ value: dados.size, disabled: false }, []],
+        height: [{ value: dados.height, disabled: false }, []],
         left: [{ value: dados.left, disabled: false }, []],
         right: [{ value: dados.right, disabled: false }, []],
         jamb: dados.jamb,
+        sizeHeight: [{ value: dados.sizeHeight, disabled: true }, []],
       });
+
+      this.updateSizeHeightForIndex(formGroup);
 
       arrayForm.push(formGroup);
     });
@@ -899,5 +975,247 @@ export class TakeOffComponent implements OnInit {
       cantinaDoorsArray.push(formGroup);
     });
   }
+
+  updateSingleDoorSize(index: number): void {
+    const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+    const singleDoorForm = singleDoorsArray.at(index) as FormGroup;
+    this.updateSizeHeightForIndex(singleDoorForm);
+  }
+
+  private updateSizeHeightForIndex(formGroup: FormGroup): void {
+    const size = formGroup.get('size')?.value || '';
+    const height = formGroup.get('height')?.value || '';
+
+    let combinedValue = '';
+    if (size && height) {
+      combinedValue = `${size}/${height}"`;
+    } else if (size) {
+      combinedValue = size;
+    }
+
+    formGroup.get('sizeHeight')?.setValue(combinedValue);
+  }
+
+  canAdvanceStatus(): boolean {
+    if (!this.orderStatus || !this.user) return false;
+
+    // ONLY COMPANY can use status change dropdown
+    if (!this.isManager) return false;
+
+    // Company always has access to status dropdown for full flexibility
+    return true;
+  }
+
+  getNextStatusLabel(): string {
+    if (!this.orderStatus) return '';
+
+    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus);
+    if (nextStatuses.length === 0) return '';
+
+    return `Approve to ${nextStatuses[0].label}`;
+  }
+
+  advanceStatus(): void {
+    if (!this.canAdvanceStatus() || this.isAdvancingStatus) return;
+
+    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus);
+    if (nextStatuses.length === 0) return;
+
+    const nextStatus = nextStatuses[0];
+    this.advanceToSpecificStatus(nextStatus.id);
+  }
+
+  /**
+   * Advance to a specific status (used by company dropdown)
+   */
+  advanceToSpecificStatus(newStatusId: number): void {
+    if (this.isAdvancingStatus || newStatusId === this.orderStatus) return;
+
+    const statusInfo = this.statusService.getStatusInfo(newStatusId);
+    this.isAdvancingStatus = true;
+
+    this.statusService.updateTakeoffStatus(this.idOrder, newStatusId).subscribe(
+      (response) => {
+        this.isAdvancingStatus = false;
+        this.orderStatus = newStatusId;
+        this.toastr.success(`Status updated to ${statusInfo.label}`, 'Success');
+      },
+      (error) => {
+        this.isAdvancingStatus = false;
+        this.toastr.error('Error updating status', 'Error');
+        console.error('Error updating status:', error);
+      }
+    );
+  }
+
+  /**
+   * Get all available statuses for company dropdown
+   */
+  getAllStatuses() {
+    return [
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.CREATED),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.TO_MEASURE),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.UNDER_REVIEW),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.READY_TO_SHIP),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.SHIPPED),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.TRIMMING_COMPLETED),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.BACK_TRIM_COMPLETED),
+      this.statusService.getStatusInfo(STATUS_CONSTANTS.CLOSED)
+    ];
+  }
+
+  // ====== BUTTON DISPLAY LOGIC ======
+
+  /**
+   * Controls when the "Recall email to carpenter" button should be displayed
+   */
+  shouldShowRecallEmailButton(): boolean {
+    return this.isManager || !STATUS_CONSTANTS.isCompleted(this.orderStatus);
+  }
+
+  /**
+   * Controls when the "Save Progress" button should be displayed for carpenters
+   */
+  shouldShowCarpenterSaveButton(): boolean {
+    return !this.isManager && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, false);
+  }
+
+  /**
+   * Controls when the "Save Progress" button should be displayed for companies
+   */
+  shouldShowCompanySaveButton(): boolean {
+    return this.isManager && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, true);
+  }
+
+  /**
+   * Controls when the "Complete Takeoff" button should be displayed
+   * Carpenter can complete takeoff when they finish measurement (TO_MEASURE -> UNDER_REVIEW)
+   */
+  shouldShowCompleteButton(): boolean {
+    // CARPENTER: Only show during measurement phase (TO_MEASURE)
+    // COMPANY: Never shows this button (uses dropdown instead)
+    return !this.isManager && this.orderStatus === TakeoffStatus.TO_MEASURE;
+  }
+
+  /**
+   * Controls when the "Save Progress" button should be displayed
+   * Carpenter can save progress during measurement phase (TO_MEASURE)
+   */
+  shouldShowSaveProgressButton(): boolean {
+    // CARPENTER: Only show during measurement phase (TO_MEASURE)
+    // COMPANY: Never shows this button (has autosave or other save mechanisms)
+    return !this.isManager && this.orderStatus === TakeoffStatus.TO_MEASURE;
+  }
+
+  /**
+   * Controls when the "Back to Carpentry" button should be displayed
+   */
+  shouldShowBackToCarpentryButton(): boolean {
+    return this.isManager && STATUS_CONSTANTS.permissions.company.canBackToCarpentry(this.orderStatus);
+  }
+
+  /**
+   * Controls when the carpenter search UI should be displayed
+   */
+  shouldShowCarpenterSearch(): boolean {
+    return this.isManager && STATUS_CONSTANTS.permissions.company.canSendToCarpenter(this.orderStatus || TakeoffStatus.CREATED);
+  }
+
+  /**
+   * Controls when the read-only status indicator should be displayed
+   */
+  shouldShowReadOnlyIndicator(): boolean {
+    return STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
+  }
+
+  /**
+   * Controls when the completion status should be displayed
+   */
+  shouldShowCompletionStatus(): boolean {
+    return STATUS_CONSTANTS.isCompleted(this.orderStatus) && !this.isManager;
+  }
+
+  /**
+   * Controls when show/hide section buttons should be displayed
+   * Only when form is editable for the current user
+   */
+  shouldShowSectionToggleButtons(): boolean {
+    if (this.isManager) {
+      return STATUS_CONSTANTS.permissions.company.canEdit(this.orderStatus);
+    } else {
+      return STATUS_CONSTANTS.permissions.carpenter.canEdit(this.orderStatus); // Only TO_MEASURE
+    }
+  }
+
+  /**
+   * Company: Approve for shipping - advances from UNDER_REVIEW to READY_TO_SHIP
+   */
+  approveForShipping(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.UNDER_REVIEW) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.READY_TO_SHIP);
+  }
+
+  /**
+   * Company: Back to measurement - reverts from UNDER_REVIEW to TO_MEASURE
+   */
+  backToMeasurement(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.UNDER_REVIEW) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.TO_MEASURE);
+  }
+
+  /**
+   * Company: Mark as shipped - advances from READY_TO_SHIP to SHIPPED
+   */
+  markAsShipped(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.READY_TO_SHIP) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.SHIPPED);
+  }
+
+  /**
+   * Company: Send to carpenter - advances from CREATED to TO_MEASURE
+   */
+  sendToCarpenter(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.CREATED) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.TO_MEASURE);
+  }
+
+  /**
+   * Company: Mark trimming completed - advances from SHIPPED to TRIMMING_COMPLETED
+   */
+  markTrimmingCompleted(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.SHIPPED) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.TRIMMING_COMPLETED);
+  }
+
+  /**
+   * Company: Mark back trim completed - advances from TRIMMING_COMPLETED to BACK_TRIM_COMPLETED
+   */
+  markBackTrimCompleted(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.TRIMMING_COMPLETED) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.BACK_TRIM_COMPLETED);
+  }
+
+  /**
+   * Company: Close service - advances from BACK_TRIM_COMPLETED to CLOSED
+   */
+  closeService(): void {
+    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.BACK_TRIM_COMPLETED) {
+      return;
+    }
+    this.advanceToSpecificStatus(TakeoffStatus.CLOSED);
+  }
+
 
 }

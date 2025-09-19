@@ -1,0 +1,157 @@
+<div class="takeoff-actions-container">
+
+  <!-- CARPENTER ACTIONS -->
+  <div class="carpenter-actions" *ngIf="!isManager">
+
+    <!-- Save Progress Button -->
+    <button
+      *ngIf="shouldShowSaveProgress()"
+      (click)="saveProgress()"
+      class="btn btn-primary me-2"
+      [disabled]="!isFormValid || isLoading"
+    >
+      <i class="fas fa-save me-1"></i>
+      <span *ngIf="!isLoading">Save Progress</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Saving...
+      </span>
+    </button>
+
+    <!-- Complete Measurement Button -->
+    <button
+      *ngIf="shouldShowCompleteMeasurement()"
+      (click)="completeMeasurement()"
+      class="btn btn-warning"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-check-circle me-1"></i>
+      Complete Measurement
+    </button>
+
+  </div>
+
+  <!-- MANAGER ACTIONS -->
+  <div class="manager-actions" *ngIf="isManager">
+
+    <!-- Current Status Display -->
+    <div class="current-status mb-2">
+      <span class="badge bg-info fs-6 px-3 py-2">
+        <i class="fas fa-info-circle me-2"></i>
+        Current: {{ getCurrentStatusLabel() }}
+      </span>
+    </div>
+
+    <!-- Approve for Shipping Button -->
+    <button
+      *ngIf="shouldShowApproveForShipping()"
+      (click)="approveForShipping()"
+      class="btn btn-success me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-check-circle me-1"></i>
+      <span *ngIf="!isLoading">Approve for Shipping</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Approving...
+      </span>
+    </button>
+
+    <!-- Back to Measurement Button -->
+    <button
+      *ngIf="shouldShowBackToMeasurement()"
+      (click)="backToMeasurement()"
+      class="btn btn-outline-warning"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-undo me-1"></i>
+      Back to Measurement
+    </button>
+
+    <!-- Send to Carpenter Button -->
+    <button
+      *ngIf="shouldShowSendToCarpenter()"
+      (click)="sendToCarpenter()"
+      class="btn btn-primary me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-user-hard-hat me-1"></i>
+      <span *ngIf="!isLoading">Send to Carpenter</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Sending...
+      </span>
+    </button>
+
+    <!-- Mark as Shipped Button -->
+    <button
+      *ngIf="shouldShowMarkAsShipped()"
+      (click)="markAsShipped()"
+      class="btn btn-info me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-shipping-fast me-1"></i>
+      <span *ngIf="!isLoading">Mark as Shipped</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Processing...
+      </span>
+    </button>
+
+    <!-- Mark Trimming Completed Button -->
+    <button
+      *ngIf="shouldShowMarkTrimmingCompleted()"
+      (click)="markTrimmingCompleted()"
+      class="btn btn-primary me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-cut me-1"></i>
+      <span *ngIf="!isLoading">Mark Trimming Completed</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Processing...
+      </span>
+    </button>
+
+    <!-- Mark Back Trim Completed Button -->
+    <button
+      *ngIf="shouldShowMarkBackTrimCompleted()"
+      (click)="markBackTrimCompleted()"
+      class="btn btn-primary me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-check-double me-1"></i>
+      <span *ngIf="!isLoading">Mark Back Trim Completed</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Processing...
+      </span>
+    </button>
+
+    <!-- Close Service Button -->
+    <button
+      *ngIf="shouldShowCloseService()"
+      (click)="closeService()"
+      class="btn btn-dark me-2"
+      [disabled]="isLoading"
+    >
+      <i class="fas fa-times-circle me-1"></i>
+      <span *ngIf="!isLoading">Close Service</span>
+      <span *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Closing...
+      </span>
+    </button>
+
+
+  </div>
+
+  <!-- NO ACTIONS AVAILABLE -->
+  <div class="no-actions text-muted" *ngIf="!shouldShowSaveProgress() && !shouldShowCompleteMeasurement() && !shouldShowApproveForShipping() && !shouldShowBackToMeasurement() && !shouldShowMarkAsShipped() && !shouldShowSendToCarpenter() && !shouldShowMarkTrimmingCompleted() && !shouldShowMarkBackTrimCompleted() && !shouldShowCloseService()">
+    <small>
+      <i class="fas fa-lock me-1"></i>
+      No actions available for current status
+    </small>
+  </div>
+
+</div>

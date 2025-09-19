@@ -16,3 +16,123 @@ body {
     font-family: 'Exo', sans-serif;
   }
 }
+
+/* Custom Toast Styles */
+.custom-toast {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid transparent !important;
+  min-width: 350px !important;
+  max-width: 500px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+/* Modal z-index fixes */
+.modal {
+  z-index: 1060 !important;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
+
+.modal-dialog {
+  z-index: 1061 !important;
+}
+
+/* Ensure modal content is interactive */
+.modal-content {
+  position: relative;
+  z-index: 1062 !important;
+  pointer-events: auto !important;
+}
+
+/* User form modal specific styles */
+.user-form-modal {
+  z-index: 1070 !important;
+
+  .modal-dialog {
+    z-index: 1071 !important;
+  }
+
+  .modal-content {
+    z-index: 1072 !important;
+    pointer-events: auto !important;
+
+    * {
+      pointer-events: auto !important;
+    }
+  }
+}
+
+/* Badge improvements - ensure white text */
+.badge {
+  color: white !important;
+  font-weight: 500;
+
+  &.badge-primary {
+    background-color: #5e72e4 !important;
+    color: white !important;
+  }
+
+  &.badge-success {
+    background-color: #2dce89 !important;
+    color: white !important;
+  }
+
+  &.badge-warning {
+    background-color: #fb6340 !important;
+    color: white !important;
+  }
+
+  &.badge-info {
+    background-color: #11cdef !important;
+    color: white !important;
+  }
+
+  &.badge-secondary {
+    background-color: #8898aa !important;
+    color: white !important;
+  }
+}
+
+.custom-toast.toast-success {
+  background-color: #28a745 !important;
+  border-color: #1e7e34 !important;
+}
+
+.custom-toast.toast-error {
+  background-color: #dc3545 !important;
+  border-color: #c82333 !important;
+}
+
+.custom-toast.toast-warning {
+  background-color: #ffc107 !important;
+  border-color: #e0a800 !important;
+  color: #212529 !important;
+}
+
+.custom-toast.toast-info {
+  background-color: #17a2b8 !important;
+  border-color: #138496 !important;
+}
+
+.toast-title {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  margin-bottom: 4px !important;
+}
+
+.toast-message {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* Toast container positioning */
+.toast-top-center {
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+}

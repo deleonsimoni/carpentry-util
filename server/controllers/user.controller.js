@@ -7,11 +7,25 @@ const { v5: uuidv5 } = require('uuid');
 module.exports = {
   insert,
   updateImageUser,
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  getUserById,
+  generateTemporaryPassword,
+  changePassword,
+  checkPasswordStatus,
 };
 
 async function insert(user) {
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   user.email = user.email.toLowerCase();
+
+  // Para usuários com role manager, definir profile como manager
+  if (user.roles && user.roles.includes('manager')) {
+    user.profile = 'manager';
+  }
+
   delete user.password;
   return await new User(user).save();
 }
@@ -51,3 +65,263 @@ async function updateImageUser(user, img) {
 
   return await retorno;
 }
+
+// Função para gerar senha temporária
+function generateTemporaryPassword() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';
+  let password = '';
+  for (let i = 0; i < 8; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+// Listar todos os usuários com paginação e filtros
+async function getAllUsers(query) {
+  const {
+    page = 1,
+    limit = 10,
+    search = '',
+    profile = '',
+    status = ''
+  } = query;
+
+  // Construir filtros de busca
+  const filters = {};
+
+  if (search) {
+    filters.$or = [
+      { fullname: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  if (profile) {
+    filters.profile = profile;
+  }
+
+  if (status) {
+    filters.status = status;
+  }
+
+  const options = {
+    page: parseInt(page),
+    limit: parseInt(limit),
+    sort: { createdAt: -1 },
+    select: '-hashedPassword' // Não retornar senha
+  };
+
+  const users = await User.find(filters)
+    .select(options.select)
+    .sort(options.sort)
+    .limit(options.limit * 1)
+    .skip((options.page - 1) * options.limit);
+
+  const total = await User.countDocuments(filters);
+
+  return {
+    users,
+    totalPages: Math.ceil(total / options.limit),
+    currentPage: options.page,
+    totalUsers: total
+  };
+}
+
+// Criar novo usuário
+async function createUser(userData) {
+  const schema = Joi.object({
+    fullname: Joi.string().required(),
+    email: Joi.string().email().required(),
+    profile: Joi.string().valid('supervisor', 'delivery', 'manager', 'carpinter').required(),
+    mobilePhone: Joi.string().optional(),
+    homePhone: Joi.string().optional(),
+    address: Joi.object().optional(),
+    socialMedia: Joi.object().optional()
+  });
+
+  const { error, value } = schema.validate(userData);
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+
+  // Verificar se email já existe
+  const existingUser = await User.findOne({ email: value.email.toLowerCase() });
+  if (existingUser) {
+    throw new Error('Email já está em uso');
+  }
+
+  // Gerar senha temporária
+  const temporaryPassword = generateTemporaryPassword();
+
+  const newUser = {
+    ...value,
+    email: value.email.toLowerCase(),
+    hashedPassword: bcrypt.hashSync(temporaryPassword, 10),
+    requirePasswordChange: value.profile !== 'manager', // Managers não precisam trocar senha
+    temporaryPassword: value.profile !== 'manager', // Managers não têm senha temporária
+    roles: [value.profile], // Adicionar profile aos roles também
+    status: 'active'
+  };
+
+  const user = await new User(newUser).save();
+  const userResponse = user.toObject();
+  delete userResponse.hashedPassword;
+
+  return {
+    user: userResponse,
+    temporaryPassword: temporaryPassword,
+    message: `Usuário criado com sucesso. Senha temporária: ${temporaryPassword}`
+  };
+}
+
+// Buscar usuário por ID
+async function getUserById(id) {
+  const user = await User.findById(id).select('-hashedPassword');
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+  return user;
+}
+
+// Atualizar usuário
+async function updateUser(id, updateData) {
+  const schema = Joi.object({
+    fullname: Joi.string().optional(),
+    profile: Joi.string().valid('supervisor', 'delivery', 'manager', 'carpinter').optional(),
+    status: Joi.string().valid('active', 'inactive').optional(),
+    mobilePhone: Joi.string().optional(),
+    homePhone: Joi.string().optional(),
+    address: Joi.object().optional(),
+    socialMedia: Joi.object().optional()
+  });
+
+  const { error, value } = schema.validate(updateData);
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+
+  // Se mudou o profile, atualizar roles também
+  if (value.profile) {
+    value.roles = [value.profile];
+  }
+
+  const user = await User.findByIdAndUpdate(
+    id,
+    value,
+    { new: true, runValidators: true }
+  ).select('-hashedPassword');
+
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  return user;
+}
+
+// Inativar usuário (soft delete)
+async function deleteUser(id) {
+  const user = await User.findByIdAndUpdate(
+    id,
+    { status: 'inactive' },
+    { new: true }
+  ).select('-hashedPassword');
+
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  return user;
+}
+
+// Verificar status da senha (se precisa trocar)
+async function checkPasswordStatus(userId) {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  return {
+    requirePasswordChange: user.requirePasswordChange,
+    temporaryPassword: user.temporaryPassword
+  };
+}
+
+// Alterar senha (primeiro login ou mudança de senha)
+async function changePassword(userId, currentPassword, newPassword) {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  // Verificar senha atual
+  const isCurrentPasswordValid = bcrypt.compareSync(currentPassword, user.hashedPassword);
+  if (!isCurrentPasswordValid) {
+    throw new Error('Senha atual incorreta');
+  }
+
+  // Validar nova senha
+  if (newPassword.length < 6) {
+    throw new Error('Nova senha deve ter pelo menos 6 caracteres');
+  }
+
+  // Hash da nova senha
+  const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
+
+  // Atualizar usuário
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      hashedPassword: hashedNewPassword,
+      requirePasswordChange: false,
+      temporaryPassword: false,
+      lastLogin: new Date()
+    },
+    { new: true }
+  ).select('-hashedPassword');
+
+  return {
+    message: 'Senha alterada com sucesso',
+    user: updatedUser
+  };
+}
+
+// Reset de senha de usuário (gerar nova senha temporária)
+async function resetUserPassword(userId) {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  // Gerar nova senha temporária
+  const temporaryPassword = Math.random().toString(36).slice(-8);
+  const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
+
+  // Atualizar usuário
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      hashedPassword: hashedPassword,
+      requirePasswordChange: true,
+      temporaryPassword: true
+    },
+    { new: true }
+  ).select('-hashedPassword');
+
+  return {
+    message: 'Password reset successfully. New temporary password generated.',
+    user: updatedUser,
+    temporaryPassword: temporaryPassword
+  };
+}
+
+module.exports = {
+  insert,
+  getAllUsers,
+  createUser,
+  getUserById,
+  updateUser,
+  deleteUser,
+  checkPasswordStatus,
+  changePassword,
+  resetUserPassword
+};

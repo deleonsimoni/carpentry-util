@@ -1,0 +1,38 @@
+// User Role Badge Styling
+.user-role-section {
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    i {
+      font-size: 0.7rem;
+      margin-right: 0.4rem;
+    }
+
+    &.badge-primary {
+      background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+      color: white;
+      border: 2px solid rgba(94, 114, 228, 0.3);
+    }
+
+    &.badge-success {
+      background: linear-gradient(135deg, #2dce89 0%, #2dcecc 100%);
+      color: white;
+      border: 2px solid rgba(45, 206, 137, 0.3);
+    }
+  }
+
+  &.badge-lg .badge {
+    font-size: 0.8rem;
+    padding: 0.6rem 1.2rem;
+  }
+}

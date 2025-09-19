@@ -22,8 +22,8 @@
     text-align: center;
     border-left: 0;
     border-right: 0;
-    min-width: 50px; // Minimum width to display at least 2 digits
-    flex: 1; // Allow input to take remaining space
+    min-width: 50px; // Base width for 2-3 digits
+    flex: 1; // Allow growth on larger screens
     height: calc(1.5em + 0.75rem + 2px); // Standard Bootstrap input height
 
     &:focus {
@@ -74,29 +74,43 @@ input[readonly].form-control {
 // Mobile-specific adjustments
 @media only screen and (max-width: 576px) {
   .input-group {
+    // Force horizontal layout and prevent wrapping
+    display: flex !important;
+    flex-wrap: nowrap !important;
+
     .form-control {
-      min-width: 80px; // Match dropdown size for consistency
+      min-width: 50px; // Compact for 2-digit numbers
+      max-width: 65px; // Limit growth on mobile
       font-size: 0.875rem; // Slightly larger font on mobile
       height: calc(1.75em + 0.75rem + 2px); // Slightly taller for mobile
+      flex: 0 0 auto; // Prevent growing/shrinking
     }
 
     .btn-sm {
-      min-width: 36px; // Slightly larger touch targets on mobile
-      width: 36px;
+      min-width: 40px; // Better touch targets on mobile
+      width: 40px;
       height: calc(1.75em + 0.75rem + 2px); // Match mobile input height
       padding: 0.375rem 0.5rem; // Slightly more padding for better touch
+      flex-shrink: 0; // Prevent shrinking
+    }
+
+    .input-group-prepend,
+    .input-group-append {
+      flex-shrink: 0; // Prevent shrinking
     }
 
     .input-group-prepend .btn,
     .input-group-append .btn {
-      min-width: 36px;
-      width: 36px;
+      min-width: 40px;
+      width: 40px;
       height: calc(1.75em + 0.75rem + 2px); // Match mobile input height
+      flex-shrink: 0; // Prevent shrinking
     }
   }
 
   input[readonly].form-control {
-    min-width: 80px; // Match dropdown size for consistency
+    min-width: 60px; // Match component size for consistency
+    max-width: 80px;
     font-size: 0.875rem;
     height: calc(1.75em + 0.75rem + 2px); // Match mobile input height
   }
@@ -105,26 +119,42 @@ input[readonly].form-control {
 // Extra small screens (very narrow)
 @media only screen and (max-width: 320px) {
   .input-group {
-    // Ensure input group stays compact on very narrow screens
+    // Ensure input group stays compact on very narrow screens and horizontal
     max-width: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
 
     .form-control {
-      min-width: 60px; // Reduce on very small screens
+      min-width: 45px; // Very compact for small screens
+      max-width: 55px; // Prevent excessive growth
       height: calc(1.5em + 0.75rem + 2px); // Standard height on small screens
+      flex: 0 0 auto; // Prevent growing/shrinking
     }
 
     .btn-sm {
-      min-width: 32px; // Keep buttons compact
-      width: 32px;
+      min-width: 36px; // Keep buttons compact but touchable
+      width: 36px;
       height: calc(1.5em + 0.75rem + 2px); // Match input height
       padding: 0.25rem 0.375rem;
+      flex-shrink: 0; // Prevent shrinking
+    }
+
+    .input-group-prepend,
+    .input-group-append {
+      flex-shrink: 0; // Prevent shrinking
     }
 
     .input-group-prepend .btn,
     .input-group-append .btn {
-      min-width: 32px;
-      width: 32px;
+      min-width: 36px;
+      width: 36px;
       height: calc(1.5em + 0.75rem + 2px); // Match input height
+      flex-shrink: 0; // Prevent shrinking
     }
+  }
+
+  input[readonly].form-control {
+    min-width: 45px;
+    max-width: 55px;
   }
 }

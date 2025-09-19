@@ -1,7 +1,7 @@
 const httpError = require('http-errors');
 
 const requireAdmin = function (req, res, next) {
-  if (req.user && req.user.roles.indexOf('admin') > -1) return next();
+  if (req.user && (req.user.roles.indexOf('admin') > -1 || req.user.roles.indexOf('manager') > -1)) return next();
   const err = new httpError(401);
   return next(err);
 };

@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '@app/shared/services';
 import { TakeoffService } from '@app/shared/services/takeoff.service';
+import { TakeoffStatusService } from '@app/shared/services/takeoff-status.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { TakeoffStatusComponent } from '@app/shared/components/takeoff-status/takeoff-status.component';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: [],
+  imports: [CommonModule, FormsModule, NgbDropdownModule, TakeoffStatusComponent],
+  standalone: true
 })
 export class HomeComponent implements OnInit {
   myOrders;
@@ -22,7 +29,8 @@ export class HomeComponent implements OnInit {
     private takeoffService: TakeoffService,
     private authService: AuthService,
     private toastr: ToastrService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private statusService: TakeoffStatusService
   ) {}
 
   ngOnInit() {
@@ -75,8 +83,8 @@ export class HomeComponent implements OnInit {
     );
   }
 
-  get isCompany() {
-    return this.user.roles.includes('company');
+  get isManager() {
+    return this.user.roles.includes('manager');
   }
 
   newOrder() {
@@ -116,12 +124,7 @@ export class HomeComponent implements OnInit {
     // Apply status filter
     if (this.selectedStatus !== '') {
       const statusValue = parseInt(this.selectedStatus);
-      filtered = filtered.filter(order => {
-        if (statusValue >= 3) {
-          return order.status >= 3; // Completed includes status 3 and above
-        }
-        return order.status === statusValue;
-      });
+      filtered = filtered.filter(order => order.status === statusValue);
     }
 
     this.filteredOrders = filtered;
@@ -137,9 +140,27 @@ export class HomeComponent implements OnInit {
     if (this.searchTerm || this.selectedStatus) {
       return 'Try adjusting your filters to see more results.';
     }
-    if (this.isCompany) {
+    if (this.isManager) {
       return 'Create your first takeoff to get started.';
     }
     return 'No takeoffs assigned to you yet.';
   }
+
+  onStatusChanged(orderId: string, newStatus: number): void {
+    this.spinner.show();
+
+    this.statusService.updateTakeoffStatus(orderId, newStatus).subscribe(
+      () => {
+        this.spinner.hide();
+        this.toastr.success('Status updated successfully', 'Success');
+        this.listMyOrders(); // Refresh the list
+      },
+      (error) => {
+        this.spinner.hide();
+        this.toastr.error('Error updating status', 'Error');
+        console.error('Error updating status:', error);
+      }
+    );
+  }
+
 }

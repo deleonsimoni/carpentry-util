@@ -51,6 +51,18 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  get isManager() {
+    return this.user && this.user.roles && this.user.roles.includes('manager');
+  }
+
+  get userRole() {
+    return {
+      name: this.isManager ? 'Manager' : 'Carpenter',
+      icon: this.isManager ? 'fa-user-tie' : 'fa-hammer',
+      badgeClass: this.isManager ? 'badge-primary' : 'badge-success'
+    };
+  }
+
   logout() {
     this.authService.signOut();
     this.router.navigateByUrl('/login');

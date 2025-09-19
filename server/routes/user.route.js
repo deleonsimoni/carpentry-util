@@ -2,23 +2,42 @@ const express = require('express');
 const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const userCtrl = require('../controllers/user.controller');
+const requireAdmin = require('../middleware/require-admin');
 const router = express.Router();
 const fileUpload = require('express-fileupload');
 
 module.exports = router;
 
-//router.use(passport.authenticate('jwt', { session: false }));
+// Middleware de autenticação para rotas protegidas
+const requireAuth = passport.authenticate('jwt', { session: false });
 
+// Rotas públicas (sem autenticação)
 router.route('/').post(asyncHandler(insert));
 
+// Rotas protegidas (requerem autenticação e admin)
+router.route('/management')
+  .get(requireAuth, requireAdmin, asyncHandler(getAllUsers))
+  .post(requireAuth, requireAdmin, asyncHandler(createUser));
+
+router.route('/management/:id')
+  .get(requireAuth, requireAdmin, asyncHandler(getUserById))
+  .put(requireAuth, requireAdmin, asyncHandler(updateUserById))
+  .delete(requireAuth, requireAdmin, asyncHandler(deleteUserById));
+
+// Rotas para gerenciamento de senha
+router.route('/password-status')
+  .get(requireAuth, asyncHandler(checkUserPasswordStatus));
+
+router.route('/change-password')
+  .post(requireAuth, asyncHandler(changeUserPassword));
+
+router.route('/reset-password/:id')
+  .post(requireAuth, requireAdmin, asyncHandler(resetUserPassword));
+
+// Rota para upload de foto de perfil (mantida a existente)
 router.put(
   '/updateProfilePic',
-  [
-    passport.authenticate('jwt', {
-      session: false,
-    }),
-    fileUpload(),
-  ],
+  [requireAuth, fileUpload()],
   asyncHandler(updateImageProfile)
 );
 
@@ -42,4 +61,158 @@ async function updateImageProfile(req, res) {
 async function teste(req, res) {
   //let user = await userCtrl.teste(req.body);
   res.json(user);
+}
+
+// Funções para gestão de usuários
+async function getAllUsers(req, res) {
+  try {
+    const result = await userCtrl.getAllUsers(req.query);
+    res.json({
+      success: true,
+      data: result.users,
+      pagination: {
+        currentPage: result.currentPage,
+        totalPages: result.totalPages,
+        totalUsers: result.totalUsers,
+        hasNextPage: result.currentPage < result.totalPages,
+        hasPrevPage: result.currentPage > 1
+      }
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function createUser(req, res) {
+  try {
+    const result = await userCtrl.createUser(req.body);
+    res.status(201).json({
+      success: true,
+      data: result.user,
+      temporaryPassword: result.temporaryPassword,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function getUserById(req, res) {
+  try {
+    const user = await userCtrl.getUserById(req.params.id);
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function updateUserById(req, res) {
+  try {
+    const user = await userCtrl.updateUser(req.params.id, req.body);
+    res.json({
+      success: true,
+      data: user,
+      message: 'Usuário atualizado com sucesso'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function deleteUserById(req, res) {
+  try {
+    const user = await userCtrl.deleteUser(req.params.id);
+    res.json({
+      success: true,
+      data: user,
+      message: 'Usuário inativado com sucesso'
+    });
+  } catch (error) {
+    res.status(404).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function checkUserPasswordStatus(req, res) {
+  try {
+    const status = await userCtrl.checkPasswordStatus(req.user._id);
+    res.json({
+      success: true,
+      data: status
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function changeUserPassword(req, res) {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        errors: true,
+        message: 'Nova senha e confirmação não conferem'
+      });
+    }
+
+    const result = await userCtrl.changePassword(req.user._id, currentPassword, newPassword);
+    res.json({
+      success: true,
+      data: result.user,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
+}
+
+async function resetUserPassword(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await userCtrl.resetUserPassword(id);
+    res.json({
+      success: true,
+      data: result.user,
+      temporaryPassword: result.temporaryPassword,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      errors: true,
+      message: error.message
+    });
+  }
 }

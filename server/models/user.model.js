@@ -66,6 +66,27 @@ const UserSchema = new mongoose.Schema(
         type: String,
       },
     ],
+    profile: {
+      type: String,
+      enum: ['supervisor', 'delivery', 'manager', 'carpinter'],
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active',
+    },
+    requirePasswordChange: {
+      type: Boolean,
+      default: true,
+    },
+    temporaryPassword: {
+      type: Boolean,
+      default: true,
+    },
+    lastLogin: {
+      type: Date,
+    },
   },
   {
     versionKey: false,

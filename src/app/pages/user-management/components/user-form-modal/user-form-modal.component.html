@@ -1,0 +1,231 @@
+<!-- Modal Header -->
+<div class="modal-header border-bottom-0 pb-0">
+  <div class="d-flex align-items-center">
+    <div class="icon-circle bg-primary mr-3">
+      <i class="fas fa-user text-white"></i>
+    </div>
+    <div>
+      <h4 class="modal-title mb-0" id="modal-title">{{ getModalTitle() }}</h4>
+      <p class="text-muted mb-0 text-sm">{{ isEditMode ? 'Edite as informações do usuário' : 'Preencha os dados para criar um novo usuário' }}</p>
+    </div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" (click)="onCancel()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<!-- Modal Body -->
+<div class="modal-body px-4 py-4">
+
+  <!-- Generated Password Alert (only shown after user creation) -->
+  <div *ngIf="generatedPassword" class="alert alert-success border-0 shadow-sm">
+    <div class="d-flex align-items-start">
+      <div class="alert-icon mr-3">
+        <i class="fas fa-key fa-lg text-success"></i>
+      </div>
+      <div class="flex-grow-1">
+        <h6 class="alert-heading mb-2">User created successfully!</h6>
+        <p class="mb-3">Temporary password generated:</p>
+        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+          <code class="flex-grow-1 text-dark font-weight-bold h5 mb-0">{{ generatedPassword }}</code>
+          <button
+            type="button"
+            class="btn btn-sm btn-outline-primary ml-2"
+            (click)="copyPassword()">
+            <i class="fas fa-copy mr-1"></i> Copy
+          </button>
+        </div>
+        <small class="text-muted">
+          <i class="fas fa-info-circle mr-1"></i>
+          O usuário deverá trocar esta senha no primeiro login.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Form -->
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" *ngIf="!generatedPassword">
+
+    <div class="row ">
+      <!-- Full Name -->
+      <div class="col-12">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-user mr-1 text-muted"></i>
+            Full Name <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('fullname')"
+            formControlName="fullname"
+            placeholder="Enter user's full name">
+          <div *ngIf="hasError('fullname')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('fullname') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="col-12">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-envelope mr-1 text-muted"></i>
+            Email <span class="text-danger">*</span>
+            <small *ngIf="isEditMode" class="text-muted ms-1">(not editable)</small>
+          </label>
+          <input
+            type="email"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('email')"
+            formControlName="email"
+            placeholder="Enter email address"
+            [readonly]="isEditMode">
+          <div *ngIf="hasError('email')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('email') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        <i class="fas fa-id-badge mr-1 text-muted"></i>
+        Profile <span class="text-danger">*</span>
+      </label>
+      <select
+        class="form-control form-control-lg"
+        [class.is-invalid]="hasError('profile')"
+        formControlName="profile">
+        <option value="">Select a profile</option>
+        <option
+          *ngFor="let profile of profileOptions"
+          [value]="profile.value">
+          {{ profile.label }}
+        </option>
+      </select>
+      <div *ngIf="hasError('profile')" class="invalid-feedback">
+        <i class="fas fa-exclamation-circle mr-1"></i>
+        {{ getErrorMessage('profile') }}
+      </div>
+    </div>
+
+    <!-- Status (apenas em modo de edição) -->
+    <div class="form-group" *ngIf="isEditMode">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        <i class="fas fa-toggle-on mr-1 text-muted"></i>
+        Status
+      </label>
+      <select class="form-control form-control-lg" formControlName="status">
+        <option
+          *ngFor="let status of statusOptions"
+          [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+    </div>
+
+    <div class="row ">
+      <!-- Mobile Phone -->
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-mobile-alt mr-1 text-muted"></i>
+            Mobile Phone
+          </label>
+          <input
+            type="tel"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('mobilePhone')"
+            formControlName="mobilePhone"
+            placeholder="(xxx) xxx-xxxx"
+            maxlength="14"
+            (input)="onPhoneInput($event, 'mobilePhone')">
+          <div *ngIf="hasError('mobilePhone')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('mobilePhone') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-phone mr-1 text-muted"></i>
+            Phone
+          </label>
+          <input
+            type="tel"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('homePhone')"
+            formControlName="homePhone"
+            placeholder="(xxx) xxx-xxxx"
+            maxlength="14"
+            (input)="onPhoneInput($event, 'homePhone')">
+          <div *ngIf="hasError('homePhone')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('homePhone') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Important Notes for Creation -->
+    <div *ngIf="!isEditMode" class="alert alert-light border border-primary border-opacity-25 mt-4">
+      <div class="d-flex align-items-start">
+        <div class="alert-icon mr-3">
+          <i class="fas fa-info-circle fa-lg text-primary"></i>
+        </div>
+        <div>
+          <h6 class="alert-heading text-primary mb-2">Important information</h6>
+          <ul class="mb-0 small text-muted">
+            <li class="mb-1">A temporary password will be generated automatically</li>
+            <li class="mb-1">User must change password on first login</li>
+            <li class="mb-0">Credentials will be displayed after creation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Modal Footer -->
+<div class="modal-footer border-top-0 pt-0 px-4 pb-4" *ngIf="!generatedPassword">
+  <div class="d-flex justify-content-end  w-100">
+    <button
+      type="button"
+      class="btn btn-outline-secondary px-4"
+      (click)="onCancel()"
+      [disabled]="isSubmitting">
+      <i class="fas fa-times mr-1"></i>
+      Cancel
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary px-4"
+      [disabled]="!userForm.valid || isSubmitting"
+      (click)="onSubmit()">
+      <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm mr-2"></span>
+      <i *ngIf="!isSubmitting" class="fas mr-1" [ngClass]="isEditMode ? 'fa-save' : 'fa-plus'"></i>
+      {{ getSubmitButtonText() }}
+    </button>
+  </div>
+</div>
+
+<!-- Password Generated Footer -->
+<div class="modal-footer border-top-0 pt-0 px-4 pb-4" *ngIf="generatedPassword">
+  <div class="w-100 text-center">
+    <button
+      type="button"
+      class="btn btn-success px-4"
+      (click)="activeModal.close('created')">
+      <i class="fas fa-check mr-1"></i>
+      Complete
+    </button>
+  </div>
+</div>

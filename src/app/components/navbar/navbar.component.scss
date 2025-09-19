@@ -1,0 +1,28 @@
+// User role badge styling
+.media-body {
+  .badge {
+    font-size: 0.6rem;
+    padding: 0.25rem 0.5rem;
+    font-weight: 500;
+
+    i {
+      font-size: 0.55rem;
+      margin-right: 0.25rem;
+    }
+  }
+
+  .badge-sm {
+    font-size: 0.55rem;
+    padding: 0.2rem 0.4rem;
+  }
+}
+
+// Adjust spacing for better alignment
+.navbar .media-body {
+  line-height: 1.2;
+
+  .mb-0 {
+    display: block;
+    margin-bottom: 0.1rem !important;
+  }
+}

@@ -23,10 +23,14 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { ImagePathUrlPipe } from './pipes/image-path-url.pipe';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { NumberInputComponent } from './components/number-input/number-input.component';
+import { TakeoffStatusComponent } from './components/takeoff-status/takeoff-status.component';
+import { TakeoffActionsComponent } from './components/takeoff-actions/takeoff-actions.component';
 
 @NgModule({
   imports: [
     NumberInputComponent,
+    TakeoffStatusComponent,
+    TakeoffActionsComponent,
   ],
   exports: [
     FormsModule,
@@ -53,6 +57,8 @@ import { NumberInputComponent } from './components/number-input/number-input.com
     ImagePathUrlPipe,
     MatAutocompleteModule,
     NumberInputComponent,
+    TakeoffStatusComponent,
+    TakeoffActionsComponent,
   ],
   providers: [ImagePathUrlPipe],
   declarations: [ImagePathUrlPipe],

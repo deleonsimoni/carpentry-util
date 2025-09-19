@@ -5,6 +5,7 @@ const User = require('../models/user.model');
 module.exports = {
   generateToken,
   updateUser,
+  updateLastLogin,
 };
 
 function generateToken(user) {
@@ -19,5 +20,13 @@ async function updateUser(user, body) {
       _id: user._id,
     },
     body
+  );
+}
+
+async function updateLastLogin(userId) {
+  return await User.findByIdAndUpdate(
+    userId,
+    { lastLogin: new Date() },
+    { new: true }
   );
 }
