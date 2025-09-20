@@ -123,6 +123,202 @@
                 <span *ngIf="passwordMismatch() && registerForm.get('repeatPassword')?.value">Passwords do not match</span>
               </div>
             </div>
+
+            <!-- Company Information Section -->
+            <div class="mt-4">
+              <div class="text-center text-muted mb-3">
+                <small><strong>Company Information</strong></small>
+              </div>
+
+              <!-- Company Name -->
+              <div class="form-group" formGroupName="company">
+                <div class="input-group input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="ni ni-building"></i></span>
+                  </div>
+                  <input
+                    class="form-control"
+                    formControlName="name"
+                    placeholder="Company Name"
+                    type="text"
+                    [class.is-valid]="registerForm.get('company.name')?.valid && registerForm.get('company.name')?.touched"
+                    [class.is-invalid]="registerForm.get('company.name')?.invalid && registerForm.get('company.name')?.touched"
+                  >
+                </div>
+                <div *ngIf="registerForm.get('company.name')?.invalid && registerForm.get('company.name')?.touched"
+                     class="text-danger text-sm">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  Company name is required
+                </div>
+              </div>
+
+              <!-- Business Number -->
+              <div class="form-group" formGroupName="company">
+                <div class="input-group input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                  </div>
+                  <input
+                    class="form-control"
+                    formControlName="businessNumber"
+                    placeholder="Business Number (Optional)"
+                    type="text"
+                  >
+                </div>
+              </div>
+
+              <!-- Industry -->
+              <div class="form-group" formGroupName="company">
+                <div class="input-group input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-industry"></i></span>
+                  </div>
+                  <input
+                    class="form-control"
+                    formControlName="industry"
+                    placeholder="Industry (Optional)"
+                    type="text"
+                  >
+                </div>
+              </div>
+
+              <!-- Company Contact -->
+              <div class="row" formGroupName="company">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                      </div>
+                      <input
+                        class="form-control"
+                        formControlName="phone"
+                        placeholder="(123) 456-7890"
+                        type="text"
+                        maxlength="14"
+                        (input)="formatPhone($event)"
+                        [class.is-invalid]="registerForm.get('company.phone')?.invalid && registerForm.get('company.phone')?.touched"
+                      >
+                    </div>
+                    <div *ngIf="registerForm.get('company.phone')?.invalid && registerForm.get('company.phone')?.touched"
+                         class="text-danger text-sm">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>
+                      Invalid phone format
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                      </div>
+                      <input
+                        class="form-control"
+                        formControlName="email"
+                        placeholder="Company Email"
+                        type="email"
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Website -->
+              <div class="form-group" formGroupName="company">
+                <div class="input-group input-group-alternative mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                  </div>
+                  <input
+                    class="form-control"
+                    formControlName="website"
+                    placeholder="Website (Optional)"
+                    type="url"
+                  >
+                </div>
+              </div>
+
+              <!-- Address Section -->
+              <div class="text-center text-muted mb-3 mt-4">
+                <small><strong>Company Address</strong></small>
+              </div>
+
+              <div formGroupName="company">
+                <div formGroupName="address">
+                  <!-- Street Address -->
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                      </div>
+                      <input
+                        class="form-control"
+                        formControlName="street"
+                        placeholder="Street Address (Optional)"
+                        type="text"
+                      >
+                    </div>
+                  </div>
+
+                  <!-- City and Province -->
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <div class="input-group input-group-alternative mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-city"></i></span>
+                          </div>
+                          <input
+                            class="form-control"
+                            formControlName="city"
+                            placeholder="City"
+                            type="text"
+                          >
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <select
+                          class="form-control"
+                          formControlName="province"
+                        >
+                          <option value="">Select Province</option>
+                          <option *ngFor="let province of canadianProvinces" [value]="province.code">
+                            {{province.name}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Postal Code -->
+                  <div class="form-group">
+                    <div class="input-group input-group-alternative mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-mail-bulk"></i></span>
+                      </div>
+                      <input
+                        class="form-control"
+                        formControlName="postalCode"
+                        placeholder="Postal Code (A1A 1A1)"
+                        type="text"
+                        maxlength="7"
+                        (input)="formatPostalCode($event)"
+                        [class.is-invalid]="registerForm.get('company.address.postalCode')?.invalid && registerForm.get('company.address.postalCode')?.touched"
+                      >
+                    </div>
+                    <div *ngIf="registerForm.get('company.address.postalCode')?.invalid && registerForm.get('company.address.postalCode')?.touched"
+                         class="text-danger text-sm">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>
+                      Invalid postal code format (use A1A 1A1)
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- <div class="text-muted font-italic"><small>password strength: <span
                   class="text-success font-weight-700">strong</span></small></div>-->
             <div class="row my-4">

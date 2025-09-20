@@ -1,18 +1,30 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
+import { CompanyService } from '@app/shared/services/company.service';
+import { Company } from '@app/shared/interfaces/company.interface';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
 
 declare interface RouteInfo {
   path: string;
   title: string;
   icon: string;
   class: string;
+  superAdminOnly?: boolean;
+  carpenterOnly?: boolean;
 }
 export const ROUTES: RouteInfo[] = [
   //{ path: '/dashboard', title: 'Dashboard', icon: 'ni-tv-2 text-primary', class: '' },
   //{ path: '/icons', title: 'Icons', icon: 'ni-planet text-blue', class: '' },
   //{ path: '/maps', title: 'Maps', icon: 'ni-pin-3 text-orange', class: '' },
   { path: '/home', title: 'Takeoff', icon: 'ni-building text-red', class: '' },
+  {
+    path: '/home',
+    title: 'My Measurements',
+    icon: 'ni-ruler-pencil text-yellow',
+    class: '',
+    carpenterOnly: true,
+  },
   {
     path: '/list-material-request',
     title: 'Material Request',
@@ -24,6 +36,13 @@ export const ROUTES: RouteInfo[] = [
     title: 'Gestão de Usuários',
     icon: 'ni-single-02 text-green',
     class: '',
+  },
+  {
+    path: '/companies',
+    title: 'Companies',
+    icon: 'ni-building text-orange',
+    class: '',
+    superAdminOnly: true,
   },
   // {
   //   path: '/user-profile',
@@ -47,13 +66,38 @@ export class SidebarComponent implements OnInit {
   public menuItems: any[] = []; // Initialize as empty array
   public isCollapsed = true;
   user;
+  currentCompany: Company | null = null;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService, private companyService: CompanyService) {}
 
   ngOnInit() {
     this.authService.getUser().subscribe(user => {
       this.user = user;
       this.updateMenuItems();
+
+      // Load company information if user has a company
+      if (user && user.company) {
+        console.log('Loading company for user:', user.email, 'company ID:', user.company);
+        this.companyService.loadCurrentUserCompany(user.company).subscribe(
+          company => {
+            console.log('Company loaded successfully:', company);
+            this.currentCompany = company;
+          },
+          error => {
+            console.error('Error loading company:', error);
+            this.currentCompany = null;
+          }
+        );
+      } else {
+        console.log('User has no company assigned:', user);
+        this.currentCompany = null;
+      }
+    });
+
+    // Subscribe to company changes
+    this.companyService.getCurrentCompany().subscribe(company => {
+      console.log('Company changed via subscription:', company);
+      this.currentCompany = company;
     });
 
     this.router.events.subscribe(event => {
@@ -74,17 +118,43 @@ export class SidebarComponent implements OnInit {
     if (!this.isAdmin && !this.isManager) {
       this.menuItems = this.menuItems.filter(item => item.path !== '/user-management');
     }
+
+    // Remove super admin only routes for non-super admin users
+    if (!this.isSuperAdmin) {
+      this.menuItems = this.menuItems.filter(item => !item.superAdminOnly);
+    }
+
+    // Remove carpenter only routes for non-carpenter users
+    if (!this.isCarpenter) {
+      this.menuItems = this.menuItems.filter(item => !item.carpenterOnly);
+    }
   }
 
   get isManager() {
-    return this.user && this.user.roles && this.user.roles.includes('manager');
+    return this.user && this.user.roles && UserRoles.isManager(this.user.roles);
   }
 
   get isAdmin() {
     return this.user && this.user.isAdmin;
   }
 
+  get isSuperAdmin() {
+    return this.user && this.user.roles && UserRoles.isSuperAdmin(this.user.roles);
+  }
+
+  get isCarpenter() {
+    return this.user && this.user.roles && UserRoles.isCarpenter(this.user.roles);
+  }
+
   get userRole() {
+    if (this.isSuperAdmin) {
+      return {
+        name: 'Super Admin',
+        icon: 'fa-crown',
+        badgeClass: 'badge-danger'
+      };
+    }
+
     if (this.user?.isAdmin) {
       return {
         name: 'Admin Global',
@@ -127,9 +197,9 @@ export class SidebarComponent implements OnInit {
       };
     }
 
-    if (profile === 'carpinter') {
+    if (profile === UserRoles.CARPENTER) {
       return {
-        name: 'Carpinter',
+        name: 'Carpenter',
         icon: 'fa-hammer',
         badgeClass: 'badge-warning'
       };

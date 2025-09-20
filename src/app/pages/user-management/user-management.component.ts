@@ -2,13 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModal, NgbModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { UserService, UserProfile } from '@app/shared/services/user.service';
 import { UserFormModalComponent } from './components/user-form-modal/user-form-modal.component';
 import { PasswordResetModalComponent } from './components/password-reset-modal/password-reset-modal.component';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
 
 @Component({
   selector: 'app-user-management',
@@ -53,7 +54,7 @@ export class UserManagementComponent implements OnInit {
   constructor(
     public userService: UserService,
     private modalService: NgbModal,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService
   ) {
     // Setup debounce para busca
@@ -92,7 +93,7 @@ export class UserManagementComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao carregar usuários:', error);
-        this.toastr.error('Erro ao carregar usuários', 'Error');
+        this.notification.error('Erro ao carregar usuários', 'Error');
         this.isLoading = false;
         this.spinner.hide();
       }
@@ -176,12 +177,12 @@ export class UserManagementComponent implements OnInit {
 
       this.userService.updateUser(user._id, { status: newStatus }).subscribe({
         next: (response) => {
-          this.toastr.success(response.message, 'Success');
+          this.notification.success(response.message, 'Success');
           this.loadUsers();
         },
         error: (error) => {
           console.error('Erro ao alterar status duser:', error);
-          this.toastr.error(error.error?.message || 'Erro ao alterar status', 'Error');
+          this.notification.error(error.error?.message || 'Erro ao alterar status', 'Error');
           this.spinner.hide();
         }
       });
@@ -205,12 +206,7 @@ export class UserManagementComponent implements OnInit {
 
   // Helper para obter classe CSS do perfil
   getProfileClass(profile: string): string {
-    switch (profile) {
-      case 'supervisor': return 'badge-primary';
-      case 'carpinteiro': return 'badge-warning';
-      case 'entregador': return 'badge-info';
-      default: return 'badge-secondary';
-    }
+    return UserRoles.getRoleBadgeClass(profile);
   }
 
   // Formatar data
@@ -257,7 +253,7 @@ export class UserManagementComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error resetting password:', error);
-          this.toastr.error(error.error?.message || 'Error resetting password', 'Error');
+          this.notification.error(error.error?.message || 'Error resetting password', 'Error');
           this.spinner.hide();
         }
       });

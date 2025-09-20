@@ -5,13 +5,22 @@ module.exports = {
   getDashboardData
 };
 
-async function getDashboardData(userId) {
+async function getDashboardData(userId, companyFilter = {}) {
   try {
+    // Filtros de empresa baseados no header
+    const userCompanyFilter = {
+      status: 'active',
+      ...companyFilter
+    };
+
     // Total de takeoffs
-    const totalTakeoffs = await Takeoff.countDocuments();
+    const totalTakeoffs = await Takeoff.countDocuments(companyFilter);
 
     // Takeoffs por status
     const takeoffsByStatus = await Takeoff.aggregate([
+      {
+        $match: companyFilter
+      },
       {
         $group: {
           _id: '$status',
@@ -21,26 +30,32 @@ async function getDashboardData(userId) {
     ]);
 
     // Total de usuários ativos
-    const activeUsers = await User.countDocuments({ status: 'active' });
+    const activeUsers = await User.countDocuments(userCompanyFilter);
 
     // Takeoffs do mês atual
     const currentMonth = new Date();
     currentMonth.setDate(1);
     currentMonth.setHours(0, 0, 0, 0);
 
-    const takeoffsThisMonth = await Takeoff.countDocuments({
-      createdAt: { $gte: currentMonth }
-    });
+    const monthFilter = {
+      createdAt: { $gte: currentMonth },
+      ...companyFilter
+    };
+
+    const takeoffsThisMonth = await Takeoff.countDocuments(monthFilter);
 
     // Takeoffs dos últimos 6 meses para gráfico
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
+    const sixMonthFilter = {
+      createdAt: { $gte: sixMonthsAgo },
+      ...companyFilter
+    };
+
     const takeoffsByMonth = await Takeoff.aggregate([
       {
-        $match: {
-          createdAt: { $gte: sixMonthsAgo }
-        }
+        $match: sixMonthFilter
       },
       {
         $group: {
@@ -57,7 +72,7 @@ async function getDashboardData(userId) {
     ]);
 
     // Takeoffs recentes
-    const recentTakeoffs = await Takeoff.find()
+    const recentTakeoffs = await Takeoff.find(companyFilter)
       .populate('user', 'fullname email')
       .populate('carpentry', 'fullname email')
       .select('custumerName status createdAt lot shipTo')

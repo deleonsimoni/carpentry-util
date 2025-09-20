@@ -3,6 +3,7 @@ const passport = require('passport');
 const asyncHandler = require('express-async-handler');
 const userCtrl = require('../controllers/user.controller');
 const requireAdmin = require('../middleware/require-admin');
+const companyHeaderMiddleware = require('../middleware/company-header.middleware');
 const router = express.Router();
 const fileUpload = require('express-fileupload');
 
@@ -16,13 +17,13 @@ router.route('/').post(asyncHandler(insert));
 
 // Rotas protegidas (requerem autenticação e admin)
 router.route('/management')
-  .get(requireAuth, requireAdmin, asyncHandler(getAllUsers))
-  .post(requireAuth, requireAdmin, asyncHandler(createUser));
+  .get(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(getAllUsers))
+  .post(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(createUser));
 
 router.route('/management/:id')
-  .get(requireAuth, requireAdmin, asyncHandler(getUserById))
-  .put(requireAuth, requireAdmin, asyncHandler(updateUserById))
-  .delete(requireAuth, requireAdmin, asyncHandler(deleteUserById));
+  .get(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(getUserById))
+  .put(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(updateUserById))
+  .delete(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(deleteUserById));
 
 // Rotas para gerenciamento de senha
 router.route('/password-status')
@@ -66,7 +67,7 @@ async function teste(req, res) {
 // Funções para gestão de usuários
 async function getAllUsers(req, res) {
   try {
-    const result = await userCtrl.getAllUsers(req.query);
+    const result = await userCtrl.getAllUsers(req.query, req.companyFilter);
     res.json({
       success: true,
       data: result.users,
@@ -89,7 +90,7 @@ async function getAllUsers(req, res) {
 
 async function createUser(req, res) {
   try {
-    const result = await userCtrl.createUser(req.body);
+    const result = await userCtrl.createUser(req.body, req.companyFilter, req.user);
     res.status(201).json({
       success: true,
       data: result.user,
@@ -107,7 +108,7 @@ async function createUser(req, res) {
 
 async function getUserById(req, res) {
   try {
-    const user = await userCtrl.getUserById(req.params.id);
+    const user = await userCtrl.getUserById(req.params.id, req.companyFilter);
     res.json({
       success: true,
       data: user
@@ -123,7 +124,7 @@ async function getUserById(req, res) {
 
 async function updateUserById(req, res) {
   try {
-    const user = await userCtrl.updateUser(req.params.id, req.body);
+    const user = await userCtrl.updateUser(req.params.id, req.body, req.companyFilter, req.user);
     res.json({
       success: true,
       data: user,
@@ -140,7 +141,7 @@ async function updateUserById(req, res) {
 
 async function deleteUserById(req, res) {
   try {
-    const user = await userCtrl.deleteUser(req.params.id);
+    const user = await userCtrl.deleteUser(req.params.id, req.companyFilter);
     res.json({
       success: true,
       data: user,

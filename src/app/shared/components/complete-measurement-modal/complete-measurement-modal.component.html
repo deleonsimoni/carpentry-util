@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <h4 class="modal-title">⚠️ Complete Measurement - Final Confirmation</h4>
+  <button
+    type="button"
+    class="ni ni-fat-remove"
+    aria-label="Close"
+    (click)="onCancelClicked()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="alert alert-warning" role="alert">
+    <h6 class="alert-heading mb-2">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      Important Notice
+    </h6>
+    <p class="mb-2">
+      <strong>Customer:</strong> {{ customerName || 'N/A' }}
+    </p>
+    <p class="mb-0">
+      Once you complete the measurement and advance to <strong>"Under Review"</strong>,
+      you will <strong>NO LONGER</strong> be able to edit or modify this takeoff form.
+    </p>
+    <hr class="my-3">
+    <p class="mb-0">
+      <i class="fas fa-info-circle mr-2"></i>
+      Please make sure all measurements and information are correct before proceeding.
+    </p>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="onCancelClicked()"
+    [disabled]="isLoading"
+  >
+    <i class="fas fa-times mr-2"></i>
+    Cancel
+  </button>
+  <button
+    type="button"
+    class="btn btn-warning"
+    (click)="onCompleteClicked()"
+    [disabled]="isLoading"
+  >
+    <i *ngIf="isLoading" class="fas fa-spinner fa-spin mr-2"></i>
+    <i *ngIf="!isLoading" class="fas fa-check mr-2"></i>
+    {{ isLoading ? 'Processing...' : 'Complete Measurement' }}
+  </button>
+</div>

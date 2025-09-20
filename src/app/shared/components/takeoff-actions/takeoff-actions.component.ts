@@ -1,6 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NotificationService } from '@app/shared/services/notification.service';
+import { TakeoffService } from '../../services/takeoff.service';
 import { TakeoffStatus, STATUS_CONSTANTS } from '../../interfaces/takeoff-status.interface';
+import { DeliveryPhotoModalComponent } from '../delivery-photo-modal/delivery-photo-modal.component';
 
 @Component({
   selector: 'app-takeoff-actions',
@@ -12,7 +16,9 @@ import { TakeoffStatus, STATUS_CONSTANTS } from '../../interfaces/takeoff-status
 export class TakeoffActionsComponent {
   @Input() currentStatus: number = 1;
   @Input() isManager: boolean = false;
+  @Input() userRole: string = ''; // New input for user role
   @Input() takeoffId: string = '';
+  @Input() customerName: string = ''; // For delivery photo modal
   @Input() isFormValid: boolean = true;
   @Input() isLoading: boolean = false;
 
@@ -25,6 +31,20 @@ export class TakeoffActionsComponent {
   @Output() onMarkTrimmingCompleted = new EventEmitter<void>();
   @Output() onMarkBackTrimCompleted = new EventEmitter<void>();
   @Output() onCloseService = new EventEmitter<void>();
+
+  constructor(
+    private modalService: NgbModal,
+    private notification: NotificationService,
+    private takeoffService: TakeoffService
+  ) {}
+
+  get currentUserRole(): string {
+    // Use userRole if provided, otherwise fall back to isManager for backward compatibility
+    if (this.userRole) {
+      return this.userRole;
+    }
+    return this.isManager ? 'manager' : 'carpenter';
+  }
 
   /**
    * CARPENTER: Save Progress Button
@@ -59,11 +79,12 @@ export class TakeoffActionsComponent {
   }
 
   /**
-   * MANAGER: Mark as Shipped Button
+   * MANAGER/DELIVERY: Mark as Shipped Button
    * Show when takeoff is READY_TO_SHIP and needs to be marked as shipped
    */
   shouldShowMarkAsShipped(): boolean {
-    return this.isManager && this.currentStatus === TakeoffStatus.READY_TO_SHIP;
+    const userRole = this.currentUserRole;
+    return (userRole === 'manager' || userRole === 'delivery') && this.currentStatus === TakeoffStatus.READY_TO_SHIP;
   }
 
   /**
@@ -144,8 +165,57 @@ export class TakeoffActionsComponent {
 
   markAsShipped() {
     if (this.shouldShowMarkAsShipped()) {
-      this.onMarkAsShipped.emit();
+      const userRole = this.currentUserRole;
+
+      // If delivery user, show photo upload modal
+      if (userRole === 'delivery') {
+        this.showDeliveryPhotoModal();
+      } else {
+        // Manager can mark as shipped directly (or also with photo modal)
+        this.onMarkAsShipped.emit();
+      }
     }
+  }
+
+  /**
+   * Show delivery photo modal for delivery users
+   */
+  private showDeliveryPhotoModal(): void {
+    const modalRef = this.modalService.open(DeliveryPhotoModalComponent, {
+      size: 'lg',
+      backdrop: 'static',
+      keyboard: false
+    });
+
+    modalRef.componentInstance.takeoffId = this.takeoffId;
+    modalRef.componentInstance.customerName = this.customerName;
+
+    modalRef.componentInstance.photoUploaded.subscribe((photo: File) => {
+      this.handleDeliveryPhotoUpload(photo, modalRef);
+    });
+  }
+
+  /**
+   * Handle the delivery photo upload and status change
+   */
+  private handleDeliveryPhotoUpload(photo: File, modalRef: any): void {
+    this.takeoffService.uploadDeliveryPhoto(this.takeoffId, photo).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notification.success('Delivery photo uploaded successfully', 'Photo Uploaded');
+          modalRef.componentInstance.completeUpload();
+          this.onMarkAsShipped.emit();
+        } else {
+          this.notification.error('Failed to upload delivery photo', 'Upload Error');
+          modalRef.componentInstance.uploadError();
+        }
+      },
+      error: (error) => {
+        console.error('Error uploading delivery photo:', error);
+        this.notification.error('Error uploading delivery photo', 'Upload Error');
+        modalRef.componentInstance.uploadError();
+      }
+    });
   }
 
   sendToCarpenter() {

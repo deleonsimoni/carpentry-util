@@ -7,9 +7,16 @@ import { TakeoffStatusService } from '@app/shared/services/takeoff-status.servic
 import { STATUS_CONSTANTS, TakeoffStatus } from '@app/shared/interfaces/takeoff-status.interface';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { TakeoffStatusComponent } from '@app/shared/components/takeoff-status/takeoff-status.component';
 import { TakeoffActionsComponent } from '@app/shared/components/takeoff-actions/takeoff-actions.component';
+import { CompleteMeasurementModalComponent } from '@app/shared/components/complete-measurement-modal/complete-measurement-modal.component';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
+import { Observable, Subject, debounceTime, distinctUntilChanged, map, merge, filter } from 'rxjs';
+import { CarpenterAutocompleteComponent } from '@app/shared/components/carpenter-autocomplete/carpenter-autocomplete.component';
+import { User } from '@app/shared/interfaces/user.interface';
+import { Carpenter, CarpenterData, TakeoffOrder } from '@app/shared/interfaces/takeoff.interface';
+import { MESSAGES, BREAKPOINTS } from '@app/shared/constants/messages.constants';
 import {
   trigger,
   state,
@@ -41,20 +48,82 @@ import {
 })
 export class TakeOffComponent implements OnInit {
   public orderForm: FormGroup;
-  carpentrys;
-  user;
-  idOrder;
-  mobile;
-  orderStatus;
-  isAdvancingStatus = false;
+  carpentrys: Carpenter[] = [];
+  user: User | null = null;
+  idOrder: string | null = null;
+  mobile: boolean = false;
+  orderStatus: number | null = null;
+  isAdvancingStatus: boolean = false;
 
-  // Status constants for template use
   readonly STATUS = STATUS_CONSTANTS;
   readonly TakeoffStatus = TakeoffStatus;
+  readonly MESSAGES = MESSAGES;
+
   emailRegex: RegExp =
     /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
-  emailCarpentry;
-  nameCarpentry;
+
+  measurementCarpenter: CarpenterData = {
+    carpenter: null,
+    email: '',
+    name: '',
+    isFound: false
+  };
+
+  trimCarpenter: CarpenterData = {
+    carpenter: null,
+    email: '',
+    name: '',
+    isFound: false
+  };
+
+  // Backward compatibility getters for template
+  get emailCarpentry(): string {
+    return this.measurementCarpenter.email;
+  }
+
+  set emailCarpentry(value: string) {
+    this.measurementCarpenter.email = value;
+  }
+
+  get nameCarpentry(): string {
+    return this.measurementCarpenter.name;
+  }
+
+  set nameCarpentry(value: string) {
+    this.measurementCarpenter.name = value;
+  }
+
+  get isCarpentryFound(): boolean {
+    return this.measurementCarpenter.isFound;
+  }
+
+  set isCarpentryFound(value: boolean) {
+    this.measurementCarpenter.isFound = value;
+  }
+
+  get emailTrimCarpentry(): string {
+    return this.trimCarpenter.email;
+  }
+
+  set emailTrimCarpentry(value: string) {
+    this.trimCarpenter.email = value;
+  }
+
+  get nameTrimCarpentry(): string {
+    return this.trimCarpenter.name;
+  }
+
+  set nameTrimCarpentry(value: string) {
+    this.trimCarpenter.name = value;
+  }
+
+  get isTrimCarpentryFound(): boolean {
+    return this.trimCarpenter.isFound;
+  }
+
+  set isTrimCarpentryFound(value: boolean) {
+    this.trimCarpenter.isFound = value;
+  }
 
   isVisibleCantinaDoors = false;
   isVisibleFrenchDoors = false;
@@ -64,7 +133,6 @@ export class TakeOffComponent implements OnInit {
   isVisibleTrim = false;
   isVisibleHardware = false;
   isVisibleLabour = false;
-  isCarpentryFound = false;
 
   doorsStyleValueIsOther = false;
 
@@ -88,7 +156,7 @@ export class TakeOffComponent implements OnInit {
     private takeoffService: TakeoffService,
     public statusService: TakeoffStatusService,
     private builder: FormBuilder,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService,
     private route: ActivatedRoute,
     private authService: AuthService,
@@ -153,12 +221,12 @@ export class TakeOffComponent implements OnInit {
           data => {
             if (!data) {
               this.spinner.hide();
-              this.toastr.warning('Carpentry not found', 'Warning');
+              this.notification.warning('Carpentry not found', 'Warning');
             } else if (data.errors) {
               this.spinner.hide();
-              this.toastr.error('Error get email carpentry', 'Error');
+              this.notification.error('Error get email carpentry', 'Error');
             } else {
-              this.toastr.success(
+              this.notification.success(
                 'Carpenter found and linked to takeoff ',
                 'Success: '
               );
@@ -173,11 +241,11 @@ export class TakeOffComponent implements OnInit {
           },
           err => {
             this.spinner.hide();
-            this.toastr.error('Error get carpentry by email ', 'Erro: ');
+            this.notification.error('Error get carpentry by email ', 'Erro: ');
           }
         );
     } else {
-      this.toastr.warning('Enter the email correctly', 'Erro: ');
+      this.notification.warning('Enter the email correctly', 'Erro: ');
     }
   }
 
@@ -192,7 +260,7 @@ export class TakeOffComponent implements OnInit {
       data => {
         if (data.errors) {
           this.spinner.hide();
-          this.toastr.error('Error get detail takeoff', 'Atenção');
+          this.notification.error('Error get detail takeoff', 'Atenção');
         } else {
           //this.carpentrys = data;
           this.orderForm.patchValue(data[0]);
@@ -203,17 +271,38 @@ export class TakeOffComponent implements OnInit {
             ?.setValue(data[0].carpentry.email);
           this.emailCarpentry = data[0].carpentry.email;
           this.nameCarpentry = data[0].carpentry.fullname;
+          this.isCarpentryFound = true;
+
+          // Handle trim carpenter if it exists
+          if (data[0].trimCarpentry) {
+            this.orderForm?.get('trimCarpentry')?.setValue(data[0].trimCarpentry._id);
+            this.emailTrimCarpentry = data[0].trimCarpentry.email;
+            this.nameTrimCarpentry = data[0].trimCarpentry.fullname;
+            this.isTrimCarpentryFound = true;
+            console.log('Trim carpenter loaded:', {
+              id: data[0].trimCarpentry._id,
+              name: this.nameTrimCarpentry,
+              email: this.emailTrimCarpentry,
+              found: this.isTrimCarpentryFound
+            });
+          } else {
+            // Reset trim carpenter data when not present
+            this.orderForm?.get('trimCarpentry')?.setValue('');
+            this.emailTrimCarpentry = '';
+            this.nameTrimCarpentry = '';
+            this.isTrimCarpentryFound = false;
+          }
 
           this.orderStatus = data[0].status;
 
-          if (this.orderStatus > 1) {
+          if (this.orderStatus !== null && this.orderStatus > 1) {
             this.orderForm.controls['carpentry'].disable();
           }
 
           // Disable entire form for carpentry when takeoff is completed (status >= UNDER_REVIEW)
-          if (STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager)) {
+          if (this.orderStatus !== null && STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager)) {
             this.orderForm.disable();
-            this.toastr.info(
+            this.notification.info(
               'This takeoff is completed and can no longer be edited.',
               'Read-only mode'
             );
@@ -224,7 +313,7 @@ export class TakeOffComponent implements OnInit {
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error get detail takeoff. ', 'Erro: ');
+        this.notification.error('Error get detail takeoff. ', 'Erro: ');
       }
     );
   }
@@ -237,16 +326,76 @@ export class TakeOffComponent implements OnInit {
         this.spinner.hide();
 
         if (data.errors) {
-          this.toastr.error('Error get carpentry', 'Atenção');
+          this.notification.error('Error get carpentry', 'Atenção');
         } else {
           this.carpentrys = data;
         }
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error get carpentry. ', 'Erro: ');
+        this.notification.error('Error get carpentry. ', 'Erro: ');
       }
     );
+  }
+
+  onCarpenterSelected(carpenter: Carpenter): void {
+    if (carpenter) {
+      this.orderForm.get('carpentry')?.setValue(carpenter._id);
+      this.orderForm.get('carpentryEmail')?.setValue(carpenter.email);
+
+      this.measurementCarpenter = {
+        carpenter,
+        email: carpenter.email,
+        name: carpenter.fullname,
+        isFound: true
+      };
+
+      if (this.idOrder && !this.shouldDisableFormField()) {
+        this.notification.info(this.MESSAGES.INFO.MEASUREMENT_CARPENTER_ASSIGNED, this.MESSAGES.TITLE.CARPENTER_UPDATED);
+        this.autoSaveCarpenterAssignment();
+      }
+    }
+  }
+
+  onCarpenterCleared() {
+    this.orderForm.get('carpentry')?.setValue('');
+    this.orderForm.get('carpentryEmail')?.setValue('');
+    this.emailCarpentry = '';
+    this.nameCarpentry = '';
+    this.isCarpentryFound = false;
+
+    if (this.idOrder && !this.shouldDisableFormField()) {
+      this.notification.info('Measurement carpenter removed. Changes will be saved automatically.', 'Carpenter Updated');
+      this.autoSaveCarpenterAssignment();
+    }
+  }
+
+  onTrimCarpenterSelected(carpenter: any) {
+    if (carpenter) {
+      this.emailTrimCarpentry = carpenter.email;
+      this.nameTrimCarpentry = carpenter.fullname;
+      this.isTrimCarpentryFound = true;
+
+      if (this.idOrder && !this.shouldDisableFormField()) {
+        this.notification.info('Trim carpenter assigned. Changes will be saved automatically.', 'Carpenter Updated');
+        this.autoSaveTrimCarpenterAssignment(carpenter._id);
+      } else {
+        this.orderForm.get('trimCarpentry')?.setValue(carpenter._id);
+      }
+    }
+  }
+
+  onTrimCarpenterCleared() {
+    this.emailTrimCarpentry = '';
+    this.nameTrimCarpentry = '';
+    this.isTrimCarpentryFound = false;
+
+    if (this.idOrder && !this.shouldDisableFormField()) {
+      this.notification.info('Trim carpenter removed. Changes will be saved automatically.', 'Carpenter Updated');
+      this.autoRemoveTrimCarpenter();
+    } else {
+      this.orderForm.get('trimCarpentry')?.setValue('');
+    }
   }
 
   back() {
@@ -273,15 +422,15 @@ export class TakeOffComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Takeoff Created', 'Success');
+          this.notification.success('Takeoff Created', 'Success');
           this.router.navigate(['/home']);
         } else {
-          this.toastr.error('Error create Takeoff', 'Atenção');
+          this.notification.error('Error create Takeoff', 'Atenção');
         }
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error create Takeoff', 'Erro: ');
+        this.notification.error('Error create Takeoff', 'Erro: ');
       }
     );
   }
@@ -296,33 +445,44 @@ export class TakeOffComponent implements OnInit {
           this.spinner.hide();
 
           if (!data.errors) {
-            this.toastr.success('Takeoff Updated', 'Success');
+            this.notification.success('Takeoff Updated', 'Success');
           } else {
-            this.toastr.error('Error update Takeoff', 'Error');
+            this.notification.error('Error update Takeoff', 'Error');
           }
         },
         err => {
           this.spinner.hide();
-          this.toastr.error('Error update Takeoff. ', 'Erro: ');
+          this.notification.error('Error update Takeoff. ', 'Erro: ');
         }
       );
   }
 
-  finalizeOrderPopUp(content) {
+  finalizeOrderPopUp() {
     console.log('🔔 MODAL DEBUG: finalizeOrderPopUp called', {
-      content: !!content,
-      contentType: typeof content,
       modalService: !!this.modalService,
-      isCompany: this.isManager,
-      orderStatus: this.orderStatus
+      isManager: this.isManager,
+      orderStatus: this.orderStatus,
+      customerName: this.orderForm?.get('custumerName')?.value
     });
 
     try {
-      const modalRef = this.modalService.open(content, {
-        centered: true,
-        backdrop: false,
-        size: 'lg'
+      const modalRef = this.modalService.open(CompleteMeasurementModalComponent, {
+        size: 'lg',
+        backdrop: 'static',
+        keyboard: false
       });
+
+      // Set modal inputs
+      modalRef.componentInstance.takeoffId = this.idOrder;
+      modalRef.componentInstance.customerName = this.orderForm?.get('custumerName')?.value || '';
+      modalRef.componentInstance.isLoading = this.isAdvancingStatus;
+
+      // Subscribe to measurement completion
+      modalRef.componentInstance.measurementCompleted.subscribe(() => {
+        this.finalizeOrder();
+        modalRef.close();
+      });
+
       console.log('✅ Modal opened successfully', modalRef);
     } catch (error) {
       console.error('❌ Modal error:', error);
@@ -350,14 +510,77 @@ export class TakeOffComponent implements OnInit {
         data => {
           this.spinner.hide();
           if (!data.errors) {
-            this.toastr.success('Progress saved successfully', 'Saved');
+            this.notification.success('Progress saved successfully', 'Saved');
           } else {
-            this.toastr.error('Error saving progress', 'Error');
+            this.notification.error('Error saving progress', 'Error');
           }
         },
         err => {
           this.spinner.hide();
-          this.toastr.error('Error saving progress', 'Error');
+          this.notification.error('Error saving progress', 'Error');
+        }
+      );
+  }
+
+  autoSaveCarpenterAssignment() {
+    this.spinner.show();
+
+    this.takeoffService
+      .updateOrder(this.orderForm.value, this.idOrder)
+      .subscribe(
+        data => {
+          this.spinner.hide();
+          if (!data.errors) {
+            console.log('Carpenter assignment saved successfully');
+          } else {
+            this.notification.error('Error saving carpenter assignment', 'Error');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.notification.error('Error saving carpenter assignment', 'Error');
+        }
+      );
+  }
+
+  autoSaveTrimCarpenterAssignment(trimCarpenterId: string) {
+    this.spinner.show();
+
+    this.takeoffService
+      .updateTrimCarpenter(this.idOrder!, trimCarpenterId)
+      .subscribe(
+        data => {
+          this.spinner.hide();
+          if (data.success) {
+            console.log('Trim carpenter assignment saved successfully');
+          } else {
+            this.notification.error('Error saving trim carpenter assignment', 'Error');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.notification.error('Error saving trim carpenter assignment', 'Error');
+        }
+      );
+  }
+
+  autoRemoveTrimCarpenter() {
+    this.spinner.show();
+
+    this.takeoffService
+      .removeTrimCarpenter(this.idOrder!)
+      .subscribe(
+        data => {
+          this.spinner.hide();
+          if (data.success) {
+            console.log('Trim carpenter removed successfully');
+          } else {
+            this.notification.error('Error removing trim carpenter', 'Error');
+          }
+        },
+        err => {
+          this.spinner.hide();
+          this.notification.error('Error removing trim carpenter', 'Error');
         }
       );
   }
@@ -372,15 +595,15 @@ export class TakeOffComponent implements OnInit {
           this.spinner.hide();
 
           if (!data.errors) {
-            this.toastr.success('Takeoff Completed', 'Success');
+            this.notification.success('Takeoff Completed', 'Success');
             this.router.navigate(['/home']);
           } else {
-            this.toastr.error('Error finalize Takeoff', 'Atenção');
+            this.notification.error('Error finalize Takeoff', 'Atenção');
           }
         },
         err => {
           this.spinner.hide();
-          this.toastr.error('Error finalize Takeoff', 'Erro: ');
+          this.notification.error('Error finalize Takeoff', 'Erro: ');
         }
       );
   }
@@ -395,18 +618,18 @@ export class TakeOffComponent implements OnInit {
           this.spinner.hide();
 
           if (!data.errors) {
-            this.toastr.success(
+            this.notification.success(
               'Takeoff released for the carpenter',
               'Success'
             );
             this.router.navigate(['/home']);
           } else {
-            this.toastr.error('Error finalize Takeoff', 'Atenção');
+            this.notification.error('Error finalize Takeoff', 'Atenção');
           }
         },
         err => {
           this.spinner.hide();
-          this.toastr.error('Error finalize Takeoff', 'Erro: ');
+          this.notification.error('Error finalize Takeoff', 'Erro: ');
         }
       );
   }
@@ -416,12 +639,44 @@ export class TakeOffComponent implements OnInit {
   }
 
   get isManager() {
-    return this.user.roles.includes('manager');
+    return this.user !== null && UserRoles.isManager(this.user.roles);
+  }
+
+  get userRole() {
+    if (!this.user || !this.user.roles) return UserRoles.CARPENTER;
+
+    if (UserRoles.isManager(this.user.roles)) {
+      return UserRoles.MANAGER;
+    } else if (UserRoles.isDelivery(this.user.roles)) {
+      return UserRoles.DELIVERY;
+    } else if (UserRoles.isCarpenter(this.user.roles)) {
+      return UserRoles.CARPENTER;
+    }
+    return UserRoles.CARPENTER; // Default fallback
+  }
+
+  /**
+   * Determine if form fields should be disabled based on user role
+   */
+  shouldDisableFormField(): boolean {
+    if (!this.user || !this.user.roles) return false;
+
+    // Delivery users can only view - no editing allowed
+    if (UserRoles.isDelivery(this.user.roles)) {
+      return true;
+    }
+
+    // Carpenter users can only edit measurement fields, not basic info
+    if (UserRoles.isCarpenter(this.user.roles)) {
+      return true; // Basic info fields are always disabled for carpenters
+    }
+
+    return false; // Managers can edit
   }
 
   get isReadonly() {
     // Form is readonly when takeoff is completed (status >= UNDER_REVIEW) and user is not company
-    return STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
+    return this.orderStatus !== null && STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
   }
 
   private createForm(): void {
@@ -429,37 +684,40 @@ export class TakeOffComponent implements OnInit {
 
     this.orderForm = this.builder.group({
       carpentry: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
         [Validators.required],
       ],
+      trimCarpentry: [
+        { value: null, disabled: this.shouldDisableFormField() },
+      ],
       custumerName: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
         [Validators.required],
       ],
       foremen: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
       extrasChecked: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
       carpInvoice: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
       shipTo: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
-      lot: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      type: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
-      elev: [{ value: null, disabled: this.user.roles.includes('carpentry') }],
+      lot: [{ value: null, disabled: this.shouldDisableFormField() }],
+      type: [{ value: null, disabled: this.shouldDisableFormField() }],
+      elev: [{ value: null, disabled: this.shouldDisableFormField() }],
       sqFootage: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
       streetName: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
 
       doorsStyle: [
-        { value: null, disabled: this.user.roles.includes('carpentry') },
+        { value: null, disabled: this.shouldDisableFormField() },
       ],
       status: [null],
       carpentryEmail: [null],
@@ -1009,7 +1267,7 @@ export class TakeOffComponent implements OnInit {
   getNextStatusLabel(): string {
     if (!this.orderStatus) return '';
 
-    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus);
+    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus!);
     if (nextStatuses.length === 0) return '';
 
     return `Approve to ${nextStatuses[0].label}`;
@@ -1018,7 +1276,7 @@ export class TakeOffComponent implements OnInit {
   advanceStatus(): void {
     if (!this.canAdvanceStatus() || this.isAdvancingStatus) return;
 
-    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus);
+    const nextStatuses = this.statusService.getNextStatuses(this.orderStatus!);
     if (nextStatuses.length === 0) return;
 
     const nextStatus = nextStatuses[0];
@@ -1034,15 +1292,15 @@ export class TakeOffComponent implements OnInit {
     const statusInfo = this.statusService.getStatusInfo(newStatusId);
     this.isAdvancingStatus = true;
 
-    this.statusService.updateTakeoffStatus(this.idOrder, newStatusId).subscribe(
+    this.statusService.updateTakeoffStatus(this.idOrder!, newStatusId).subscribe(
       (response) => {
         this.isAdvancingStatus = false;
         this.orderStatus = newStatusId;
-        this.toastr.success(`Status updated to ${statusInfo.label}`, 'Success');
+        this.notification.success(`Status updated to ${statusInfo.label}`, 'Success');
       },
       (error) => {
         this.isAdvancingStatus = false;
-        this.toastr.error('Error updating status', 'Error');
+        this.notification.error('Error updating status', 'Error');
         console.error('Error updating status:', error);
       }
     );
@@ -1070,21 +1328,21 @@ export class TakeOffComponent implements OnInit {
    * Controls when the "Recall email to carpenter" button should be displayed
    */
   shouldShowRecallEmailButton(): boolean {
-    return this.isManager || !STATUS_CONSTANTS.isCompleted(this.orderStatus);
+    return this.isManager || (this.orderStatus !== null && !STATUS_CONSTANTS.isCompleted(this.orderStatus));
   }
 
   /**
    * Controls when the "Save Progress" button should be displayed for carpenters
    */
   shouldShowCarpenterSaveButton(): boolean {
-    return !this.isManager && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, false);
+    return !this.isManager && this.orderStatus !== null && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, 'carpenter');
   }
 
   /**
    * Controls when the "Save Progress" button should be displayed for companies
    */
   shouldShowCompanySaveButton(): boolean {
-    return this.isManager && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, true);
+    return this.isManager && this.orderStatus !== null && STATUS_CONSTANTS.can.userSaveProgress(this.orderStatus, 'manager');
   }
 
   /**
@@ -1111,7 +1369,7 @@ export class TakeOffComponent implements OnInit {
    * Controls when the "Back to Carpentry" button should be displayed
    */
   shouldShowBackToCarpentryButton(): boolean {
-    return this.isManager && STATUS_CONSTANTS.permissions.company.canBackToCarpentry(this.orderStatus);
+    return this.isManager && this.orderStatus !== null && STATUS_CONSTANTS.permissions.company.canBackToCarpentry(this.orderStatus);
   }
 
   /**
@@ -1122,17 +1380,24 @@ export class TakeOffComponent implements OnInit {
   }
 
   /**
+   * Controls when managers can edit carpenter assignments in existing takeoffs
+   */
+  canEditCarpenterAssignments(): boolean {
+    return this.isManager && this.idOrder && !this.shouldDisableFormField();
+  }
+
+  /**
    * Controls when the read-only status indicator should be displayed
    */
   shouldShowReadOnlyIndicator(): boolean {
-    return STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
+    return this.orderStatus !== null && STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager);
   }
 
   /**
    * Controls when the completion status should be displayed
    */
   shouldShowCompletionStatus(): boolean {
-    return STATUS_CONSTANTS.isCompleted(this.orderStatus) && !this.isManager;
+    return this.orderStatus !== null && STATUS_CONSTANTS.isCompleted(this.orderStatus) && !this.isManager;
   }
 
   /**
@@ -1168,10 +1433,13 @@ export class TakeOffComponent implements OnInit {
   }
 
   /**
-   * Company: Mark as shipped - advances from READY_TO_SHIP to SHIPPED
+   * Manager/Delivery: Mark as shipped - advances from READY_TO_SHIP to SHIPPED
    */
   markAsShipped(): void {
-    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.READY_TO_SHIP) {
+    const userRole = this.userRole;
+    const hasPermission = userRole === 'manager' || userRole === 'delivery';
+
+    if (this.isAdvancingStatus || !hasPermission || this.orderStatus !== TakeoffStatus.READY_TO_SHIP) {
       return;
     }
     this.advanceToSpecificStatus(TakeoffStatus.SHIPPED);

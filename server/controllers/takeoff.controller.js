@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const Takeoff = require('../models/takeoff.model');
 const { PDFDocument, setFontAndSize, rgb } = require('pdf-lib');
 const fs = require('fs');
+const UserRoles = require('../constants/user-roles');
 
 module.exports = {
   insert,
@@ -13,88 +14,124 @@ module.exports = {
   findCarpentryByEmail,
   generatePDF,
   updateTakeoffStatus,
+  uploadDeliveryPhoto,
+  updateTrimCarpenter,
+  removeTrimCarpenter,
 };
 
-async function insert(idUser, body) {
+async function insert(idUser, body, companyFilter = {}) {
   body.user = idUser;
   body.status = 1;
+
+  // Set company from the filter if provided
+  if (companyFilter.company) {
+    body.company = companyFilter.company;
+  }
 
   return await new Takeoff(body).save();
 }
 
-async function getTakeoffs(idUSer) {
-  return await Takeoff.find({ $or: [{ user: idUSer }, { carpentry: idUSer }] })
+async function getTakeoffs(user, companyFilter = {}) {
+  let baseQuery;
+
+  // If user is delivery, show all takeoffs from their company
+  if (UserRoles.isDelivery(user.roles)) {
+    baseQuery = {
+      ...companyFilter // Only company filter for delivery users
+    };
+  } else {
+    // For other users (manager, carpenter), use existing logic
+    baseQuery = {
+      $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+      ...companyFilter
+    };
+  }
+
+  return await Takeoff.find(baseQuery)
     .populate('carpentry', 'fullname email')
+    .populate('trimCarpentry', 'fullname email')
     .populate('user', 'fullname email')
-    .select('custumerName carpentry user status shipTo lot')
+    .select('custumerName carpentry trimCarpentry user status shipTo lot')
     .sort({
       createdAt: -1,
     });
 }
 
-async function detailTakeoff(idUser, idTakeoff) {
-  return await Takeoff.find({
+async function detailTakeoff(idUser, idTakeoff, companyFilter = {}) {
+  const baseQuery = {
     $and: [{ _id: idTakeoff }],
-    $or: [{ user: idUser }, { carpentry: idUser }],
-  }).populate('carpentry', 'fullname email');
+    $or: [{ user: idUser }, { carpentry: idUser }, { trimCarpentry: idUser }],
+    ...companyFilter
+  };
+
+  return await Takeoff.find(baseQuery)
+    .populate('carpentry', 'fullname email')
+    .populate('trimCarpentry', 'fullname email');
 }
 
-async function updateTakeoff(user, body, idTakeoff) {
+async function updateTakeoff(user, body, idTakeoff, companyFilter = {}) {
   body.status = 2;
-  return await Takeoff.findOneAndUpdate(
-    {
-      $and: [{ _id: idTakeoff }],
-      $or: [{ user: user._id }, { carpentry: user._id }],
-    },
-    body
-  );
+
+  const baseQuery = {
+    $and: [{ _id: idTakeoff }],
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  return await Takeoff.findOneAndUpdate(baseQuery, body);
 }
 
-async function finalizeTakeoff(user, body, idTakeoff) {
-  if (user.roles.includes('manager')) {
+async function finalizeTakeoff(user, body, idTakeoff, companyFilter = {}) {
+  if (UserRoles.isManager(user.roles)) {
     delete body.status;
   } else {
     body.status = 3;
   }
 
-  return await Takeoff.findOneAndUpdate(
-    {
-      $and: [{ _id: idTakeoff }],
-      $or: [{ user: user._id }, { carpentry: user._id }],
-    },
-    body
-  );
+  const baseQuery = {
+    $and: [{ _id: idTakeoff }],
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  return await Takeoff.findOneAndUpdate(baseQuery, body);
 }
 
-async function findCarpentryByEmail(user, email) {
-  return await User.findOne({
+async function findCarpentryByEmail(user, email, companyFilter = {}) {
+  const filters = {
     email: email.toLowerCase(),
-    roles: 'carpentry',
-  });
+    roles: UserRoles.CARPENTER,
+    ...companyFilter
+  };
+
+  return await User.findOne(filters);
 }
 
-async function backTakeoffToCarpentry(user, body, idTakeoff) {
+async function backTakeoffToCarpentry(user, body, idTakeoff, companyFilter = {}) {
   body.status = 2;
 
-  return await Takeoff.findOneAndUpdate(
-    {
-      $and: [{ _id: idTakeoff }],
-      $or: [{ user: user._id }, { carpentry: user._id }],
-    },
-    body
-  );
+  const baseQuery = {
+    $and: [{ _id: idTakeoff }],
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  return await Takeoff.findOneAndUpdate(baseQuery, body);
 }
 
-async function generatePDF(user, idTakeoff) {
+async function generatePDF(user, idTakeoff, companyFilter = {}) {
   const today = new Date();
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1; // Months start at 0!
   let dd = today.getDate();
 
-  let takeoff = await Takeoff.findOne({
+  const baseQuery = {
     $and: [{ _id: idTakeoff }],
-    $or: [{ user: user._id }, { carpentry: user._id }],
-  });
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  let takeoff = await Takeoff.findOne(baseQuery);
 
   const filePath = 'template.pdf';
 
@@ -1079,19 +1116,153 @@ async function generatePDF(user, idTakeoff) {
   return await pdfDoc.saveAsBase64({ dataUri: true });
 }
 
-async function updateTakeoffStatus(user, takeoffId, newStatus) {
+async function updateTakeoffStatus(user, takeoffId, newStatus, companyFilter = {}) {
   const validStatuses = [1, 2, 3, 4, 5, 6, 7, 8];
 
   if (!validStatuses.includes(newStatus)) {
     throw new Error('Invalid status value');
   }
 
-  return await Takeoff.findOneAndUpdate(
-    {
+  let baseQuery;
+
+  // If user is delivery, allow access to all company takeoffs
+  if (UserRoles.isDelivery(user.roles)) {
+    baseQuery = {
       $and: [{ _id: takeoffId }],
-      $or: [{ user: user._id }, { carpentry: user._id }],
-    },
+      ...companyFilter
+    };
+  } else {
+    // For other users (manager, carpenter), use existing logic
+    baseQuery = {
+      $and: [{ _id: takeoffId }],
+      $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+      ...companyFilter
+    };
+  }
+
+  return await Takeoff.findOneAndUpdate(
+    baseQuery,
     { status: newStatus },
     { new: true }
   );
+}
+
+async function uploadDeliveryPhoto(user, takeoffId, file) {
+  try {
+    // Verify user has permission to upload delivery photo
+    const takeoff = await Takeoff.findOne({
+      $and: [{ _id: takeoffId }],
+      $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    });
+
+    if (!takeoff) {
+      throw new Error('Takeoff not found or access denied');
+    }
+
+    // Only managers and delivery users can upload delivery photos
+    if (!UserRoles.isManager(user.roles) && !UserRoles.isDelivery(user.roles)) {
+      throw new Error('Only managers and delivery users can upload delivery photos');
+    }
+
+    // Update takeoff with delivery photo information
+    const updatedTakeoff = await Takeoff.findByIdAndUpdate(
+      takeoffId,
+      {
+        deliveryPhoto: file.path,
+        deliveryPhotoUploadedAt: new Date()
+      },
+      { new: true }
+    );
+
+    return {
+      success: true,
+      message: 'Delivery photo uploaded successfully',
+      data: {
+        deliveryPhoto: updatedTakeoff.deliveryPhoto,
+        uploadedAt: updatedTakeoff.deliveryPhotoUploadedAt
+      }
+    };
+  } catch (error) {
+    // If there's an error, try to delete the uploaded file
+    if (file && file.path && fs.existsSync(file.path)) {
+      fs.unlinkSync(file.path);
+    }
+    throw error;
+  }
+}
+
+async function updateTrimCarpenter(user, trimCarpenterId, idTakeoff, companyFilter = {}) {
+  if (!UserRoles.isManager(user.roles) && !UserRoles.isSupervisor(user.roles)) {
+    const error = new Error('Only managers and supervisors can assign trim carpenters');
+    error.status = 403;
+    throw error;
+  }
+
+  if (!trimCarpenterId) {
+    const error = new Error('Trim carpenter ID is required');
+    error.status = 400;
+    throw error;
+  }
+
+  const carpenter = await User.findOne({
+    _id: trimCarpenterId,
+    roles: UserRoles.CARPENTER,
+    ...companyFilter
+  });
+
+  if (!carpenter) {
+    const error = new Error('Carpenter not found or does not belong to your company');
+    error.status = 404;
+    throw error;
+  }
+
+  const baseQuery = {
+    $and: [{ _id: idTakeoff }],
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  const updatedTakeoff = await Takeoff.findOneAndUpdate(
+    baseQuery,
+    { trimCarpentry: trimCarpenterId },
+    { new: true }
+  ).populate('trimCarpentry', 'fullname email')
+   .populate('carpentry', 'fullname email');
+
+  if (!updatedTakeoff) {
+    const error = new Error('Takeoff not found or access denied');
+    error.status = 404;
+    throw error;
+  }
+
+  return updatedTakeoff;
+}
+
+async function removeTrimCarpenter(user, idTakeoff, companyFilter = {}) {
+  if (!UserRoles.isManager(user.roles) && !UserRoles.isSupervisor(user.roles)) {
+    const error = new Error('Only managers and supervisors can remove trim carpenters');
+    error.status = 403;
+    throw error;
+  }
+
+  const baseQuery = {
+    $and: [{ _id: idTakeoff }],
+    $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+    ...companyFilter
+  };
+
+  const updatedTakeoff = await Takeoff.findOneAndUpdate(
+    baseQuery,
+    { $unset: { trimCarpentry: "" } },
+    { new: true }
+  ).populate('carpentry', 'fullname email')
+   .populate('trimCarpentry', 'fullname email');
+
+  if (!updatedTakeoff) {
+    const error = new Error('Takeoff not found or access denied');
+    error.status = 404;
+    throw error;
+  }
+
+  return updatedTakeoff;
 }

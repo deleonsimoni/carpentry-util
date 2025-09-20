@@ -7,8 +7,10 @@ import { AuthService } from '@app/shared/services';
 import { TakeoffService } from '@app/shared/services/takeoff.service';
 import { TakeoffStatusService } from '@app/shared/services/takeoff-status.service';
 import { DashboardService, DashboardData } from '@app/shared/services/dashboard.service';
+import { TakeoffStatus } from '@app/shared/interfaces/takeoff-status.interface';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { TakeoffStatusComponent } from '@app/shared/components/takeoff-status/takeoff-status.component';
 
 @Component({
@@ -29,11 +31,15 @@ export class HomeComponent implements OnInit {
   public dashboardData: DashboardData | null = null;
   public isLoadingStats = true;
 
+  // Status constants for template
+  readonly TakeoffStatus = TakeoffStatus;
+  readonly UserRoles = UserRoles;
+
   constructor(
     private router: Router,
     private takeoffService: TakeoffService,
     private authService: AuthService,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService,
     private statusService: TakeoffStatusService,
     private dashboardService: DashboardService
@@ -67,7 +73,7 @@ export class HomeComponent implements OnInit {
         this.spinner.hide();
 
         if (data.errors) {
-          this.toastr.error('Error get orders', 'Atenção');
+          this.notification.error('Error get orders', 'Atenção');
         } else {
           this.myOrders = data;
           this.filteredOrders = data;
@@ -75,7 +81,7 @@ export class HomeComponent implements OnInit {
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error get orders. ', 'Erro: ');
+        this.notification.error('Error get orders. ', 'Erro: ');
       }
     );
   }
@@ -87,7 +93,7 @@ export class HomeComponent implements OnInit {
       data => {
         if (data.errors) {
           this.spinner.hide();
-          this.toastr.error('Error generate PDF', 'Atenção');
+          this.notification.error('Error generate PDF', 'Atenção');
         } else {
           const link = document.createElement('a');
           link.href = data;
@@ -99,13 +105,30 @@ export class HomeComponent implements OnInit {
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error generate PDF', 'Erro: ');
+        this.notification.error('Error generate PDF', 'Erro: ');
       }
     );
   }
 
   get isManager() {
-    return this.user.roles.includes('manager');
+    return UserRoles.isManager(this.user?.roles || []);
+  }
+
+  get isDelivery() {
+    return UserRoles.isDelivery(this.user?.roles || []);
+  }
+
+  get userRole() {
+    if (!this.user?.roles) return UserRoles.CARPENTER;
+
+    if (UserRoles.isManager(this.user.roles)) {
+      return UserRoles.MANAGER;
+    } else if (UserRoles.isDelivery(this.user.roles)) {
+      return UserRoles.DELIVERY;
+    } else if (UserRoles.isCarpenter(this.user.roles)) {
+      return UserRoles.CARPENTER;
+    }
+    return UserRoles.CARPENTER; // Default fallback
   }
 
   newOrder() {
@@ -114,6 +137,10 @@ export class HomeComponent implements OnInit {
 
   detailOrder(idOrder) {
     this.router.navigate(['/take-off', idOrder]);
+  }
+
+  openMeasurements(idOrder) {
+    this.router.navigate(['/measurements', idOrder]);
   }
 
   onSearchChange() {
@@ -173,12 +200,12 @@ export class HomeComponent implements OnInit {
     this.statusService.updateTakeoffStatus(orderId, newStatus).subscribe(
       () => {
         this.spinner.hide();
-        this.toastr.success('Status updated successfully', 'Success');
+        this.notification.success('Status updated successfully', 'Success');
         this.listMyOrders(); // Refresh the list
       },
       (error) => {
         this.spinner.hide();
-        this.toastr.error('Error updating status', 'Error');
+        this.notification.error('Error updating status', 'Error');
         console.error('Error updating status:', error);
       }
     );

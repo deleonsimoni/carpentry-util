@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbActiveModal, NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { UserService, UserProfile, CreateUserRequest, UpdateUserRequest } from '@app/shared/services/user.service';
@@ -33,7 +33,7 @@ export class UserFormModalComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     public activeModal: NgbActiveModal,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService
   ) {
     this.userForm = this.createForm();
@@ -113,7 +113,7 @@ export class UserFormModalComponent implements OnInit {
     this.userService.createUser(formValue).subscribe({
       next: (response) => {
         this.generatedPassword = response.temporaryPassword;
-        this.toastr.success(response.message, 'Sucesso');
+        this.notification.success(response.message, 'Sucesso');
         this.isSubmitting = false;
 
         // Mostrar senha gerada por alguns segundos antes de fechar
@@ -123,7 +123,7 @@ export class UserFormModalComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erro ao criar usuário:', error);
-        this.toastr.error(error.error?.message || 'Erro ao criar usuário', 'Erro');
+        this.notification.error(error.error?.message || 'Erro ao criar usuário', 'Erro');
         this.isSubmitting = false;
       }
     });
@@ -155,19 +155,19 @@ export class UserFormModalComponent implements OnInit {
 
     // Se não há mudanças, fechar modal
     if (Object.keys(updateData).length === 0) {
-      this.toastr.info('Nenhuma alteração foi feita', 'Info');
+      this.notification.info('Nenhuma alteração foi feita', 'Info');
       this.activeModal.dismiss();
       return;
     }
 
     this.userService.updateUser(this.userData._id, updateData).subscribe({
       next: (response) => {
-        this.toastr.success(response.message, 'Sucesso');
+        this.notification.success(response.message, 'Sucesso');
         this.activeModal.close('updated');
       },
       error: (error) => {
         console.error('Erro ao atualizar usuário:', error);
-        this.toastr.error(error.error?.message || 'Erro ao atualizar usuário', 'Erro');
+        this.notification.error(error.error?.message || 'Erro ao atualizar usuário', 'Erro');
         this.isSubmitting = false;
       }
     });
@@ -218,7 +218,7 @@ export class UserFormModalComponent implements OnInit {
   // Copiar senha para clipboard
   copyPassword(): void {
     navigator.clipboard.writeText(this.generatedPassword).then(() => {
-      this.toastr.success('Senha copiada para a área de transferência', 'Copiado');
+      this.notification.success('Senha copiada para a área de transferência', 'Copiado');
     });
   }
 

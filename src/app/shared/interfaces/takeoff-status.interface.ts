@@ -38,7 +38,19 @@ export const STATUS_CONSTANTS = {
 
 
   permissions: {
-    // Company permissions
+    // Manager permissions (formerly company)
+    manager: {
+      canEdit: (status: number) => status === TakeoffStatus.CREATED,
+      canSaveProgress: (status: number) => status === TakeoffStatus.CREATED,
+      canAdvanceStatus: (status: number) => [TakeoffStatus.CREATED, TakeoffStatus.UNDER_REVIEW, TakeoffStatus.READY_TO_SHIP, TakeoffStatus.SHIPPED, TakeoffStatus.TRIMMING_COMPLETED, TakeoffStatus.BACK_TRIM_COMPLETED].includes(status),
+      canSendToCarpenter: (status: number) => status === TakeoffStatus.CREATED,
+      canApproveReview: (status: number) => status === TakeoffStatus.UNDER_REVIEW,
+      canMarkAsShipped: (status: number) => status === TakeoffStatus.READY_TO_SHIP,
+      canCloseService: (status: number) => status === TakeoffStatus.BACK_TRIM_COMPLETED,
+      canBackToCarpentry: (status: number) => status === TakeoffStatus.UNDER_REVIEW
+    },
+
+    // Company permissions (alias for manager for backward compatibility)
     company: {
       canEdit: (status: number) => status === TakeoffStatus.CREATED,
       canSaveProgress: (status: number) => status === TakeoffStatus.CREATED,
@@ -60,19 +72,61 @@ export const STATUS_CONSTANTS = {
       canStartInstallation: (status: number) => false,
       canCompleteInstallation: (status: number) => false,
       canFinishService: (status: number) => false
+    },
+
+    // Delivery permissions
+    delivery: {
+      canEdit: (status: number) => false, // Delivery cannot edit takeoff details
+      canSaveProgress: (status: number) => false,
+      canAdvanceStatus: (status: number) => status === TakeoffStatus.READY_TO_SHIP, // Can only mark as shipped
+      canMarkAsShipped: (status: number) => status === TakeoffStatus.READY_TO_SHIP,
+      canUploadDeliveryPhoto: (status: number) => status === TakeoffStatus.READY_TO_SHIP
     }
   },
 
   // Helper methods to check permissions
   can: {
-    userEdit: (status: number, isCompany: boolean) =>
-      isCompany ? STATUS_CONSTANTS.permissions.company.canEdit(status) : STATUS_CONSTANTS.permissions.carpenter.canEdit(status),
+    userEdit: (status: number, userRole: string) => {
+      if (userRole === 'manager' || userRole === 'company') {
+        return STATUS_CONSTANTS.permissions.manager.canEdit(status);
+      } else if (userRole === 'carpenter') {
+        return STATUS_CONSTANTS.permissions.carpenter.canEdit(status);
+      } else if (userRole === 'delivery') {
+        return STATUS_CONSTANTS.permissions.delivery.canEdit(status);
+      }
+      return false;
+    },
 
-    userSaveProgress: (status: number, isCompany: boolean) =>
-      isCompany ? STATUS_CONSTANTS.permissions.company.canSaveProgress(status) : STATUS_CONSTANTS.permissions.carpenter.canSaveProgress(status),
+    userSaveProgress: (status: number, userRole: string) => {
+      if (userRole === 'manager' || userRole === 'company') {
+        return STATUS_CONSTANTS.permissions.manager.canSaveProgress(status);
+      } else if (userRole === 'carpenter') {
+        return STATUS_CONSTANTS.permissions.carpenter.canSaveProgress(status);
+      } else if (userRole === 'delivery') {
+        return STATUS_CONSTANTS.permissions.delivery.canSaveProgress(status);
+      }
+      return false;
+    },
 
-    userAdvanceStatus: (status: number, isCompany: boolean) =>
-      isCompany ? STATUS_CONSTANTS.permissions.company.canAdvanceStatus(status) : STATUS_CONSTANTS.permissions.carpenter.canAdvanceStatus(status)
+    userAdvanceStatus: (status: number, userRole: string) => {
+      if (userRole === 'manager' || userRole === 'company') {
+        return STATUS_CONSTANTS.permissions.manager.canAdvanceStatus(status);
+      } else if (userRole === 'carpenter') {
+        return STATUS_CONSTANTS.permissions.carpenter.canAdvanceStatus(status);
+      } else if (userRole === 'delivery') {
+        return STATUS_CONSTANTS.permissions.delivery.canAdvanceStatus(status);
+      }
+      return false;
+    },
+
+    userUploadDeliveryPhoto: (status: number, userRole: string) => {
+      if (userRole === 'manager' || userRole === 'company') {
+        return STATUS_CONSTANTS.permissions.manager.canMarkAsShipped(status);
+      } else if (userRole === 'delivery') {
+        return STATUS_CONSTANTS.permissions.delivery.canUploadDeliveryPhoto(status);
+      }
+      return false;
+    }
   }
 } as const;
 

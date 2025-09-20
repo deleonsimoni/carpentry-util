@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, of } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Company, CompanyFilters, SendTakeoffRequest, SendTakeoffResponse } from '../interfaces/company.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CompanyService {
+  private currentCompany$ = new BehaviorSubject<Company | null>(null);
 
   constructor(private http: HttpClient) { }
 
@@ -32,7 +34,14 @@ export class CompanyService {
   }
 
   getCompanyById(id: string): Observable<Company> {
-    return this.http.get<Company>(`/api/company/${id}`);
+    console.log('CompanyService: Making GET request to /api/company/' + id);
+    return this.http.get<Company>(`/api/company/${id}`).pipe(
+      tap(response => console.log('CompanyService: Raw response:', response)),
+      catchError(error => {
+        console.error('CompanyService: HTTP error in getCompanyById:', error);
+        throw error;
+      })
+    );
   }
 
   createCompany(company: Company): Observable<Company> {
@@ -53,5 +62,41 @@ export class CompanyService {
 
   sendTakeoffToCompanies(request: SendTakeoffRequest): Observable<SendTakeoffResponse> {
     return this.http.post<SendTakeoffResponse>(`/api/company/send-takeoff`, request);
+  }
+
+  // Methods for current company management
+  getCurrentCompany(): Observable<Company | null> {
+    return this.currentCompany$.asObservable();
+  }
+
+  loadCurrentUserCompany(companyId: string): Observable<Company | null> {
+    console.log('CompanyService: Loading company with ID:', companyId);
+    return this.getCompanyById(companyId).pipe(
+      tap(company => {
+        console.log('CompanyService: Company loaded successfully:', company);
+        this.currentCompany$.next(company);
+      }),
+      catchError(error => {
+        console.error('CompanyService: Error loading company:', error);
+        console.error('CompanyService: Error details:', {
+          status: error.status,
+          statusText: error.statusText,
+          message: error.message,
+          url: error.url
+        });
+        this.currentCompany$.next(null);
+        return of(null);
+      })
+    );
+  }
+
+  updateCurrentCompany(companyId: string, companyData: Partial<Company>): Observable<Company> {
+    return this.updateCompany(companyId, companyData as Company).pipe(
+      tap(company => this.currentCompany$.next(company))
+    );
+  }
+
+  clearCurrentCompany(): void {
+    this.currentCompany$.next(null);
   }
 }

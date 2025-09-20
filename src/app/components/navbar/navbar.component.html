@@ -31,22 +31,34 @@
           <div class=" dropdown-header noti-title">
             <h6 class="text-overflow m-0">Welcome!</h6>
           </div>
+
+          <!-- User Profile -->
           <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
             <i class="ni ni-single-02"></i>
             <span>My Profile</span>
           </a>
-          <!--<a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
-            <i class="ni ni-settings-gear-65"></i>
-            <span>Settings</span>
-          </a>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
-            <i class="ni ni-calendar-grid-58"></i>
-            <span>Activity</span>
-          </a>
-          <a routerLinkActive="active" [routerLink]="['/user-profile']" class="dropdown-item">
-            <i class="ni ni-support-16"></i>
-            <span>Support</span>
-          </a>-->
+
+          <!-- Company Section - Only for Managers -->
+          <div *ngIf="(isManager || isSuperAdmin) && currentCompany">
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-header">
+              <h6 class="text-overflow m-0">
+                <i class="ni ni-building text-primary"></i>
+                {{currentCompany.name}}
+              </h6>
+            </div>
+
+            <a (click)="navigateToCompany()" class="dropdown-item">
+              <i class="ni ni-settings-gear-65"></i>
+              <span>Manage Company</span>
+            </a>
+
+            <a routerLinkActive="active" [routerLink]="['/user-management']" class="dropdown-item">
+              <i class="ni ni-single-02"></i>
+              <span>Manage Users</span>
+            </a>
+          </div>
+
           <div class="dropdown-divider"></div>
           <a (click)="logout()" class="dropdown-item">
             <i class="ni ni-user-run"></i>

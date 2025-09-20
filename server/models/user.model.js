@@ -1,7 +1,17 @@
 const mongoose = require('mongoose');
+const UserRoles = require('../constants/user-roles');
 
 const UserSchema = new mongoose.Schema(
   {
+    // Company relationship (MULTI-TENANCY KEY)
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: function() {
+        return !UserRoles.isSuperAdmin(this.roles);
+      }
+    },
+
     fullname: {
       type: String,
       required: true,
@@ -64,11 +74,19 @@ const UserSchema = new mongoose.Schema(
     roles: [
       {
         type: String,
+        validate: {
+          validator: function(role) {
+            return UserRoles.isValidRole(role);
+          },
+          message: function(props) {
+            return `${props.value} is not a valid role. Valid roles are: ${UserRoles.getAllRoles().join(', ')}`;
+          }
+        }
       },
     ],
     profile: {
       type: String,
-      enum: ['supervisor', 'delivery', 'manager', 'carpinter'],
+      enum: UserRoles.getAllRoles(),
       required: true,
     },
     status: {

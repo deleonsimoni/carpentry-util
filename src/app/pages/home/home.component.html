@@ -222,6 +222,8 @@
                             [canChange]="true"
                             [showActions]="true"
                             [isManager]="isManager"
+                            [userRole]="userRole"
+                            [customerName]="order.custumerName"
                             (statusChanged)="onStatusChanged(order._id, $event)"
                           ></app-takeoff-status>
                         </div>
@@ -237,7 +239,14 @@
                               <i class="fas fa-eye mr-2"></i>Detail
                             </a>
                             <a
-                              *ngIf="order.status >= 6 && isManager"
+                              *ngIf="order.status === TakeoffStatus.TO_MEASURE && userRole === UserRoles.CARPENTER && order.carpentry?._id === user._id"
+                              class="dropdown-item"
+                              (click)="openMeasurements(order._id)"
+                            >
+                              <i class="fas fa-ruler mr-2"></i>Measurements
+                            </a>
+                            <a
+                              *ngIf="order.status >= TakeoffStatus.UNDER_REVIEW && isManager"
                               class="dropdown-item"
                               (click)="geratePDF(order._id, order.custumerName)"
                             >
@@ -311,6 +320,8 @@
                       [canChange]="true"
                       [showActions]="true"
                       [isManager]="isManager"
+                      [userRole]="userRole"
+                      [customerName]="myOrder.custumerName"
                       (statusChanged)="onStatusChanged(myOrder._id, $event)"
                     ></app-takeoff-status>
                   </td>
@@ -405,7 +416,7 @@
                     </div>
 
                     <a
-                      *ngIf="myOrder.status >= 6 && isManager"
+                      *ngIf="myOrder.status >= TakeoffStatus.UNDER_REVIEW && isManager"
                       (click)="geratePDF(myOrder._id, myOrder.custumerName)"
                       class="btn btn-primary"
                       >Generate PDF</a
@@ -428,6 +439,12 @@
                           class="dropdown-item"
                           (click)="detailOrder(myOrder._id)"
                           ><i class="fas fa-eye mr-2"></i>Detail</a
+                        >
+                        <a
+                          *ngIf="myOrder.status === TakeoffStatus.TO_MEASURE && userRole === UserRoles.CARPENTER && myOrder.carpentry?._id === user._id"
+                          class="dropdown-item"
+                          (click)="openMeasurements(myOrder._id)"
+                          ><i class="fas fa-ruler mr-2"></i>Measurements</a
                         >
                       </div>
                     </div>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 import { UserService } from '@app/shared/services/user.service';
@@ -32,7 +32,7 @@ export class ChangePasswordRequiredComponent implements OnInit {
     private authService: AuthService,
     private tokenStorage: TokenStorage,
     private router: Router,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService
   ) {
     this.passwordForm = this.createForm();
@@ -99,7 +99,7 @@ export class ChangePasswordRequiredComponent implements OnInit {
           this.tokenStorage.saveToken(response.token);
           this.authService.setUser(response.user);
 
-          this.toastr.success(response.message, 'Success');
+          this.notification.success(response.message, 'Success');
           this.isSubmitting = false;
           this.spinner.hide();
 
@@ -108,7 +108,7 @@ export class ChangePasswordRequiredComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error changing password:', error);
-          this.toastr.error(error.error?.message || 'Error changing password', 'Error');
+          this.notification.error(error.error?.message || 'Error changing password', 'Error');
           this.isSubmitting = false;
           this.spinner.hide();
         }

@@ -1,0 +1,50 @@
+<div class="form-group">
+  <!-- Label -->
+  <label
+    *ngIf="showLabel"
+    class="form-control-label">
+    {{ label }}
+    <span *ngIf="required" class="text-danger">*</span>
+  </label>
+
+  <!-- Search Input -->
+  <input
+    type="text"
+    [class]="cssClass"
+    [placeholder]="placeholder"
+    [ngbTypeahead]="searchCarpenters"
+    [resultFormatter]="formatCarpenterResult"
+    [inputFormatter]="formatCarpenterInput"
+    [disabled]="disabled"
+    [value]="searchValue"
+    (selectItem)="onCarpenterSelected($event)"
+    (input)="onInputChange($event)"
+    (blur)="onBlur()"
+    autocomplete="off"
+  />
+
+  <!-- Selected Carpenter Display -->
+  <div *ngIf="isCarpenterSelected" class="mt-2">
+    <div class="d-flex align-items-center">
+      <span class="text-success">
+        <i class="fas fa-check-circle mr-1"></i>
+        {{ selectedCarpenterInfo }}
+      </span>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary ml-2"
+        (click)="clearSelection()"
+        [disabled]="disabled">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- No Selection State -->
+  <div *ngIf="!isCarpenterSelected && searchValue" class="mt-1">
+    <small class="text-muted">
+      <i class="fas fa-search mr-1"></i>
+      Type at least 2 characters to search
+    </small>
+  </div>
+</div>

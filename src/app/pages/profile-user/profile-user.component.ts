@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@app/shared/services';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxImageCompressService } from 'ngx-image-compress';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ImagePathUrlPipe } from '@app/shared/pipes/image-path-url.pipe';
@@ -21,7 +21,7 @@ export class ProfileUserComponent implements OnInit {
   urlImage;
   constructor(
     private builder: FormBuilder,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService,
     private route: ActivatedRoute,
     private authService: AuthService,
@@ -82,14 +82,14 @@ export class ProfileUserComponent implements OnInit {
         this.spinner.hide();
 
         if (!data.errors) {
-          this.toastr.success('Profile Updated', 'Success');
+          this.notification.success('Profile Updated', 'Success');
         } else {
-          this.toastr.error('Error update Profile', 'Error');
+          this.notification.error('Error update Profile', 'Error');
         }
       },
       err => {
         this.spinner.hide();
-        this.toastr.error('Error update Profile. ', 'Erro: ');
+        this.notification.error('Error update Profile. ', 'Erro: ');
       }
     );
   }
@@ -104,14 +104,14 @@ export class ProfileUserComponent implements OnInit {
           this.spinner.hide();
 
           if (!data.errors) {
-            this.toastr.success('Image Profile Updated', 'Success');
+            this.notification.success('Image Profile Updated', 'Success');
           } else {
-            this.toastr.error('Error update Image Profile', 'Error');
+            this.notification.error('Error update Image Profile', 'Error');
           }
         },
         err => {
           this.spinner.hide();
-          this.toastr.error('Error update Image Profile. ', 'Erro: ');
+          this.notification.error('Error update Image Profile. ', 'Erro: ');
         }
       );
   }

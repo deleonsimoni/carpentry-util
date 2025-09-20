@@ -11,6 +11,7 @@ import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { AuthHeaderInterceptor } from './interceptors/header.interceptor';
 import { CatchErrorInterceptor } from './interceptors/http-error.interceptor';
+import { CompanyHeaderInterceptor } from './shared/interceptors/company-header.interceptor';
 
 import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './header/header.component';
@@ -22,7 +23,7 @@ import { ComponentsModule } from './components/components.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-import { ToastrModule } from 'ngx-toastr';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { MaterialRequestComponent } from './pages/material-request/material-request.component';
 import { ListMaterialRequestComponent } from './pages/list-material-request/list-material-request.component';
@@ -45,19 +46,7 @@ export function appInitializerFactory(authService: AuthService) {
     RouterModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    ToastrModule.forRoot({
-      timeOut: 4000,
-      positionClass: 'toast-top-center',
-      preventDuplicates: true,
-      progressBar: true,
-      progressAnimation: 'increasing',
-      closeButton: true,
-      newestOnTop: true,
-      tapToDismiss: true,
-      toastClass: 'ngx-toastr custom-toast',
-      titleClass: 'toast-title',
-      messageClass: 'toast-message'
-    }),
+    MatSnackBarModule,
     NgxSpinnerModule,
   ],
   exports: [NgxSpinnerModule],
@@ -75,6 +64,11 @@ export function appInitializerFactory(authService: AuthService) {
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthHeaderInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CompanyHeaderInterceptor,
       multi: true,
     },
     {

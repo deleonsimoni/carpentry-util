@@ -8,6 +8,8 @@ import {
 import { Router } from '@angular/router';
 import { User } from '@app/shared/interfaces';
 import { AuthService } from '@app/shared/services';
+import { CompanyService } from '@app/shared/services/company.service';
+import { Company } from '@app/shared/interfaces/company.interface';
 
 @Component({
   selector: 'app-navbar',
@@ -16,6 +18,7 @@ import { AuthService } from '@app/shared/services';
 })
 export class NavbarComponent implements OnInit {
   user;
+  currentCompany: Company | null = null;
 
   public focus;
   public listTitles: any[];
@@ -25,7 +28,8 @@ export class NavbarComponent implements OnInit {
     location: Location,
     private element: ElementRef,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private companyService: CompanyService
   ) {
     this.location = location;
   }
@@ -35,6 +39,11 @@ export class NavbarComponent implements OnInit {
 
     this.authService.getUser().subscribe(user => {
       this.user = user;
+    });
+
+    // Subscribe to company changes
+    this.companyService.getCurrentCompany().subscribe(company => {
+      this.currentCompany = company;
     });
   }
 
@@ -55,12 +64,22 @@ export class NavbarComponent implements OnInit {
     return this.user && this.user.roles && this.user.roles.includes('manager');
   }
 
+  get isSuperAdmin() {
+    return this.user && this.user.roles && this.user.roles.includes('super_admin');
+  }
+
   get userRole() {
     return {
       name: this.isManager ? 'Manager' : 'Carpenter',
       icon: this.isManager ? 'fa-user-tie' : 'fa-hammer',
       badgeClass: this.isManager ? 'badge-primary' : 'badge-success'
     };
+  }
+
+  navigateToCompany() {
+    if (this.currentCompany) {
+      this.router.navigate(['/company', this.currentCompany._id]);
+    }
   }
 
   logout() {

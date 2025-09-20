@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const TakeoffSchema = new mongoose.Schema(
   {
+    // Company relationship (MULTI-TENANCY KEY)
+    company: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company',
+      required: true
+    },
+
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -11,6 +18,11 @@ const TakeoffSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
+    },
+    trimCarpentry: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: false,
     },
     custumerName: {
       type: String,
@@ -44,6 +56,13 @@ const TakeoffSchema = new mongoose.Schema(
     },
     status: {
       type: Number,
+    },
+
+    deliveryPhoto: {
+      type: String, // File path to the uploaded delivery photo
+    },
+    deliveryPhotoUploadedAt: {
+      type: Date,
     },
 
     doorsStyle: {
@@ -175,5 +194,10 @@ const TakeoffSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+// Index for better performance with multi-tenancy
+TakeoffSchema.index({ company: 1, createdAt: -1 });
+TakeoffSchema.index({ company: 1, status: 1 });
+TakeoffSchema.index({ company: 1, user: 1 });
 
 module.exports = mongoose.model('Takeoff', TakeoffSchema);

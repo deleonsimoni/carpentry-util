@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Joi = require('joi');
 const User = require('../models/user.model');
+const UserRoles = require('../constants/user-roles');
+const Company = require('../models/company.model');
 const S3Uploader = require('./aws.controller');
 const { v5: uuidv5 } = require('uuid');
 
@@ -22,8 +24,37 @@ async function insert(user) {
   user.email = user.email.toLowerCase();
 
   // Para usuários com role manager, definir profile como manager
-  if (user.roles && user.roles.includes('manager')) {
-    user.profile = 'manager';
+  if (UserRoles.isManager(user.roles)) {
+    user.profile = UserRoles.MANAGER;
+  }
+
+  // Se há dados da empresa (registro de manager), criar a empresa primeiro
+  if (user.company && typeof user.company === 'object' && user.company.name) {
+    try {
+      // Criar a empresa
+      const companyData = {
+        ...user.company,
+        createdBy: null // Será definido depois que o usuário for criado
+      };
+
+      const company = new Company(companyData);
+      const savedCompany = await company.save();
+
+      // Substituir o objeto company pelo ID da empresa criada
+      user.company = savedCompany._id;
+
+      // Depois de criar o usuário, atualizar a empresa com o createdBy
+      delete user.password;
+      const savedUser = await new User(user).save();
+
+      // Atualizar a empresa com o ID do usuário criador
+      await Company.findByIdAndUpdate(savedCompany._id, { createdBy: savedUser._id });
+
+      return savedUser;
+    } catch (error) {
+      console.error('Error creating company during user registration:', error);
+      throw new Error('Erro ao criar empresa: ' + error.message);
+    }
   }
 
   delete user.password;
@@ -77,7 +108,7 @@ function generateTemporaryPassword() {
 }
 
 // Listar todos os usuários com paginação e filtros
-async function getAllUsers(query) {
+async function getAllUsers(query, companyFilter = {}) {
   const {
     page = 1,
     limit = 10,
@@ -87,7 +118,9 @@ async function getAllUsers(query) {
   } = query;
 
   // Construir filtros de busca
-  const filters = {};
+  const filters = {
+    ...companyFilter
+  };
 
   if (search) {
     filters.$or = [
@@ -128,11 +161,11 @@ async function getAllUsers(query) {
 }
 
 // Criar novo usuário
-async function createUser(userData) {
+async function createUser(userData, companyFilter = {}, currentUser = null) {
   const schema = Joi.object({
     fullname: Joi.string().required(),
     email: Joi.string().email().required(),
-    profile: Joi.string().valid('supervisor', 'delivery', 'manager', 'carpinter').required(),
+    profile: Joi.string().valid(UserRoles.SUPERVISOR, UserRoles.DELIVERY, UserRoles.MANAGER, UserRoles.CARPENTER).required(),
     mobilePhone: Joi.string().optional(),
     homePhone: Joi.string().optional(),
     address: Joi.object().optional(),
@@ -157,10 +190,11 @@ async function createUser(userData) {
     ...value,
     email: value.email.toLowerCase(),
     hashedPassword: bcrypt.hashSync(temporaryPassword, 10),
-    requirePasswordChange: value.profile !== 'manager', // Managers não precisam trocar senha
-    temporaryPassword: value.profile !== 'manager', // Managers não têm senha temporária
+    requirePasswordChange: value.profile !== UserRoles.MANAGER, // Managers não precisam trocar senha
+    temporaryPassword: value.profile !== UserRoles.MANAGER, // Managers não têm senha temporária
     roles: [value.profile], // Adicionar profile aos roles também
-    status: 'active'
+    status: 'active',
+    company: companyFilter.company || null
   };
 
   const user = await new User(newUser).save();
@@ -175,8 +209,14 @@ async function createUser(userData) {
 }
 
 // Buscar usuário por ID
-async function getUserById(id) {
-  const user = await User.findById(id).select('-hashedPassword');
+async function getUserById(id, companyFilter = {}) {
+  // Construir filtros para tenancy
+  const filters = {
+    _id: id,
+    ...companyFilter
+  };
+
+  const user = await User.findOne(filters).select('-hashedPassword');
   if (!user) {
     throw new Error('Usuário não encontrado');
   }
@@ -184,10 +224,10 @@ async function getUserById(id) {
 }
 
 // Atualizar usuário
-async function updateUser(id, updateData) {
+async function updateUser(id, updateData, companyFilter = {}, currentUser = null) {
   const schema = Joi.object({
     fullname: Joi.string().optional(),
-    profile: Joi.string().valid('supervisor', 'delivery', 'manager', 'carpinter').optional(),
+    profile: Joi.string().valid(UserRoles.SUPERVISOR, UserRoles.DELIVERY, UserRoles.MANAGER, UserRoles.CARPENTER).optional(),
     status: Joi.string().valid('active', 'inactive').optional(),
     mobilePhone: Joi.string().optional(),
     homePhone: Joi.string().optional(),
@@ -205,8 +245,14 @@ async function updateUser(id, updateData) {
     value.roles = [value.profile];
   }
 
-  const user = await User.findByIdAndUpdate(
-    id,
+  // Construir filtros para tenancy
+  const filters = {
+    _id: id,
+    ...companyFilter
+  };
+
+  const user = await User.findOneAndUpdate(
+    filters,
     value,
     { new: true, runValidators: true }
   ).select('-hashedPassword');
@@ -219,9 +265,15 @@ async function updateUser(id, updateData) {
 }
 
 // Inativar usuário (soft delete)
-async function deleteUser(id) {
-  const user = await User.findByIdAndUpdate(
-    id,
+async function deleteUser(id, companyFilter = {}) {
+  // Construir filtros para tenancy
+  const filters = {
+    _id: id,
+    ...companyFilter
+  };
+
+  const user = await User.findOneAndUpdate(
+    filters,
     { status: 'inactive' },
     { new: true }
   ).select('-hashedPassword');

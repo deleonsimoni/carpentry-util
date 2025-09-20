@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/shared/services';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -17,7 +17,7 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private authService: AuthService,
     private builder: FormBuilder,
-    private toastr: ToastrService
+    private notification: NotificationService
   ) {
     this.createForm();
   }
@@ -29,7 +29,7 @@ export class RegisterComponent implements OnInit {
         if (user && user._id) {
           // User is already logged in, redirect to home
           this.router.navigate(['/home']);
-          this.toastr.info('You are already logged in', 'Redirected');
+          this.notification.info('You are already logged in', 'Redirected');
         }
       },
       err => {
@@ -41,6 +41,7 @@ export class RegisterComponent implements OnInit {
 
   private createForm(): void {
     this.registerForm = this.builder.group({
+      // Personal Info
       fullname: [null, [Validators.required]],
       email: [
         null,
@@ -54,36 +55,57 @@ export class RegisterComponent implements OnInit {
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
       roles: ['manager'], // Sempre manager
-      privacyAccepted: [false, [Validators.requiredTrue]],
 
-      /*address: this.builder.group({
-        street: [null, [Validators.required]],
-        num: [null, [Validators.required]],
-        complement: [null],
-        zip: [null, [Validators.required]],
-        city: [null, [Validators.required]],
-        district: [null, [Validators.required]],
-        country: [null, [Validators.required]],
-        state: [null, [Validators.required]]
+      // Company Info
+      company: this.builder.group({
+        name: [null, [Validators.required]],
+        businessNumber: [null],
+        industry: [null],
+        phone: [null, [Validators.pattern(/^\(\d{3}\) \d{3}-\d{4}$/)]],
+        email: [null],
+        website: [null],
+        address: this.builder.group({
+          street: [null],
+          city: [null],
+          province: [null],
+          postalCode: [null, [Validators.pattern(/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/)]],
+          country: ['Canada']
+        })
       }),
-      phones: this.builder.group({
-        telephone: [null],
-        cellphone: [null, [Validators.required]],
-      }),
-      icAcceptTerms: [false, [Validators.requiredTrue]]*/
+
+      privacyAccepted: [false, [Validators.requiredTrue]]
     });
+  }
+
+  // Canadian provinces
+  get canadianProvinces() {
+    return [
+      { code: 'AB', name: 'Alberta' },
+      { code: 'BC', name: 'British Columbia' },
+      { code: 'MB', name: 'Manitoba' },
+      { code: 'NB', name: 'New Brunswick' },
+      { code: 'NL', name: 'Newfoundland and Labrador' },
+      { code: 'NS', name: 'Nova Scotia' },
+      { code: 'NT', name: 'Northwest Territories' },
+      { code: 'NU', name: 'Nunavut' },
+      { code: 'ON', name: 'Ontario' },
+      { code: 'PE', name: 'Prince Edward Island' },
+      { code: 'QC', name: 'Quebec' },
+      { code: 'SK', name: 'Saskatchewan' },
+      { code: 'YT', name: 'Yukon' }
+    ];
   }
 
   register(): void {
     const form = this.registerForm.value;
 
     if (form.password != form.repeatPassword) {
-      this.toastr.error('Senhas divergentes.', 'Atenção: ');
+      this.notification.error('Senhas divergentes.', 'Atenção: ');
       return;
     }
 
     if (!this.registerForm.value.fullname) {
-      this.toastr.error('Digite o nome e sobrenome.', 'Atenção: ');
+      this.notification.error('Digite o nome e sobrenome.', 'Atenção: ');
       return;
     }
 
@@ -97,20 +119,20 @@ export class RegisterComponent implements OnInit {
 
       this.authService.register(this.registerForm.value).subscribe(
         (res: any) => {
-          this.toastr.success('Cadastro realizado com sucesso.', 'Bem-vindo');
+          this.notification.success('Cadastro realizado com sucesso.', 'Bem-vindo');
           this.router.navigate(['/home']);
         },
         err => {
           this.carregando = false;
           if (err.status === 500) {
             if (err.error.message.match('email')) {
-              this.toastr.error('Email já registrado.', 'Erro: ');
+              this.notification.error('Email já registrado.', 'Erro: ');
             }
           }
         }
       );
     } else {
-      this.toastr.error(
+      this.notification.error(
         'Verifique os campos do formulário para checar o correto preenchimento.',
         'Erro: '
       );
@@ -121,6 +143,24 @@ export class RegisterComponent implements OnInit {
     const password = this.registerForm.get('password')?.value;
     const repeatPassword = this.registerForm.get('repeatPassword')?.value;
     return password !== repeatPassword && repeatPassword?.length > 0;
+  }
+
+  formatPhone(event: any): void {
+    let value = event.target.value.replace(/\D/g, '');
+    if (value.length >= 6) {
+      value = value.replace(/(\d{3})(\d{3})(\d{0,4})/, '($1) $2-$3');
+    } else if (value.length >= 3) {
+      value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+    }
+    this.registerForm.get('company.phone')?.setValue(value);
+  }
+
+  formatPostalCode(event: any): void {
+    let value = event.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (value.length >= 4) {
+      value = value.replace(/([A-Za-z]\d[A-Za-z])(\d[A-Za-z]\d)/, '$1 $2');
+    }
+    this.registerForm.get('company.address.postalCode')?.setValue(value);
   }
 
 }

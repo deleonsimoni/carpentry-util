@@ -1,0 +1,443 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Takeoff Measurements</h6>
+          <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+            <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+              <li class="breadcrumb-item"><a href="#" (click)="goBack()"><i class="fas fa-home"></i></a></li>
+              <li class="breadcrumb-item active" aria-current="page">Measurements</li>
+            </ol>
+          </nav>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+          <button
+            class="btn btn-sm btn-neutral"
+            (click)="goBack()">
+            <i class="fas fa-arrow-left"></i> Back
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--7">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="row justify-content-center">
+    <div class="col-12 text-center">
+      <div class="card shadow">
+        <div class="card-body py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading takeoff measurements...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div *ngIf="!isLoading" class="row">
+    <div class="col">
+      <div class="card shadow">
+        <!-- Header -->
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">{{ takeoff.custumerName }} - Measurements</h3>
+              <p class="text-sm text-muted mb-0">
+                Job Site: {{ takeoff.shipTo }} | LOT: {{ takeoff.lot }}
+              </p>
+            </div>
+            <div class="col-4 text-right">
+              <app-takeoff-status
+                [currentStatus]="orderStatus"
+                [takeoffId]="takeoffId"
+                [canChange]="false"
+                [showActions]="false"
+                [userRole]="'carpenter'"
+                [customerName]="takeoff.custumerName">
+              </app-takeoff-status>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form content -->
+        <div class="card-body">
+          <form [formGroup]="measurementForm" *ngIf="canEditMeasurements">
+
+            <!-- Interior Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-door-open mr-2"></i>Interior Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="interiorDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                      <th>Jamb</th>
+                      <th>Trim</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of interiorDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="jamb">
+                          <option value="">Select Jamb</option>
+                          <option value="4 9/16">4 9/16</option>
+                          <option value="5 1/4">5 1/4</option>
+                          <option value="6 9/16">6 9/16</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="trim">
+                          <option value="">Select Trim</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Bathroom Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-bath mr-2"></i>Bathroom Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="bathroomDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                      <th>Jamb</th>
+                      <th>Trim</th>
+                      <th>Privacy</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of bathroomDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="jamb">
+                          <option value="">Select Jamb</option>
+                          <option value="4 9/16">4 9/16</option>
+                          <option value="5 1/4">5 1/4</option>
+                          <option value="6 9/16">6 9/16</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="trim">
+                          <option value="">Select Trim</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="privacy">
+                          <option value="">Select Privacy</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Closet Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-hanger mr-2"></i>Closet Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="closetDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                      <th>Type</th>
+                      <th>Trim</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of closetDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="type">
+                          <option value="">Select Type</option>
+                          <option value="bifold">Bifold</option>
+                          <option value="sliding">Sliding</option>
+                          <option value="hinged">Hinged</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="trim">
+                          <option value="">Select Trim</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Cantina Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-glass-cheers mr-2"></i>Cantina Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="cantinaDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of cantinaDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- French Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-door-closed mr-2"></i>French Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="frenchDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                      <th>Jamb</th>
+                      <th>Swing</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of frenchDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="jamb">
+                          <option value="">Select Jamb</option>
+                          <option value="4 9/16">4 9/16</option>
+                          <option value="5 1/4">5 1/4</option>
+                          <option value="6 9/16">6 9/16</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="swing">
+                          <option value="">Select Swing</option>
+                          <option value="LH">LH</option>
+                          <option value="RH">RH</option>
+                          <option value="LHR">LHR</option>
+                          <option value="RHR">RHR</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Double Doors -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-columns mr-2"></i>Double Doors
+                </h4>
+              </div>
+            </div>
+
+            <div formArrayName="doubleDoors" class="mb-4">
+              <div class="table-responsive">
+                <table class="table table-flush">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Height</th>
+                      <th>Qty</th>
+                      <th>Jamb</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let door of doubleDoors.controls; let i = index" [formGroupName]="i">
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="size" placeholder="Size">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm" formControlName="height" placeholder="Height">
+                      </td>
+                      <td>
+                        <input type="number" class="form-control form-control-sm" formControlName="qty" placeholder="Qty">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm" formControlName="jamb">
+                          <option value="">Select Jamb</option>
+                          <option value="4 9/16">4 9/16</option>
+                          <option value="5 1/4">5 1/4</option>
+                          <option value="6 9/16">6 9/16</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Measurements -->
+            <div class="row">
+              <div class="col-12">
+                <h4 class="text-primary mb-3">
+                  <i class="fas fa-ruler mr-2"></i>Additional Measurements
+                </h4>
+              </div>
+            </div>
+
+            <div formGroupName="measurements" class="mb-4">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label">Ceiling Height</label>
+                    <input type="text" class="form-control" formControlName="ceilingHeight" placeholder="e.g., 9 ft">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-control-label">Notes</label>
+                    <textarea class="form-control" formControlName="notes" rows="3" placeholder="Additional notes or measurements"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="row">
+              <div class="col-12">
+                <div class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-primary mr-3"
+                    (click)="saveMeasurements()"
+                    [disabled]="isAdvancingStatus">
+                    <i class="fas fa-save mr-2"></i>Save Progress
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    (click)="completeMeasurements()"
+                    [disabled]="isAdvancingStatus">
+                    <i class="fas fa-check mr-2"></i>Complete Measurements
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </form>
+
+          <!-- Access denied message -->
+          <div *ngIf="!canEditMeasurements" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-lock fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">Access Restricted</h4>
+            <p class="text-muted mb-4">
+              Measurements can only be edited when the status is "To Measure" and you are the assigned carpenter.
+            </p>
+            <button class="btn btn-primary" (click)="goBack()">
+              <i class="fas fa-arrow-left mr-2"></i>Go Back
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

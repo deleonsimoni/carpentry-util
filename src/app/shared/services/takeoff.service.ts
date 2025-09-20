@@ -42,4 +42,19 @@ export class TakeoffService {
   generatePDF(id: any) {
     return this.http.get<any>(`/api/takeoff/${id}/generatePDF`);
   }
+
+  uploadDeliveryPhoto(takeoffId: string, photo: File) {
+    const formData = new FormData();
+    formData.append('deliveryPhoto', photo);
+
+    return this.http.post<any>(`/api/takeoff/${takeoffId}/delivery-photo`, formData);
+  }
+
+  updateTrimCarpenter(takeoffId: string, trimCarpenterId: string) {
+    return this.http.patch<any>(`/api/takeoff/${takeoffId}/trim-carpenter`, { trimCarpenterId });
+  }
+
+  removeTrimCarpenter(takeoffId: string) {
+    return this.http.delete<any>(`/api/takeoff/${takeoffId}/trim-carpenter`);
+  }
 }

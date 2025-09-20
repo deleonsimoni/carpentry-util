@@ -1,5 +1,6 @@
 
 const User = require('../models/user.model');
+const UserRoles = require('../constants/user-roles');
 
 module.exports = {
   getAll
@@ -8,7 +9,7 @@ module.exports = {
 
 async function getAll() {
   return await User
-    .find({ roles: 'carpentry' })
+    .find({ roles: UserRoles.CARPENTER })
     .select('email fullname')
     .sort({
       createAt: -1

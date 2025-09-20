@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@app/shared/services';
 import { UserService } from '@app/shared/services/user.service';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
@@ -19,7 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private userService: UserService,
     private builder: FormBuilder,
-    private toastr: ToastrService,
+    private notification: NotificationService,
     private spinner: NgxSpinnerService
   ) {
     this.loginForm = this.builder.group({
@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (user && user._id) {
           // User is already logged in, redirect to home
           this.router.navigate(['/home']);
-          this.toastr.info('You are already logged in', 'Redirected');
+          this.notification.info('You are already logged in', 'Redirected');
         }
       },
       err => {
@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             next: (response) => {
               // Managers are not required to change password
               if (res.roles && res.roles.includes('manager')) {
-                this.toastr.success('Nice to see you', 'Welcome :)');
+                this.notification.success('Nice to see you', 'Welcome :)');
                 this.router.navigate(['/home']);
                 this.spinner.hide();
                 return;
@@ -73,11 +73,11 @@ export class LoginComponent implements OnInit, OnDestroy {
 
               if (response.data.requirePasswordChange) {
                 // Redirect to password change page
-                this.toastr.info('You must change your temporary password', 'Password Change Required');
+                this.notification.info('You must change your temporary password', 'Password Change Required');
                 this.router.navigate(['/change-password-required']);
               } else {
                 // Normal login flow
-                this.toastr.success('Nice to see you', 'Welcome :)');
+                this.notification.success('Nice to see you', 'Welcome :)');
                 this.router.navigate(['/home']);
               }
               this.spinner.hide();
@@ -85,7 +85,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             error: (error) => {
               console.error('Error checking password status:', error);
               // In case of error, proceed with normal flow
-              this.toastr.success('Nice to see you', 'Welcome :)');
+              this.notification.success('Nice to see you', 'Welcome :)');
               this.router.navigate(['/home']);
               this.spinner.hide();
             }
@@ -95,7 +95,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.spinner.hide();
 
           if (err.status === 401) {
-            this.toastr.error('Invalid email or password', 'Error: ');
+            this.notification.error('Invalid email or password', 'Error: ');
           }
         }
       );

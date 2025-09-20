@@ -1,0 +1,131 @@
+<div class="landing-container">
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">CarpentryUtil</h1>
+        <h2 class="hero-subtitle">Simplified Carpentry Management</h2>
+        <p class="hero-description">
+          Streamline your carpentry business with our comprehensive takeoff management system.
+          From measurement to delivery, we've got you covered.
+        </p>
+
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg" (click)="navigateToLogin()">
+            Get Started
+          </button>
+          <button class="btn btn-outline-secondary btn-lg" (click)="navigateToSubscription()">
+            View Pricing
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-image">
+        <div class="feature-preview">
+          <div class="dashboard-mockup">
+            <div class="mockup-header">
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+              <div class="mockup-dot"></div>
+            </div>
+            <div class="mockup-content">
+              <div class="mockup-item">📋 Takeoff Management</div>
+              <div class="mockup-item">👷 Carpenter Assignment</div>
+              <div class="mockup-item">📊 Progress Tracking</div>
+              <div class="mockup-item">📱 Mobile Friendly</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <h2 class="section-title">Why Choose CarpentryUtil?</h2>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Takeoff Management</h3>
+          <p>Create, manage, and track takeoffs with detailed measurements and specifications.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">👷</div>
+          <h3>Carpenter Assignment</h3>
+          <p>Assign measurement and trim carpenters to projects with automatic notifications.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Progress Tracking</h3>
+          <p>Monitor project status from initial measurement to final delivery.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🚚</div>
+          <h3>Delivery Management</h3>
+          <p>Track deliveries with photo confirmation and status updates.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>Mobile Responsive</h3>
+          <p>Access your projects anywhere with our mobile-friendly interface.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Analytics & Reports</h3>
+          <p>Generate detailed PDF reports and track business performance.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Ready to Streamline Your Carpentry Business?</h2>
+        <p>Join hundreds of contractors who trust CarpentryUtil to manage their projects efficiently.</p>
+
+        <div class="cta-buttons">
+          <button class="btn btn-primary btn-lg" (click)="navigateToRegister()">
+            Start Free Trial
+          </button>
+          <button class="btn btn-outline-light btn-lg" (click)="navigateToLogin()">
+            Sign In
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <h3>CarpentryUtil</h3>
+          <p>Your trusted partner in carpentry project management.</p>
+        </div>
+
+        <div class="footer-links">
+          <div class="footer-column">
+            <h4>Product</h4>
+            <a href="#" (click)="navigateToSubscription()">Pricing</a>
+            <a href="#" (click)="navigateToLogin()">Sign In</a>
+            <a href="#" (click)="navigateToRegister()">Sign Up</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 CarpentryUtil. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,110 @@
+<div class="modal-header">
+  <h4 class="modal-title text-primary">
+    <i class="fas fa-camera mr-2"></i>Delivery Photo Upload
+  </h4>
+  <button type="button" class="close" (click)="cancel()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  <div class="mb-3">
+    <p class="text-muted">
+      <strong>Customer:</strong> {{ customerName }}
+    </p>
+    <p class="text-sm text-muted mb-4">
+      Please upload a photo confirming the delivery has been completed successfully.
+    </p>
+  </div>
+
+  <!-- File Upload Area -->
+  <div class="upload-area mb-4">
+    <div
+      class="upload-dropzone border-dashed border-2 p-4 text-center"
+      [class.border-primary]="dragOver"
+      [class.border-secondary]="!dragOver"
+      [class.bg-light]="dragOver"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+      (click)="fileInput.click()"
+      style="cursor: pointer; min-height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+
+      <div *ngIf="!selectedFile" class="upload-placeholder">
+        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">Drop photo here or click to browse</h5>
+        <p class="text-sm text-muted mb-0">Supports: JPG, PNG, GIF (Max: 5MB)</p>
+      </div>
+
+      <div *ngIf="selectedFile && previewUrl" class="preview-container">
+        <img [src]="previewUrl" alt="Preview" class="img-fluid rounded shadow" style="max-height: 300px; max-width: 100%;">
+        <div class="mt-3">
+          <p class="text-sm text-muted mb-1">
+            <strong>{{ selectedFile.name }}</strong>
+          </p>
+          <p class="text-xs text-muted mb-0">
+            {{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <input
+      #fileInput
+      type="file"
+      class="d-none"
+      accept="image/*"
+      (change)="onFileSelected($event)">
+  </div>
+
+  <!-- File Info and Actions -->
+  <div *ngIf="selectedFile" class="d-flex justify-content-between align-items-center mb-3">
+    <span class="text-success">
+      <i class="fas fa-check-circle mr-1"></i>Photo selected
+    </span>
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-danger"
+      (click)="removeFile()"
+      [disabled]="isUploading">
+      <i class="fas fa-times mr-1"></i>Remove
+    </button>
+  </div>
+
+  <!-- Upload Progress -->
+  <div *ngIf="isUploading" class="mb-3">
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped progress-bar-animated"
+           role="progressbar"
+           style="width: 100%">
+        Uploading...
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="cancel()"
+    [disabled]="isUploading">
+    Cancel
+  </button>
+  <button
+    type="button"
+    class="btn btn-warning"
+    (click)="skipPhotoUpload()"
+    [disabled]="isUploading">
+    <i class="fas fa-forward mr-2"></i>Skip Photo & Complete Delivery
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary"
+    (click)="uploadPhoto()"
+    [disabled]="!canUpload">
+    <i class="fas fa-upload mr-2"></i>
+    <span *ngIf="!isUploading">Upload & Complete Delivery</span>
+    <span *ngIf="isUploading">Uploading...</span>
+  </button>
+</div>

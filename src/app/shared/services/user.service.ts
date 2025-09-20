@@ -1,14 +1,15 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { User } from '../interfaces/user.interface';
+import { User, UserProfile as UserProfileInterface, UserProfileType, UserStatusType } from '../interfaces/user.interface';
+import { UserRoles } from '../constants/user-roles.constants';
 
 export interface UserProfile {
   _id: string;
   fullname: string;
   email: string;
-  profile?: 'supervisor' | 'delivery' | 'manager' | 'carpinter';
-  status: 'active' | 'inactive';
+  profile?: UserProfileType;
+  status: UserStatusType;
   requirePasswordChange: boolean;
   temporaryPassword: boolean;
   createdAt: string;
@@ -32,7 +33,7 @@ export interface UserListResponse {
 export interface CreateUserRequest {
   fullname: string;
   email: string;
-  profile?: 'supervisor' | 'delivery' | 'manager' | 'carpinter';
+  profile?: UserProfileType;
   mobilePhone?: string;
   homePhone?: string;
 }
@@ -46,8 +47,8 @@ export interface CreateUserResponse {
 
 export interface UpdateUserRequest {
   fullname?: string;
-  profile?: 'supervisor' | 'carpinteiro' | 'entregador';
-  status?: 'active' | 'inactive';
+  profile?: UserProfileType;
+  status?: UserStatusType;
   mobilePhone?: string;
   homePhone?: string;
 }
@@ -133,10 +134,10 @@ export class UserService {
   // Obter lista de perfis disponíveis
   getAvailableProfiles(): { value: string; label: string }[] {
     return [
-      { value: 'supervisor', label: 'Supervisor' },
-      { value: 'delivery', label: 'Delivery' },
-      { value: 'manager', label: 'Manager' },
-      { value: 'carpinter', label: 'Carpinter' }
+      { value: UserRoles.SUPERVISOR, label: UserRoles.getDisplayName(UserRoles.SUPERVISOR) },
+      { value: UserRoles.DELIVERY, label: UserRoles.getDisplayName(UserRoles.DELIVERY) },
+      { value: UserRoles.MANAGER, label: UserRoles.getDisplayName(UserRoles.MANAGER) },
+      { value: UserRoles.CARPENTER, label: UserRoles.getDisplayName(UserRoles.CARPENTER) }
     ];
   }
 

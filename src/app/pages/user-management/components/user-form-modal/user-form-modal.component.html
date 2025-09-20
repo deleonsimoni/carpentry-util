@@ -18,24 +18,24 @@
 <div class="modal-body px-4 py-4">
 
   <!-- Generated Password Alert (only shown after user creation) -->
-  <div *ngIf="generatedPassword" class="alert alert-success border-0 shadow-sm">
+  <div *ngIf="generatedPassword" class="alert alert-light border border-secondary shadow-sm">
     <div class="d-flex align-items-start">
       <div class="alert-icon mr-3">
-        <i class="fas fa-key fa-lg text-success"></i>
+        <i class="fas fa-key fa-lg text-dark"></i>
       </div>
       <div class="flex-grow-1">
-        <h6 class="alert-heading mb-2">User created successfully!</h6>
-        <p class="mb-3">Temporary password generated:</p>
-        <div class="d-flex align-items-center mb-3 p-3 bg-light rounded">
+        <h6 class="alert-heading mb-2 text-dark">User created successfully!</h6>
+        <p class="mb-3 text-dark">Temporary password generated:</p>
+        <div class="d-flex align-items-center mb-3 p-3 bg-light border rounded">
           <code class="flex-grow-1 text-dark font-weight-bold h5 mb-0">{{ generatedPassword }}</code>
           <button
             type="button"
-            class="btn btn-sm btn-outline-primary ml-2"
+            class="btn btn-sm btn-outline-secondary ml-2"
             (click)="copyPassword()">
             <i class="fas fa-copy mr-1"></i> Copy
           </button>
         </div>
-        <small class="text-muted">
+        <small class="text-dark">
           <i class="fas fa-info-circle mr-1"></i>
           O usuário deverá trocar esta senha no primeiro login.
         </small>
@@ -175,14 +175,14 @@
     </div>
 
     <!-- Important Notes for Creation -->
-    <div *ngIf="!isEditMode" class="alert alert-light border border-primary border-opacity-25 mt-4">
+    <div *ngIf="!isEditMode" class="alert alert-light border border-secondary mt-4">
       <div class="d-flex align-items-start">
         <div class="alert-icon mr-3">
-          <i class="fas fa-info-circle fa-lg text-primary"></i>
+          <i class="fas fa-info-circle fa-lg text-dark"></i>
         </div>
         <div>
-          <h6 class="alert-heading text-primary mb-2">Important information</h6>
-          <ul class="mb-0 small text-muted">
+          <h6 class="alert-heading text-dark mb-2">Important information</h6>
+          <ul class="mb-0 small text-dark">
             <li class="mb-1">A temporary password will be generated automatically</li>
             <li class="mb-1">User must change password on first login</li>
             <li class="mb-0">Credentials will be displayed after creation</li>

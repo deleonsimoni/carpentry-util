@@ -10,12 +10,29 @@
       <img src="./assets/img/brand/carpentryLogo2.png" class="navbar-brand-img" alt="...">
     </a>
 
-    <!-- User Role Badge -->
-    <div class="user-role-section d-none d-md-block text-center my-3" *ngIf="user">
+    <!-- User Section -->
+    <div class="user-section d-none d-md-block text-center my-3" *ngIf="user">
+      <!-- Company Name (Above Role) -->
+      <div class="company-name-section mb-2" *ngIf="currentCompany && !isSuperAdmin">
+        <small class="text-muted d-block">
+          <i class="ni ni-building text-primary"></i>
+          {{currentCompany.name}}
+        </small>
+      </div>
+
+      <!-- User Role Badge -->
       <span class="badge badge-lg" [ngClass]="userRole.badgeClass">
         <i class="fas" [ngClass]="userRole.icon"></i>
         {{userRole.name}}
       </span>
+
+      <!-- Debug Info (temporary) -->
+      <div class="debug-info mt-2" style="font-size: 10px; color: #666;">
+        <div>User: {{user?.email}}</div>
+        <div>Company ID: {{user?.company}}</div>
+        <div>Current Company: {{currentCompany?.name || 'none'}}</div>
+        <div>Super Admin: {{isSuperAdmin}}</div>
+      </div>
     </div>
     <!-- User -->
     <ul class="nav align-items-center d-md-none">

@@ -7,6 +7,7 @@ import { tap, pluck, catchError } from 'rxjs/operators';
 import { User } from '@app/shared/interfaces';
 
 import { TokenStorage } from './token.storage';
+import { CompanyHeaderInterceptor } from '../../interceptors/company-header.interceptor';
 
 interface AuthResponse {
   token: string;
@@ -73,11 +74,20 @@ export class AuthService {
   signOut(): void {
     this.tokenStorage.signOut();
     this.setUser(null);
+    CompanyHeaderInterceptor.clearStoredUserData();
   }
 
   getAuthorizationHeaders() {
     const token: string | null = this.tokenStorage.getToken() || '';
-    return { Authorization: `Bearer ${token}` };
+    const headers: any = { Authorization: `Bearer ${token}` };
+
+    // Add company ID header if user is logged in and has a company
+    const currentUser = this.user$.value;
+    if (currentUser && currentUser.company) {
+      headers['x-company-id'] = currentUser.company;
+    }
+
+    return headers;
   }
 
   /**
@@ -86,5 +96,28 @@ export class AuthService {
    */
   checkTheUserOnTheFirstLoad(): Promise<User | null> {
     return firstValueFrom(this.me());
+  }
+
+  /**
+   * Generic method to make authenticated HTTP requests
+   */
+  makeRequest(method: string, url: string, body?: any): Observable<any> {
+    const fullUrl = `/api${url}`;
+    const headers = this.getAuthorizationHeaders();
+
+    switch (method.toUpperCase()) {
+      case 'GET':
+        return this.http.get(fullUrl, { headers });
+      case 'POST':
+        return this.http.post(fullUrl, body, { headers });
+      case 'PUT':
+        return this.http.put(fullUrl, body, { headers });
+      case 'PATCH':
+        return this.http.patch(fullUrl, body, { headers });
+      case 'DELETE':
+        return this.http.delete(fullUrl, { headers });
+      default:
+        throw new Error(`Unsupported HTTP method: ${method}`);
+    }
   }
 }

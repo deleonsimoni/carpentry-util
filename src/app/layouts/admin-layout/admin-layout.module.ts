@@ -14,6 +14,7 @@ import { TakeOffComponent } from '../../pages/new-takeoff/new-takeoff.component'
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@app/shared/shared.module';
 import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.component';
+import { CarpenterAutocompleteComponent } from '@app/shared/components/carpenter-autocomplete/carpenter-autocomplete.component';
 // import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
@@ -26,6 +27,7 @@ import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.compo
     ReactiveFormsModule,
     ClipboardModule,
     SharedModule,
+    CarpenterAutocompleteComponent,
   ],
   declarations: [
     DashboardComponent,
