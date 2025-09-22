@@ -2,6 +2,53 @@
 @use '@angular/material' as mat;
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+// CarpentryUtil Color Variables
+:root {
+  // Primary Colors (Red theme from takeoff)
+  --primary-red: #dc3545;
+  --primary-red-dark: #c82333;
+  --primary-red-light: #e85e6d;
+
+  // Secondary Colors (Blue system)
+  --secondary-blue: #5e72e4;
+  --secondary-blue-dark: #4c63d2;
+  --secondary-blue-light: #7b8ce8;
+
+  // Badge Colors
+  --badge-primary: #5e72e4;
+  --badge-success: #2dce89;
+  --badge-warning: #fb6340;
+  --badge-info: #11cdef;
+  --badge-secondary: #8898aa;
+  --badge-danger: #f44336;
+
+  // Status Colors
+  --success-color: #28a745;
+  --success-dark: #1e7e34;
+  --error-color: #dc3545;
+  --error-dark: #c82333;
+  --warning-color: #ffc107;
+  --warning-dark: #e0a800;
+  --info-color: #17a2b8;
+  --info-dark: #138496;
+
+  // Neutral Colors
+  --white: #ffffff;
+  --light-gray: #f4f3f3;
+  --medium-gray: #6c757d;
+  --dark-gray: #343a40;
+  --black: #000000;
+
+  // Background Gradients
+  --gradient-primary: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+  --gradient-secondary: linear-gradient(45deg, var(--secondary-blue), var(--secondary-blue-dark));
+
+  // Shadows
+  --shadow-primary: 0 4px 15px rgba(94, 114, 228, 0.3);
+  --shadow-primary-hover: 0 6px 20px rgba(94, 114, 228, 0.4);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
 $custom-typography: mat.define-typography-config($font-family: 'Exo',
   );
 
@@ -9,7 +56,7 @@ $custom-typography: mat.define-typography-config($font-family: 'Exo',
 @include mat.core();
 
 body {
-  background-color: #f4f3f3;
+  background-color: var(--light-gray);
   margin: 0;
 
   app-root * {
@@ -68,54 +115,54 @@ body {
 
 /* Badge improvements - ensure white text */
 .badge {
-  color: white !important;
+  color: var(--white) !important;
   font-weight: 500;
 
   &.badge-primary {
-    background-color: #5e72e4 !important;
-    color: white !important;
+    background-color: var(--badge-primary) !important;
+    color: var(--white) !important;
   }
 
   &.badge-success {
-    background-color: #2dce89 !important;
-    color: white !important;
+    background-color: var(--badge-success) !important;
+    color: var(--white) !important;
   }
 
   &.badge-warning {
-    background-color: #fb6340 !important;
-    color: white !important;
+    background-color: var(--badge-warning) !important;
+    color: var(--white) !important;
   }
 
   &.badge-info {
-    background-color: #11cdef !important;
-    color: white !important;
+    background-color: var(--badge-info) !important;
+    color: var(--white) !important;
   }
 
   &.badge-secondary {
-    background-color: #8898aa !important;
-    color: white !important;
+    background-color: var(--badge-secondary) !important;
+    color: var(--white) !important;
   }
 }
 
 .custom-toast.toast-success {
-  background-color: #28a745 !important;
-  border-color: #1e7e34 !important;
+  background-color: var(--success-color) !important;
+  border-color: var(--success-dark) !important;
 }
 
 .custom-toast.toast-error {
-  background-color: #dc3545 !important;
-  border-color: #c82333 !important;
+  background-color: var(--error-color) !important;
+  border-color: var(--error-dark) !important;
 }
 
 .custom-toast.toast-warning {
-  background-color: #ffc107 !important;
-  border-color: #e0a800 !important;
-  color: #212529 !important;
+  background-color: var(--warning-color) !important;
+  border-color: var(--warning-dark) !important;
+  color: var(--dark-gray) !important;
 }
 
 .custom-toast.toast-info {
-  background-color: #17a2b8 !important;
-  border-color: #138496 !important;
+  background-color: var(--info-color) !important;
+  border-color: var(--info-dark) !important;
 }
 
 .toast-title {

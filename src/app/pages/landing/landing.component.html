@@ -1,6 +1,22 @@
 <div class="landing-container">
+  <!-- Header -->
+  <header class="landing-header">
+    <div class="container">
+      <nav class="nav-bar">
+        <div class="nav-brand">
+          <h2>CarpentryUtil</h2>
+        </div>
+        <div class="nav-links">
+          <button class="btn-link" (click)="navigateToLogin()">Sign In</button>
+          <button class="btn btn-primary" (click)="navigateToRegister()">Sign Up</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
   <!-- Hero Section -->
-  <header class="hero-section">
+  <section class="hero-section">
+    <div class="container">
     <div class="hero-content">
       <div class="hero-text">
         <h1 class="hero-title">CarpentryUtil</h1>
@@ -38,7 +54,8 @@
         </div>
       </div>
     </div>
-  </header>
+    </div>
+  </section>
 
   <!-- Features Section -->
   <section class="features-section">
