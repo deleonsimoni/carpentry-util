@@ -76,54 +76,13 @@ export class TakeOffComponent implements OnInit {
     isFound: false
   };
 
-  // Backward compatibility getters for template
-  get emailCarpentry(): string {
-    return this.measurementCarpenter.email;
-  }
-
-  set emailCarpentry(value: string) {
-    this.measurementCarpenter.email = value;
-  }
-
-  get nameCarpentry(): string {
-    return this.measurementCarpenter.name;
-  }
-
-  set nameCarpentry(value: string) {
-    this.measurementCarpenter.name = value;
-  }
-
-  get isCarpentryFound(): boolean {
-    return this.measurementCarpenter.isFound;
-  }
-
-  set isCarpentryFound(value: boolean) {
-    this.measurementCarpenter.isFound = value;
-  }
-
-  get emailTrimCarpentry(): string {
-    return this.trimCarpenter.email;
-  }
-
-  set emailTrimCarpentry(value: string) {
-    this.trimCarpenter.email = value;
-  }
-
-  get nameTrimCarpentry(): string {
-    return this.trimCarpenter.name;
-  }
-
-  set nameTrimCarpentry(value: string) {
-    this.trimCarpenter.name = value;
-  }
-
-  get isTrimCarpentryFound(): boolean {
-    return this.trimCarpenter.isFound;
-  }
-
-  set isTrimCarpentryFound(value: boolean) {
-    this.trimCarpenter.isFound = value;
-  }
+  // Legacy properties for backward compatibility
+  emailCarpentry: string = '';
+  nameCarpentry: string = '';
+  isCarpentryFound: boolean = false;
+  emailTrimCarpentry: string = '';
+  nameTrimCarpentry: string = '';
+  isTrimCarpentryFound: boolean = false;
 
   isVisibleCantinaDoors = false;
   isVisibleFrenchDoors = false;
@@ -349,6 +308,11 @@ export class TakeOffComponent implements OnInit {
         name: carpenter.fullname,
         isFound: true
       };
+
+      // Update legacy properties for template compatibility
+      this.emailCarpentry = carpenter.email;
+      this.nameCarpentry = carpenter.fullname;
+      this.isCarpentryFound = true;
 
       if (this.idOrder && !this.shouldDisableFormField()) {
         this.notification.info(this.MESSAGES.INFO.MEASUREMENT_CARPENTER_ASSIGNED, this.MESSAGES.TITLE.CARPENTER_UPDATED);
@@ -1383,7 +1347,7 @@ export class TakeOffComponent implements OnInit {
    * Controls when managers can edit carpenter assignments in existing takeoffs
    */
   canEditCarpenterAssignments(): boolean {
-    return this.isManager && this.idOrder && !this.shouldDisableFormField();
+    return this.isManager && !!this.idOrder && !this.shouldDisableFormField();
   }
 
   /**
@@ -1406,9 +1370,9 @@ export class TakeOffComponent implements OnInit {
    */
   shouldShowSectionToggleButtons(): boolean {
     if (this.isManager) {
-      return STATUS_CONSTANTS.permissions.company.canEdit(this.orderStatus);
+      return this.orderStatus !== null && STATUS_CONSTANTS.permissions.company.canEdit(this.orderStatus);
     } else {
-      return STATUS_CONSTANTS.permissions.carpenter.canEdit(this.orderStatus); // Only TO_MEASURE
+      return this.orderStatus !== null && STATUS_CONSTANTS.permissions.carpenter.canEdit(this.orderStatus); // Only TO_MEASURE
     }
   }
 

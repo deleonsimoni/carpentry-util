@@ -7,7 +7,7 @@ import { LandingComponent } from '../../pages/landing/landing.component';
 import { SubscriptionComponent } from '../../pages/subscription/subscription.component';
 
 export const AuthLayoutRoutes: Routes = [
-    { path: '', component: LandingComponent },
+    { path: 'hero', component: LandingComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'subscription', component: SubscriptionComponent },

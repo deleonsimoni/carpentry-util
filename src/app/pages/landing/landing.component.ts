@@ -26,4 +26,8 @@ export class LandingComponent {
   navigateToSubscription(): void {
     this.router.navigate(['/subscription']);
   }
+
+  navigateToHero(): void {
+    this.router.navigate(['/hero']);
+  }
 }
