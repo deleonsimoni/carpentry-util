@@ -1,7 +1,7 @@
 // Landing Page Styles
 .landing-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   color: white;
 }
 
@@ -265,14 +265,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, #4CAF50, #45a049);
+  background: linear-gradient(45deg, #5e72e4, #4c63d2);
   color: white;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 15px rgba(94, 114, 228, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 20px rgba(94, 114, 228, 0.4);
 }
 
 .btn-outline-secondary {
@@ -310,12 +310,21 @@
     text-align: center;
   }
 
+  .hero-text {
+    text-align: center;
+  }
+
   .hero-title {
     font-size: 2.5rem;
   }
 
   .hero-subtitle {
     font-size: 1.4rem;
+  }
+
+  .hero-section {
+    min-height: 80vh;
+    padding: 2rem 1rem;
   }
 
   .features-grid {
@@ -329,13 +338,17 @@
 
   .hero-buttons,
   .cta-buttons {
-    flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .btn {
-    width: 100%;
+    min-width: 140px;
+  }
+
+  .dashboard-mockup {
     max-width: 300px;
+    transform: none;
   }
 }
 

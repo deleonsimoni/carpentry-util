@@ -1,7 +1,7 @@
 // Subscription Page Styles
 .subscription-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   color: white;
 }
 
@@ -107,8 +107,8 @@
 }
 
 .pricing-card.highlighted {
-  border: 2px solid #4CAF50;
-  box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+  border: 2px solid #5e72e4;
+  box-shadow: 0 10px 30px rgba(94, 114, 228, 0.3);
   background: rgba(255, 255, 255, 0.15);
 }
 
@@ -116,7 +116,7 @@
   position: absolute;
   top: -1px;
   right: -1px;
-  background: linear-gradient(45deg, #4CAF50, #45a049);
+  background: linear-gradient(45deg, #5e72e4, #4c63d2);
   color: white;
   padding: 0.5rem 2rem;
   font-size: 0.9rem;
@@ -184,7 +184,7 @@
 }
 
 .feature-icon {
-  background: #4CAF50;
+  background: #5e72e4;
   color: white;
   border-radius: 50%;
   width: 20px;
@@ -337,14 +337,14 @@
 }
 
 .btn-primary {
-  background: linear-gradient(45deg, #4CAF50, #45a049);
+  background: linear-gradient(45deg, #5e72e4, #4c63d2);
   color: white;
-  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 4px 15px rgba(94, 114, 228, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 6px 20px rgba(94, 114, 228, 0.4);
 }
 
 .btn-outline-primary {

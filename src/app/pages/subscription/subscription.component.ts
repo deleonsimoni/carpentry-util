@@ -24,12 +24,12 @@ export class SubscriptionComponent {
 
   plans: SubscriptionPlan[] = [
     {
-      name: 'Starter',
+      name: 'Basic',
       price: '$29',
       period: 'per month',
       description: 'Perfect for small carpentry businesses',
       features: [
-        'Up to 50 takeoffs per month',
+        'Pode criar até 50 takeoffs por mês',
         '2 carpenter assignments',
         'Basic reporting',
         'Email support',
@@ -45,7 +45,7 @@ export class SubscriptionComponent {
       period: 'per month',
       description: 'Ideal for growing businesses',
       features: [
-        'Unlimited takeoffs',
+        'Até 250 takeoffs por mês',
         'Unlimited carpenter assignments',
         'Advanced reporting & analytics',
         'Priority support',
@@ -64,7 +64,7 @@ export class SubscriptionComponent {
       period: 'per month',
       description: 'For large teams and companies',
       features: [
-        'Everything in Professional',
+        'Takeoffs ilimitados',
         'Multi-company management',
         'Advanced user roles',
         'API access',

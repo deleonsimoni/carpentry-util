@@ -23,7 +23,27 @@ async function insert(user) {
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   user.email = user.email.toLowerCase();
 
-  // Para usuários com role manager, definir profile como manager
+  // Garantir que roles seja um array válido
+  if (!user.roles || !Array.isArray(user.roles)) {
+    user.roles = [];
+  }
+
+  // Se profile não foi definido, usar CARPENTER como padrão
+  if (!user.profile) {
+    user.profile = UserRoles.CARPENTER;
+  }
+
+  // Validar se o profile é válido
+  if (!UserRoles.isValidRole(user.profile)) {
+    throw new Error(`Profile inválido: ${user.profile}. Valores válidos: ${UserRoles.getAllRoles().join(', ')}`);
+  }
+
+  // Adicionar o profile aos roles se não estiver presente
+  if (!user.roles.includes(user.profile)) {
+    user.roles.push(user.profile);
+  }
+
+  // Para usuários com role manager, garantir que profile está correto
   if (UserRoles.isManager(user.roles)) {
     user.profile = UserRoles.MANAGER;
   }
