@@ -42,7 +42,7 @@ const CompanySchema = new mongoose.Schema(
       type: String,
       trim: true
     }, // Canadian format: (xxx) xxx-xxxx
-    email: {
+    companyEmail: {
       type: String,
       trim: true,
       lowercase: true
@@ -53,10 +53,6 @@ const CompanySchema = new mongoose.Schema(
     },
 
     // Business Details
-    industry: {
-      type: String,
-      trim: true
-    },
     taxNumber: {
       type: String,
       trim: true

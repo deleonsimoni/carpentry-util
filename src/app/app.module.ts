@@ -15,7 +15,6 @@ import { CompanyHeaderInterceptor } from './shared/interceptors/company-header.i
 
 import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './header/header.component';
-import { HomeComponent } from './home/home.component';
 import { AuthService } from './shared/services';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -54,7 +53,6 @@ export function appInitializerFactory(authService: AuthService) {
   declarations: [
     AppComponent,
     HeaderComponent,
-    HomeComponent,
     AdminLayoutComponent,
     AuthLayoutComponent,
     MaterialRequestComponent,

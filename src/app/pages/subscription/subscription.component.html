@@ -1,18 +1,6 @@
 <div class="subscription-container">
   <!-- Header -->
-  <header class="subscription-header">
-    <div class="container">
-      <nav class="nav-bar">
-        <div class="nav-brand" (click)="navigateToLanding()">
-          <h2>CarpentryUtil</h2>
-        </div>
-        <div class="nav-links">
-          <button class="btn-link" (click)="navigateToLogin()">Sign In</button>
-          <button class="btn btn-primary" (click)="navigateToRegister()">Sign Up</button>
-        </div>
-      </nav>
-    </div>
-  </header>
+  <app-public-header></app-public-header>
 
   <!-- Hero Section -->
   <section class="pricing-hero">
@@ -113,7 +101,7 @@
     <div class="container">
       <div class="cta-content">
         <h2>Ready to Get Started?</h2>
-        <p>Join thousands of contractors who trust CarpentryUtil to manage their projects efficiently.</p>
+        <p>Join thousands of contractors who trust CarpentryGO to manage their projects efficiently.</p>
         <button class="btn btn-primary btn-lg" (click)="navigateToRegister()">
           Start Your Free Trial
         </button>
@@ -121,34 +109,4 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="subscription-footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <h3>CarpentryUtil</h3>
-          <p>Streamline your carpentry business with our comprehensive management solution.</p>
-        </div>
-
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4>Product</h4>
-            <a href="#" (click)="navigateToLanding()">Features</a>
-            <a href="#" (click)="navigateToRegister()">Sign Up</a>
-            <a href="#" (click)="navigateToLogin()">Sign In</a>
-          </div>
-
-          <div class="footer-column">
-            <h4>Support</h4>
-            <a href="mailto:support@carpentryutil.com">Contact Support</a>
-            <a href="mailto:sales@carpentryutil.com">Sales Inquiries</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2024 CarpentryUtil. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
 </div>

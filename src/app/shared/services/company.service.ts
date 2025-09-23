@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, map } from 'rxjs/operators';
 import { Company, CompanyFilters, SendTakeoffRequest, SendTakeoffResponse } from '../interfaces/company.interface';
 
 @Injectable({
@@ -34,9 +34,9 @@ export class CompanyService {
   }
 
   getCompanyById(id: string): Observable<Company> {
-    console.log('CompanyService: Making GET request to /api/company/' + id);
-    return this.http.get<Company>(`/api/company/${id}`).pipe(
-      tap(response => console.log('CompanyService: Raw response:', response)),
+    return this.http.get<{success: boolean, data: Company}>(`/api/company/${id}`).pipe(
+      tap(response => console.log('CompanyService: Raw API response:', response)),
+      map(response => response.data),
       catchError(error => {
         console.error('CompanyService: HTTP error in getCompanyById:', error);
         throw error;
@@ -70,10 +70,8 @@ export class CompanyService {
   }
 
   loadCurrentUserCompany(companyId: string): Observable<Company | null> {
-    console.log('CompanyService: Loading company with ID:', companyId);
     return this.getCompanyById(companyId).pipe(
       tap(company => {
-        console.log('CompanyService: Company loaded successfully:', company);
         this.currentCompany$.next(company);
       }),
       catchError(error => {

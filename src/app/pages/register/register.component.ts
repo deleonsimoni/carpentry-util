@@ -34,7 +34,6 @@ export class RegisterComponent implements OnInit {
       },
       err => {
         // User not logged in, stay on register page
-        console.log('User not logged in');
       }
     );
   }
@@ -54,20 +53,19 @@ export class RegisterComponent implements OnInit {
       ],
       password: [null, [Validators.required, Validators.minLength(6)]],
       repeatPassword: [null, [Validators.required, Validators.minLength(6)]],
-      roles: ['manager'], // Sempre manager
+      // roles será definido automaticamente no backend
 
       // Company Info
       company: this.builder.group({
         name: [null, [Validators.required]],
         businessNumber: [null],
-        industry: [null],
         phone: [null, [Validators.pattern(/^\(\d{3}\) \d{3}-\d{4}$/)]],
-        email: [null],
+        companyEmail: [null],
         website: [null],
         address: this.builder.group({
           street: [null],
           city: [null],
-          province: [null],
+          province: [null, [Validators.required]],
           postalCode: [null, [Validators.pattern(/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/)]],
           country: ['Canada']
         })
@@ -77,24 +75,6 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Canadian provinces
-  get canadianProvinces() {
-    return [
-      { code: 'AB', name: 'Alberta' },
-      { code: 'BC', name: 'British Columbia' },
-      { code: 'MB', name: 'Manitoba' },
-      { code: 'NB', name: 'New Brunswick' },
-      { code: 'NL', name: 'Newfoundland and Labrador' },
-      { code: 'NS', name: 'Nova Scotia' },
-      { code: 'NT', name: 'Northwest Territories' },
-      { code: 'NU', name: 'Nunavut' },
-      { code: 'ON', name: 'Ontario' },
-      { code: 'PE', name: 'Prince Edward Island' },
-      { code: 'QC', name: 'Quebec' },
-      { code: 'SK', name: 'Saskatchewan' },
-      { code: 'YT', name: 'Yukon' }
-    ];
-  }
 
   register(): void {
     const form = this.registerForm.value;
@@ -115,7 +95,11 @@ export class RegisterComponent implements OnInit {
       this.registerForm.value.email = this.registerForm.value.email
         .toLowerCase()
         .trim();
-      this.registerForm.removeControl('cf-password');
+
+      // Roles será definido automaticamente no backend baseado na presença de company
+
+      // Remove campos desnecessários antes de enviar
+      this.registerForm.removeControl('repeatPassword');
 
       this.authService.register(this.registerForm.value).subscribe(
         (res: any) => {
@@ -124,10 +108,24 @@ export class RegisterComponent implements OnInit {
         },
         err => {
           this.carregando = false;
+          console.error('Registration error:', err);
+
           if (err.status === 500) {
-            if (err.error.message.match('email')) {
-              this.notification.error('Email já registrado.', 'Erro: ');
+            if (err.error && err.error.message) {
+              if (err.error.message.match('email')) {
+                this.notification.error('Email já registrado.', 'Erro: ');
+              } else {
+                this.notification.error(err.error.message, 'Erro: ');
+              }
+            } else {
+              this.notification.error('Erro interno do servidor.', 'Erro: ');
             }
+          } else if (err.status === 400) {
+            const message = err.error?.message || 'Dados inválidos.';
+            this.notification.error(message, 'Erro: ');
+          } else {
+            const message = err.error?.message || 'Erro no registro.';
+            this.notification.error(message, 'Erro: ');
           }
         }
       );
@@ -162,5 +160,6 @@ export class RegisterComponent implements OnInit {
     }
     this.registerForm.get('company.address.postalCode')?.setValue(value);
   }
+
 
 }

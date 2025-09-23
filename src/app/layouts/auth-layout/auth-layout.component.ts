@@ -28,4 +28,20 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
     var body = document.getElementsByTagName("body")[0];
     body.classList.remove("bg-default");
   }
+
+  navigateToHero(): void {
+    this.router.navigate(['/hero']);
+  }
+
+  navigateToSubscription(): void {
+    this.router.navigate(['/subscription']);
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  navigateToRegister(): void {
+    this.router.navigate(['/register']);
+  }
 }

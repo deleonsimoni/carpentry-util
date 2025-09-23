@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { PublicHeaderComponent } from '@app/shared/components/public-header/public-header.component';
 
 interface SubscriptionPlan {
   name: string;
@@ -17,7 +18,7 @@ interface SubscriptionPlan {
   selector: 'app-subscription',
   templateUrl: './subscription.component.html',
   styleUrls: ['./subscription.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, PublicHeaderComponent],
   standalone: true
 })
 export class SubscriptionComponent {
@@ -96,7 +97,7 @@ export class SubscriptionComponent {
   selectPlan(plan: SubscriptionPlan): void {
     if (plan.name === 'Enterprise') {
       // Handle contact sales flow
-      window.open('mailto:sales@carpentryutil.com?subject=Enterprise Plan Inquiry', '_blank');
+      window.open('mailto:sales@carpentrygo.com?subject=Enterprise Plan Inquiry', '_blank');
     } else {
       // Navigate to registration with plan parameter
       this.router.navigate(['/register'], { queryParams: { plan: plan.name.toLowerCase() } });

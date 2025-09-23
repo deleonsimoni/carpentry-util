@@ -11,6 +11,6 @@ router.use(passport.authenticate('jwt', { session: false }));
 router.route('/').get(asyncHandler(getAllCarpentry));
 
 async function getAllCarpentry(req, res) {
-  let response = await carpentryCtrl.getAll();
+  let response = await carpentryCtrl.getAll(req.user);
   res.json(response);
 }

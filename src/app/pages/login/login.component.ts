@@ -49,7 +49,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       err => {
         // User not logged in, stay on login page
-        console.log('User not logged in');
       }
     );
   }
@@ -57,14 +56,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   login(): void {
     if (this.loginForm.valid) {
       this.spinner.show();
+      console.log('🔍 LOGIN - Iniciando processo de login');
 
       this.authService.login(this.loginForm.value).subscribe(
         (res: any) => {
+          console.log('✅ LOGIN - Login realizado com sucesso:', res);
+
           // Check if user needs to change password (except managers)
           this.userService.checkPasswordStatus().subscribe({
             next: (response) => {
+              console.log('✅ LOGIN - Status da senha obtido:', response);
+
               // Managers are not required to change password
               if (res.roles && res.roles.includes('manager')) {
+                console.log('✅ LOGIN - Usuário é manager, redirecionando para /takeoff');
                 this.notification.success('Nice to see you', 'Welcome :)');
                 this.router.navigate(['/home']);
                 this.spinner.hide();
@@ -72,18 +77,20 @@ export class LoginComponent implements OnInit, OnDestroy {
               }
 
               if (response.data.requirePasswordChange) {
+                console.log('⚠️ LOGIN - Usuário precisa trocar senha, redirecionando para /change-password-required');
                 // Redirect to password change page
                 this.notification.info('You must change your temporary password', 'Password Change Required');
                 this.router.navigate(['/change-password-required']);
               } else {
-                // Normal login flow
+                console.log('✅ LOGIN - Login normal, redirecionando para /takeoff');
+                // Normal login flow - redirect to takeoff list
                 this.notification.success('Nice to see you', 'Welcome :)');
                 this.router.navigate(['/home']);
               }
               this.spinner.hide();
             },
             error: (error) => {
-              console.error('Error checking password status:', error);
+              console.error('❌ LOGIN - Erro ao verificar status da senha:', error);
               // In case of error, proceed with normal flow
               this.notification.success('Nice to see you', 'Welcome :)');
               this.router.navigate(['/home']);
@@ -92,13 +99,19 @@ export class LoginComponent implements OnInit, OnDestroy {
           });
         },
         err => {
+          console.error('❌ LOGIN - Erro no login:', err);
           this.spinner.hide();
 
           if (err.status === 401) {
             this.notification.error('Invalid email or password', 'Error: ');
+          } else {
+            this.notification.error('Login error: ' + (err.message || 'Unknown error'), 'Error: ');
           }
         }
       );
+    } else {
+      console.log('⚠️ LOGIN - Formulário inválido');
+      this.notification.error('Please fill in all required fields', 'Form Invalid');
     }
   }
 

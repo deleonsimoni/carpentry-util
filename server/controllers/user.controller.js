@@ -20,18 +20,35 @@ module.exports = {
 };
 
 async function insert(user) {
+  console.log('🔍 DEBUG - Dados recebidos no user.controller.js:', JSON.stringify(user, null, 2));
+
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   user.email = user.email.toLowerCase();
+
+  // Detectar automaticamente o tipo de usuário baseado nos dados
+  const isManagerRegistration = user.company && typeof user.company === 'object' && user.company.name;
+
+  console.log('🔍 DEBUG - É registro de manager (tem company)?', isManagerRegistration);
 
   // Garantir que roles seja um array válido
   if (!user.roles || !Array.isArray(user.roles)) {
     user.roles = [];
   }
 
-  // Se profile não foi definido, usar CARPENTER como padrão
-  if (!user.profile) {
-    user.profile = UserRoles.CARPENTER;
+  // Se é registro de manager (tem dados de company), definir como manager automaticamente
+  if (isManagerRegistration) {
+    user.roles = [UserRoles.MANAGER];
+    user.profile = UserRoles.MANAGER;
+    console.log('🔍 DEBUG - Definido automaticamente como MANAGER por ter company');
+  } else {
+    // Se profile não foi definido, usar CARPENTER como padrão
+    if (!user.profile) {
+      user.profile = UserRoles.CARPENTER;
+    }
   }
+
+  console.log('🔍 DEBUG - Roles finais:', user.roles);
+  console.log('🔍 DEBUG - Profile final:', user.profile);
 
   // Validar se o profile é válido
   if (!UserRoles.isValidRole(user.profile)) {
@@ -44,8 +61,18 @@ async function insert(user) {
   }
 
   // Para usuários com role manager, garantir que profile está correto
+  console.log('🔍 DEBUG - Verificando se é manager:', UserRoles.isManager(user.roles));
   if (UserRoles.isManager(user.roles)) {
+    console.log('✅ DEBUG - É MANAGER! Aplicando configurações...');
     user.profile = UserRoles.MANAGER;
+    // Managers não precisam trocar senha após registro
+    user.requirePasswordChange = false;
+    user.temporaryPassword = false;
+    console.log('✅ DEBUG - Profile definido como:', user.profile);
+    console.log('✅ DEBUG - requirePasswordChange:', user.requirePasswordChange);
+    console.log('✅ DEBUG - temporaryPassword:', user.temporaryPassword);
+  } else {
+    console.log('❌ DEBUG - NÃO é manager');
   }
 
   // Se há dados da empresa (registro de manager), criar a empresa primeiro

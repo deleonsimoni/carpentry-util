@@ -14,17 +14,8 @@ declare interface RouteInfo {
   carpenterOnly?: boolean;
 }
 export const ROUTES: RouteInfo[] = [
-  //{ path: '/dashboard', title: 'Dashboard', icon: 'ni-tv-2 text-primary', class: '' },
-  //{ path: '/icons', title: 'Icons', icon: 'ni-planet text-blue', class: '' },
-  //{ path: '/maps', title: 'Maps', icon: 'ni-pin-3 text-orange', class: '' },
-  { path: '/home', title: 'Takeoff', icon: 'ni-building text-red', class: '' },
-  {
-    path: '/home',
-    title: 'My Measurements',
-    icon: 'ni-ruler-pencil text-yellow',
-    class: '',
-    carpenterOnly: true,
-  },
+  { path: '/home', title: 'Dashboard', icon: 'ni-tv-2 text-primary', class: '' },
+  { path: '/takeoff', title: 'Takeoff', icon: 'ni-building text-red', class: '' },
   {
     path: '/list-material-request',
     title: 'Material Request',
@@ -77,26 +68,25 @@ export class SidebarComponent implements OnInit {
 
       // Load company information if user has a company
       if (user && user.company) {
-        console.log('Loading company for user:', user.email, 'company ID:', user.company);
+        console.log('🔍 Sidebar: User has company, loading company data for ID:', user.company);
         this.companyService.loadCurrentUserCompany(user.company).subscribe(
           company => {
-            console.log('Company loaded successfully:', company);
+            console.log('✅ Sidebar: Company loaded successfully:', company);
             this.currentCompany = company;
           },
           error => {
-            console.error('Error loading company:', error);
+            console.error('❌ Sidebar: Error loading company:', error);
             this.currentCompany = null;
           }
         );
       } else {
-        console.log('User has no company assigned:', user);
+        console.log('⚠️ Sidebar: User has no company associated');
         this.currentCompany = null;
       }
     });
 
     // Subscribe to company changes
     this.companyService.getCurrentCompany().subscribe(company => {
-      console.log('Company changed via subscription:', company);
       this.currentCompany = company;
     });
 

@@ -109,10 +109,10 @@ export class DashboardComponent implements OnInit {
 
     // Status distribution chart (bar chart)
     const statusData = this.dashboardData ? [
-      this.dashboardData.statusStats.pending,
-      this.dashboardData.statusStats.inProgress,
-      this.dashboardData.statusStats.completed,
-      this.dashboardData.statusStats.other
+      this.dashboardData.statusStats.pending || 0,
+      this.dashboardData.statusStats.inProgress || 0,
+      this.dashboardData.statusStats.completed || 0,
+      this.dashboardData.statusStats.other || 0
     ] : [15, 25, 35, 10];
 
     this.ordersChart = new Chart(chartOrders, {
@@ -205,16 +205,16 @@ export class DashboardComponent implements OnInit {
     let count = 0;
     switch (status) {
       case 'pending':
-        count = this.dashboardData.statusStats.pending;
+        count = this.dashboardData.statusStats.pending || 0;
         break;
       case 'inProgress':
-        count = this.dashboardData.statusStats.inProgress;
+        count = this.dashboardData.statusStats.inProgress || 0;
         break;
       case 'completed':
-        count = this.dashboardData.statusStats.completed;
+        count = this.dashboardData.statusStats.completed || 0;
         break;
       case 'other':
-        count = this.dashboardData.statusStats.other;
+        count = this.dashboardData.statusStats.other || 0;
         break;
     }
 

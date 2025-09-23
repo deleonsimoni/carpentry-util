@@ -7,12 +7,30 @@ module.exports = {
 };
 
 
-async function getAll() {
-  return await User
-    .find({ roles: UserRoles.CARPENTER })
-    .select('email fullname')
+async function getAll(currentUser) {
+  console.log('🔍 DEBUG - Buscando carpinteiros para empresa:', currentUser?.company);
+
+  // Construir filtros baseado na empresa do usuário logado
+  const filters = {
+    roles: UserRoles.CARPENTER
+  };
+
+  // Se o usuário tem empresa, filtrar apenas carpinteiros da mesma empresa
+  if (currentUser && currentUser.company) {
+    filters.company = currentUser.company;
+  }
+
+  console.log('🔍 DEBUG - Filtros aplicados:', filters);
+
+  const carpenters = await User
+    .find(filters)
+    .select('email fullname company')
     .sort({
-      createAt: -1
+      createdAt: -1
     });
+
+  console.log('🔍 DEBUG - Carpinteiros encontrados:', carpenters.length);
+
+  return carpenters;
 }
 

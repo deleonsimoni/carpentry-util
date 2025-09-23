@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ImagePathUrlPipe implements PipeTransform {
   transform(value: any, ...args: any[]) {
     if (typeof value == 'string') {
-      return 'https://carpentryutil-public.s3.amazonaws.com/'.concat(value);
+      return 'https://carpentrygo-public.s3.amazonaws.com/'.concat(value);
     }
   }
 }

@@ -5,53 +5,10 @@
   color: white;
 }
 
-// Header
-.subscription-header {
-  padding: 1rem 0;
-  background: rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-}
-
-.nav-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-brand {
-  cursor: pointer;
-}
-
-.nav-brand h2 {
-  margin: 0;
-  font-weight: 700;
-  color: white;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.btn-link {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1rem;
-  cursor: pointer;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  transition: opacity 0.3s ease;
-}
-
-.btn-link:hover {
-  opacity: 0.8;
-}
 
 // Hero Section
 .pricing-hero {
-  padding: 4rem 2rem;
+  padding: 8rem 2rem 4rem 2rem;
   text-align: center;
 }
 
@@ -84,21 +41,24 @@
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
-  max-width: 1000px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
 .pricing-card {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
 }
 
 .pricing-card:hover {
@@ -133,41 +93,43 @@
 // Plan Header
 .plan-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
 }
 
 .plan-name {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   color: #fff;
 }
 
 .plan-price {
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .price {
-  font-size: 3rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #fff;
 }
 
 .period {
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #e6f0ff;
   margin-left: 0.5rem;
 }
 
 .plan-description {
   color: #e6f0ff;
-  font-size: 1rem;
-  line-height: 1.5;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 // Plan Features
 .plan-features {
-  margin-bottom: 2rem;
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
 }
 
 .plan-features ul {
@@ -179,28 +141,31 @@
 .plan-features li {
   display: flex;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.6rem;
   color: #e6f0ff;
+  font-size: 0.9rem;
 }
 
 .feature-icon {
   background: #5e72e4;
   color: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: bold;
-  margin-right: 0.75rem;
+  margin-right: 0.6rem;
   flex-shrink: 0;
 }
 
 // Plan Footer
 .plan-footer {
   text-align: center;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 // FAQ Section
@@ -368,6 +333,13 @@
 }
 
 // Responsive Design
+@media (max-width: 1024px) {
+  .pricing-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .nav-links {
     flex-direction: column;
@@ -380,6 +352,25 @@
 
   .pricing-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .pricing-card {
+    min-height: auto;
+    padding: 1.5rem;
+  }
+
+  .plan-name {
+    font-size: 1.4rem;
+  }
+
+  .price {
+    font-size: 2.8rem;
+  }
+
+  .plan-features li {
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
   }
 
   .faq-grid {
@@ -406,9 +397,15 @@
   }
 }
 
+@media (max-width: 768px) {
+  .pricing-hero {
+    padding: 6rem 2rem 3rem 2rem;
+  }
+}
+
 @media (max-width: 480px) {
   .pricing-hero {
-    padding: 2rem 1rem;
+    padding: 5rem 1rem 2rem 1rem;
   }
 
   .pricing-section {

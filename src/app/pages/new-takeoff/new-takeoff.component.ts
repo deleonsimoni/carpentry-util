@@ -238,12 +238,6 @@ export class TakeOffComponent implements OnInit {
             this.emailTrimCarpentry = data[0].trimCarpentry.email;
             this.nameTrimCarpentry = data[0].trimCarpentry.fullname;
             this.isTrimCarpentryFound = true;
-            console.log('Trim carpenter loaded:', {
-              id: data[0].trimCarpentry._id,
-              name: this.nameTrimCarpentry,
-              email: this.emailTrimCarpentry,
-              found: this.isTrimCarpentryFound
-            });
           } else {
             // Reset trim carpenter data when not present
             this.orderForm?.get('trimCarpentry')?.setValue('');
@@ -363,7 +357,7 @@ export class TakeOffComponent implements OnInit {
   }
 
   back() {
-    this.router.navigate(['/home']);
+    this.router.navigate(['/takeoff']);
   }
 
   checkDoorsStyleValueIsOther() {
@@ -387,7 +381,7 @@ export class TakeOffComponent implements OnInit {
 
         if (!data.errors) {
           this.notification.success('Takeoff Created', 'Success');
-          this.router.navigate(['/home']);
+          this.router.navigate(['/takeoff']);
         } else {
           this.notification.error('Error create Takeoff', 'Atenção');
         }
@@ -422,13 +416,6 @@ export class TakeOffComponent implements OnInit {
   }
 
   finalizeOrderPopUp() {
-    console.log('🔔 MODAL DEBUG: finalizeOrderPopUp called', {
-      modalService: !!this.modalService,
-      isManager: this.isManager,
-      orderStatus: this.orderStatus,
-      customerName: this.orderForm?.get('custumerName')?.value
-    });
-
     try {
       const modalRef = this.modalService.open(CompleteMeasurementModalComponent, {
         size: 'lg',
@@ -447,7 +434,6 @@ export class TakeOffComponent implements OnInit {
         modalRef.close();
       });
 
-      console.log('✅ Modal opened successfully', modalRef);
     } catch (error) {
       console.error('❌ Modal error:', error);
     }
@@ -495,7 +481,6 @@ export class TakeOffComponent implements OnInit {
         data => {
           this.spinner.hide();
           if (!data.errors) {
-            console.log('Carpenter assignment saved successfully');
           } else {
             this.notification.error('Error saving carpenter assignment', 'Error');
           }
@@ -516,7 +501,6 @@ export class TakeOffComponent implements OnInit {
         data => {
           this.spinner.hide();
           if (data.success) {
-            console.log('Trim carpenter assignment saved successfully');
           } else {
             this.notification.error('Error saving trim carpenter assignment', 'Error');
           }
@@ -537,7 +521,6 @@ export class TakeOffComponent implements OnInit {
         data => {
           this.spinner.hide();
           if (data.success) {
-            console.log('Trim carpenter removed successfully');
           } else {
             this.notification.error('Error removing trim carpenter', 'Error');
           }
@@ -560,7 +543,7 @@ export class TakeOffComponent implements OnInit {
 
           if (!data.errors) {
             this.notification.success('Takeoff Completed', 'Success');
-            this.router.navigate(['/home']);
+            this.router.navigate(['/takeoff']);
           } else {
             this.notification.error('Error finalize Takeoff', 'Atenção');
           }
@@ -586,7 +569,7 @@ export class TakeOffComponent implements OnInit {
               'Takeoff released for the carpenter',
               'Success'
             );
-            this.router.navigate(['/home']);
+            this.router.navigate(['/takeoff']);
           } else {
             this.notification.error('Error finalize Takeoff', 'Atenção');
           }

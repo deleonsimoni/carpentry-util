@@ -1,3 +1,15 @@
+// Navbar positioning and styling
+.navbar-top {
+  position: relative;
+  z-index: 1030;
+  background: transparent !important;
+  backdrop-filter: none;
+
+  .container-fluid {
+    background: transparent;
+  }
+}
+
 // User role badge styling
 .media-body {
   .badge {
@@ -24,5 +36,19 @@
   .mb-0 {
     display: block;
     margin-bottom: 0.1rem !important;
+  }
+}
+
+// Ensure text is visible against colored backgrounds
+.navbar-dark {
+  .navbar-brand,
+  .nav-link,
+  .dropdown-toggle {
+    color: rgba(255, 255, 255, 0.95) !important;
+
+    &:hover,
+    &:focus {
+      color: rgba(255, 255, 255, 1) !important;
+    }
   }
 }

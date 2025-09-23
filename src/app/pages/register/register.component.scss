@@ -83,6 +83,29 @@
   animation: none;
 }
 
+// Split background using CSS variables
+.split-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: var(--primary-red);
+  z-index: -1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #172b4d;
+  }
+}
+
+
+
 // Responsive adjustments
 @media (max-width: 576px) {
   .account-type-card {

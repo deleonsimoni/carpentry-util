@@ -1,25 +1,13 @@
 <div class="landing-container">
   <!-- Header -->
-  <header class="landing-header">
-    <div class="container">
-      <nav class="nav-bar">
-        <div class="nav-brand">
-          <h2>CarpentryUtil</h2>
-        </div>
-        <div class="nav-links">
-          <button class="btn-link" (click)="navigateToLogin()">Sign In</button>
-          <button class="btn btn-primary" (click)="navigateToRegister()">Sign Up</button>
-        </div>
-      </nav>
-    </div>
-  </header>
+  <app-public-header></app-public-header>
 
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="container">
     <div class="hero-content">
       <div class="hero-text">
-        <h1 class="hero-title">CarpentryUtil</h1>
+        <h1 class="hero-title">CarpentryGO</h1>
         <h2 class="hero-subtitle">Simplified Carpentry Management</h2>
         <p class="hero-description">
           Streamline your carpentry business with our comprehensive takeoff management system.
@@ -60,7 +48,7 @@
   <!-- Features Section -->
   <section class="features-section">
     <div class="container">
-      <h2 class="section-title">Why Choose CarpentryUtil?</h2>
+      <h2 class="section-title">Why Choose CarpentryGO?</h2>
 
       <div class="features-grid">
         <div class="feature-card">
@@ -107,7 +95,7 @@
     <div class="container">
       <div class="cta-content">
         <h2>Ready to Streamline Your Carpentry Business?</h2>
-        <p>Join hundreds of contractors who trust CarpentryUtil to manage their projects efficiently.</p>
+        <p>Join hundreds of contractors who trust CarpentryGO to manage their projects efficiently.</p>
 
         <div class="cta-buttons">
           <button class="btn btn-primary btn-lg" (click)="navigateToRegister()">
@@ -121,28 +109,4 @@
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="landing-footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-brand">
-          <h3>CarpentryUtil</h3>
-          <p>Your trusted partner in carpentry project management.</p>
-        </div>
-
-        <div class="footer-links">
-          <div class="footer-column">
-            <h4>Product</h4>
-            <a href="#" (click)="navigateToSubscription()">Pricing</a>
-            <a href="#" (click)="navigateToLogin()">Sign In</a>
-            <a href="#" (click)="navigateToRegister()">Sign Up</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2024 CarpentryUtil. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
 </div>

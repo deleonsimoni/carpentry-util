@@ -11,13 +11,17 @@ export class AuthGuard implements CanActivate {
   constructor(private router: Router, private authService: AuthService) { }
 
   canActivate(): Observable<boolean> {
+    console.log('🔍 AUTH_GUARD - Verificando autenticação...');
     return this.authService.getUser().pipe(
       map(user => {
+        console.log('🔍 AUTH_GUARD - Usuário obtido:', user);
         if (user !== null) {
+          console.log('✅ AUTH_GUARD - Usuário autenticado, permitindo acesso');
           return true;
         }
 
-        this.router.navigateByUrl('/login');
+        console.log('❌ AUTH_GUARD - Usuário não autenticado, redirecionando para /hero');
+        this.router.navigateByUrl('/hero');
         return false;
       })
     );

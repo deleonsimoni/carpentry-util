@@ -1,8 +1,10 @@
 <!-- Sidenav -->
 <app-sidebar></app-sidebar>
 <div class="main-content d-flex flex-column min-vh-100">
-  <!-- Top navbar -->
-  <app-navbar></app-navbar>
+  <!-- Top navbar positioned absolutely to overlay on page content -->
+  <div class="navbar-fixed-top">
+    <app-navbar></app-navbar>
+  </div>
   <!-- Pages -->
   <div class="flex-grow-1">
     <router-outlet></router-outlet>

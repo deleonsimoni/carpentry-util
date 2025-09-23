@@ -129,12 +129,6 @@ export class ProfileUserComponent implements OnInit {
         country: [null],
         postalCode: [null],
       }),
-      socialMedia: this.builder.group({
-        facebook: [null],
-        youtube: [null],
-        instagram: [null],
-        website: [null],
-      }),
     });
   }
 }

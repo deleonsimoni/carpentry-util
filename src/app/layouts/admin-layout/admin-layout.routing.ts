@@ -6,6 +6,7 @@ import { MapsComponent } from '../../pages/maps/maps.component';
 import { TakeOffComponent } from '../../pages/new-takeoff/new-takeoff.component';
 import { TakeoffMeasurementsComponent } from '../../pages/takeoff-measurements/takeoff-measurements.component';
 import { HomeComponent } from '../../pages/home/home.component';
+import { TakeoffComponent } from '../../pages/takeoff/takeoff.component';
 import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.component';
 import { MaterialRequestComponent } from '@app/pages/material-request/material-request.component';
 import { ListMaterialRequestComponent } from '@app/pages/list-material-request/list-material-request.component';
@@ -13,6 +14,7 @@ import { PasswordChangeGuard } from '../../shared/guards/password-change.guard';
 
 export const AdminLayoutRoutes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent, canActivate: [PasswordChangeGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [PasswordChangeGuard] },
   { path: 'take-off/:id', component: TakeOffComponent, canActivate: [PasswordChangeGuard] },
   { path: 'measurements/:id', component: TakeoffMeasurementsComponent, canActivate: [PasswordChangeGuard] },
@@ -34,7 +36,7 @@ export const AdminLayoutRoutes: Routes = [
     loadComponent: () => import('../../pages/company-detail/company-detail.component').then(c => c.CompanyDetailComponent),
     canActivate: [PasswordChangeGuard]
   },
-  { path: 'home', component: HomeComponent, canActivate: [PasswordChangeGuard] },
+  { path: 'takeoff', component: TakeoffComponent, canActivate: [PasswordChangeGuard] },
   { path: 'icons', component: IconsComponent, canActivate: [PasswordChangeGuard] },
   { path: 'maps', component: MapsComponent, canActivate: [PasswordChangeGuard] },
 ];
