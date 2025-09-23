@@ -408,6 +408,7 @@
                       class="form-control form-control-alternative"
                       formControlName="doorsStyle"
                     >
+                      <option value=""></option>
                       <option
                         *ngFor="let doorsStyleValue of doorsStyleValues"
                         [ngValue]="doorsStyleValue"
@@ -476,6 +477,7 @@
                               class="form-control form-control-alternative"
                               formControlName="swing"
                             >
+                              <option value=""></option>
                               <option value="RH">RH</option>
                               <option value="LH">LH</option>
                             </select>
@@ -488,6 +490,7 @@
                               class="form-control form-control-alternative"
                               formControlName="jamb"
                             >
+                              <option value=""></option>
                               <option value="475">475</option>
                               <option value="675">675</option>
                             </select>
@@ -551,6 +554,7 @@
                               class="form-control form-control-alternative"
                               formControlName="size"
                             >
+                              <option value=""></option>
                               <option value="18">18"</option>
                               <option value="24">24"</option>
                               <option value="26">26"</option>
@@ -567,6 +571,7 @@
                               class="form-control form-control-alternative"
                               formControlName="swing"
                             >
+                              <option value=""></option>
                               <option value="RH">RH</option>
                               <option value="LH">LH</option>
                               <option value="DOUBLE">DOUBLE</option>
@@ -583,6 +588,7 @@
                               class="form-control form-control-alternative"
                               formControlName="height"
                             >
+                              <option value=""></option>
                               <option value="80">80"</option>
                               <option value="84">84"</option>
                               <option value="96">96"</option>
@@ -596,6 +602,7 @@
                               class="form-control form-control-alternative"
                               formControlName="jamb"
                             >
+                              <option value=""></option>
                               <option value="475">475</option>
                               <option value="675">675</option>
                             </select>
@@ -617,7 +624,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleDoubleDoors && shouldShowSectionToggleButtons()"
+                  *ngIf="!isVisibleDoubleDoors"
                   (click)="showHideFormDouble()"
                   class="btn btn-warning"
                 >
@@ -625,7 +632,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleDoubleDoors && shouldShowSectionToggleButtons()"
+                  *ngIf="isVisibleDoubleDoors"
                   (click)="showHideFormDouble()"
                   class="btn btn-warning"
                 >
@@ -658,6 +665,7 @@
                             class="form-control form-control-alternative"
                             formControlName="size"
                           >
+                            <option value=""></option>
                             <option value="18">20"</option>
                             <option value="24">24"</option>
                             <option value="26">28"</option>
@@ -699,6 +707,7 @@
                             class="form-control form-control-alternative"
                             formControlName="jamb"
                           >
+                            <option value=""></option>
                             <option value="475">475</option>
                             <option value="675">675</option>
                           </select>
@@ -784,6 +793,7 @@
                               formControlName="height"
                               (change)="updateSingleDoorSize(i)"
                             >
+                              <option value=""></option>
                               <option value="80">80"</option>
                               <option value="84">84"</option>
                               <option value="96">96"</option>
@@ -815,6 +825,7 @@
                               class="form-control form-control-alternative"
                               formControlName="jamb"
                             >
+                              <option value=""></option>
                               <option value="475">475</option>
                               <option value="675">675</option>
                             </select>
@@ -876,7 +887,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleArches && shouldShowSectionToggleButtons()"
+                  *ngIf="!isVisibleArches"
                   (click)="showHideFormArches()"
                   class="btn btn-warning"
                 >
@@ -884,7 +895,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleArches && shouldShowSectionToggleButtons()"
+                  *ngIf="isVisibleArches"
                   (click)="showHideFormArches()"
                   class="btn btn-warning"
                 >
@@ -932,7 +943,7 @@
                             class="form-control form-control-alternative"
                             formControlName="height"
                           >
-                            <option value="">Select Height</option>
+                            <option value=""></option>
                             <option value="80">80"</option>
                             <option value="96">96"</option>
                             <option value="custom">Custom</option>
@@ -957,7 +968,7 @@
                             class="form-control form-control-alternative"
                             formControlName="jamb"
                           >
-                            <option value="">Select Jamb</option>
+                            <option value=""></option>
                             <option value="475">475</option>
                             <option value="675">675</option>
                             <option value="custom">Custom</option>
@@ -1018,7 +1029,7 @@
               <!-- Address -->
               <h6 class="heading-small text-muted mb-4">
                 <button
-                  *ngIf="!isVisibleTrim && shouldShowSectionToggleButtons()"
+                  *ngIf="!isVisibleTrim"
                   (click)="showHideFormTrim()"
                   class="btn btn-warning"
                 >
@@ -1026,7 +1037,7 @@
                 </button>
 
                 <button
-                  *ngIf="isVisibleTrim && shouldShowSectionToggleButtons()"
+                  *ngIf="isVisibleTrim"
                   (click)="showHideFormTrim()"
                   class="btn btn-warning"
                 >
@@ -1248,6 +1259,7 @@
                             class="form-control form-control-alternative"
                             formControlName="size"
                           >
+                            <option value=""></option>
                             <option value="18">18"</option>
                             <option value="24">24"</option>
                             <option value="26">26"</option>
