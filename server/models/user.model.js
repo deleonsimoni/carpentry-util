@@ -105,6 +105,13 @@ const UserSchema = new mongoose.Schema(
     lastLogin: {
       type: Date,
     },
+    verificationCode: { 
+      type: String 
+    },
+    isVerified: {
+       type: Boolean, 
+       default: false 
+    },
   },
   {
     versionKey: false,

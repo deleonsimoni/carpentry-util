@@ -57,7 +57,7 @@ export class RegisterComponent implements OnInit {
 
       // Company Info
       company: this.builder.group({
-        name: [null, [Validators.required]],
+        
         businessNumber: [null],
         phone: [null, [Validators.pattern(/^\(\d{3}\) \d{3}-\d{4}$/)]],
         companyEmail: [null],

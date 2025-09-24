@@ -19,9 +19,10 @@ module.exports = {
   checkPasswordStatus,
 };
 
-async function insert(user) {
+async function insert(user, verificationCode) {
   console.log('🔍 DEBUG - Dados recebidos no user.controller.js:', JSON.stringify(user, null, 2));
 
+  user.verificationCode = verificationCode;
   user.hashedPassword = bcrypt.hashSync(user.password, 10);
   user.email = user.email.toLowerCase();
 
