@@ -37,19 +37,19 @@ async function verifyEmail(req, res) {
     const { token, email } = req.query;
 
     const user = await User.findOne({ email });
+
     if (!user) return res.status(400).send("User not found.");
 
-    if (user.verificationToken !== token) {
+    if (user.verificationCode !== token) {
       return res.status(400).send("Invalid Token.");
     }
 
     user.isVerified = true;
-    user.verificationToken = null;
+    user.verificationCode = null;
     await user.save();
 
-    // Pode redirecionar para a sua aplicação (frontend)
-    res.send("E-mail verificado com sucesso! Você já pode acessar sua conta.");
-    
+    return res.redirect("/login?verified=true");    
+
   } catch (err) {
     console.error(err);
     res.status(500).send("Erro no servidor.");
@@ -71,7 +71,6 @@ async function register(req, res, next) {
   // Enviar email de verificação
   const emailSent = await sendVerificationEmail(user.email, codEmail);
   
-
   return res.status(201).json({
         success: true,
         message: 'We\'ve sent a verification link to your email. Please check your inbox to validate.'
@@ -82,17 +81,20 @@ async function sendVerificationEmail(email, verificationCode) {
   
   const subject = "Welcome to CarpentryGo - Confirm your registration";
 
-  const verificationUrl = `https://carpentrygo.com/verify-email?token=${verificationCode}&email=${email}`;
+  const verificationUrl = `https://carpentrygo.com/api/auth/verify-email?token=${verificationCode}&email=${email}`;
   
   const html=`
     <h2>Welcome to CarpentryGo 🎉</h2>
     <p>Hello, thank you for registering!</p>
-    <p>Click :</p>
-    <p>Click the link below to confirm your registration:</p>
+    <p>Click the button below to confirm your registration:</p>
     <a href="${verificationUrl}"
     style="display:inline-block;padding:10px 20px;background:#004a80;color:#fff;text-decoration:none;border-radius:5px;">
     Confirm my registration
     </a>
+    <p>Or click the link below to register.</p>
+    <a>${verificationUrl}</a>
+
+
     <p>If you were not the one who registered, ignore this email.</p>
   `;
 

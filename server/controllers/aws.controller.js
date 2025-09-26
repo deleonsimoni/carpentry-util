@@ -19,8 +19,9 @@ const transporter = nodemailer.createTransport({
 
 async function enviarEmail(email, assunto, corpo) {
   try {
+    
     const info = await transporter.sendMail({
-      from: '"CarpentryGo" <contact@carpentrygo.com>', // precisa estar verificado no SES
+      from: '"CarpentryGo" <no-reply@carpentrygo.com>', // precisa estar verificado no SES
       to: email,
       subject: assunto,
       html: corpo,

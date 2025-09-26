@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '@app/shared/services';
 import { UserService } from '@app/shared/services/user.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 
@@ -12,7 +12,11 @@ import { NgxSpinnerService } from 'ngx-spinner';
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
+
   public loginForm: FormGroup;
+
+  mensagem: string | null = null;
+
 
   constructor(
     private router: Router,
@@ -20,8 +24,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private builder: FormBuilder,
     private notification: NotificationService,
-    private spinner: NgxSpinnerService
+    private spinner: NgxSpinnerService,
+    private route: ActivatedRoute
   ) {
+
+    this.route.queryParams.subscribe(params => {
+      if (params['verified']) {
+        this.notification.success('✅ Your account has been successfully verified. Please log in.', 'Welcome :)');
+      }
+    });
+
     this.loginForm = this.builder.group({
       // tslint:disable-next-line: max-line-length
       email: [

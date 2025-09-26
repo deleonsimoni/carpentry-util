@@ -57,7 +57,7 @@ export class RegisterComponent implements OnInit {
 
       // Company Info
       company: this.builder.group({
-        
+        name: [null, [Validators.required]],
         businessNumber: [null],
         phone: [null, [Validators.pattern(/^\(\d{3}\) \d{3}-\d{4}$/)]],
         companyEmail: [null],
@@ -99,11 +99,11 @@ export class RegisterComponent implements OnInit {
       // Roles será definido automaticamente no backend baseado na presença de company
 
       // Remove campos desnecessários antes de enviar
-      this.registerForm.removeControl('repeatPassword');
+      //this.registerForm.removeControl('repeatPassword');
 
       this.authService.register(this.registerForm.value).subscribe(
         (res: any) => {
-          this.notification.success('Cadastro realizado com sucesso.', 'Bem-vindo');
+          this.notification.success('We\'ve sent a verification link to your email. Please check your inbox to validate..', 'Wait');
           this.router.navigate(['/home']);
         },
         err => {
