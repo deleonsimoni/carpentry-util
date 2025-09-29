@@ -92,8 +92,7 @@ async function sendVerificationEmail(email, verificationCode) {
     Confirm my registration
     </a>
     <p>Or click the link below to register.</p>
-    <a>${verificationUrl}</a>
-
+    <a href="${verificationUrl}">${verificationUrl}</a>
 
     <p>If you were not the one who registered, ignore this email.</p>
   `;
