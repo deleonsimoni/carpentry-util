@@ -1,0 +1,434 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Invoice Management</h6>
+          <p class="text-white mt-0 mb-0">Generate and manage your invoices</p>
+        </div>
+        <div class="col-lg-6 col-5 text-right" *ngIf="activeTab === 'takeoffs'">
+          <button
+            class="btn btn-success btn-lg"
+            [disabled]="selectedTakeoffs.length === 0"
+            (click)="generateInvoice()">
+            <i class="fas fa-file-invoice-dollar mr-2"></i>Generate Invoice
+            <span class="badge badge-light ml-2" *ngIf="selectedTakeoffs.length > 0">
+              {{ selectedTakeoffs.length }}
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Selection info (only on takeoffs tab) -->
+      <div class="row" *ngIf="activeTab === 'takeoffs' && selectedTakeoffs.length > 0">
+        <div class="col-12">
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <span class="alert-icon"><i class="ni ni-check-bold"></i></span>
+            <span class="alert-text">
+              <strong>{{ selectedTakeoffs.length }}</strong> takeoff(s) selected.
+              Total value: <strong>{{ getTotalSelectedValue() | currency:'USD':'symbol':'1.2-2' }}</strong>
+            </span>
+            <button type="button" class="close" (click)="clearSelection()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Max selection warning -->
+      <div class="row" *ngIf="activeTab === 'takeoffs' && maxSelectionReached">
+        <div class="col-12">
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <span class="alert-icon"><i class="fas fa-exclamation-triangle"></i></span>
+            <span class="alert-text">
+              Maximum of 5 takeoffs can be selected per invoice.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Invoice Management</h3>
+            </div>
+          </div>
+
+          <!-- Tab Navigation -->
+          <div class="nav-wrapper mt-3">
+            <ul class="nav nav-pills nav-fill flex-column flex-md-row" id="tabs-icons-text" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link mb-sm-3 mb-md-0"
+                   [class.active]="activeTab === 'takeoffs'"
+                   (click)="setActiveTab('takeoffs')"
+                   role="tab">
+                  <i class="fas fa-list mr-2"></i>Available Takeoffs
+                  <span class="badge badge-primary ml-2" *ngIf="availableTakeoffs.length > 0">
+                    {{ availableTakeoffs.length }}
+                  </span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link mb-sm-3 mb-md-0"
+                   [class.active]="activeTab === 'history'"
+                   (click)="setActiveTab('history')"
+                   role="tab">
+                  <i class="fas fa-history mr-2"></i>Invoice History
+                  <span class="badge badge-secondary ml-2" *ngIf="invoiceHistory.length > 0">
+                    {{ invoiceHistory.length }}
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Takeoffs Tab Content -->
+        <div *ngIf="activeTab === 'takeoffs'">
+          <div class="card-header border-0 pb-0">
+            <div class="row align-items-center">
+              <div class="col">
+                <h4 class="mb-0">Available Takeoffs</h4>
+                <p class="text-muted mb-0">Select up to 5 takeoffs to generate an invoice</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-sm btn-outline-primary" (click)="loadTakeoffsForInvoice()">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div *ngIf="isLoadingTakeoffs" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading your takeoffs...</p>
+          </div>
+
+          <!-- Desktop table view -->
+          <div *ngIf="!isLoadingTakeoffs && availableTakeoffs.length > 0" class="d-none d-lg-block table-responsive">
+            <table class="table align-items-center table-flush table-hover">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        id="selectAll"
+                        [(ngModel)]="selectAll"
+                        (change)="onSelectAll()">
+                      <label class="custom-control-label" for="selectAll"></label>
+                    </div>
+                  </th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Takeoff</th>
+                  <th scope="col">Role</th>
+                  <th scope="col">Value</th>
+                  <th scope="col">Completion Date</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let takeoff of availableTakeoffs; trackBy: trackByTakeoffId"
+                    [class.table-active]="takeoff.selected">
+                  <td>
+                    <div class="custom-control custom-checkbox">
+                      <input
+                        type="checkbox"
+                        class="custom-control-input"
+                        [id]="'takeoff_' + takeoff._id"
+                        [(ngModel)]="takeoff.selected"
+                        (change)="onTakeoffSelection(takeoff)">
+                      <label class="custom-control-label" [for]="'takeoff_' + takeoff._id"></label>
+                    </div>
+                  </td>
+                  <th scope="row">
+                    <div class="media align-items-center">
+                      <div class="media-body">
+                        <span class="mb-0 text-sm text-primary font-weight-bold">{{ takeoff.customer.name }}</span>
+                        <br>
+                        <small class="text-muted" *ngIf="takeoff.customer.email">
+                          {{ takeoff.customer.email }}
+                        </small>
+                      </div>
+                    </div>
+                  </th>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-primary"></i>
+                      {{ takeoff.takeoffNumber }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge badge-pill"
+                          [class.badge-info]="takeoff.role === 'measure'"
+                          [class.badge-warning]="takeoff.role === 'trim'">
+                      {{ takeoff.role | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-success font-weight-bold">
+                      {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-sm">
+                      {{ takeoff.completedDate | date:'MM/dd/yyyy' }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge badge-dot mr-4">
+                      <i class="bg-success"></i>
+                      Completed
+                    </span>
+                  </td>
+                  <td class="text-right">
+                    <div ngbDropdown placement="bottom-right" class="dropdown-hover-fix">
+                      <a
+                        class="btn btn-sm btn-icon-only text-light"
+                        ngbDropdownToggle>
+                        <i class="fas fa-ellipsis-v"></i>
+                      </a>
+                      <div ngbDropdownMenu class="dropdown-menu-right dropdown-menu-arrow">
+                        <a class="dropdown-item" (click)="viewTakeoffDetails(takeoff)">
+                          <i class="fas fa-eye mr-2"></i>View Details
+                        </a>
+                        <a class="dropdown-item" (click)="removeTakeoffFromList(takeoff)">
+                          <i class="fas fa-times mr-2"></i>Remove from List
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile cards view for takeoffs -->
+          <div *ngIf="!isLoadingTakeoffs && availableTakeoffs.length > 0" class="d-block d-lg-none">
+            <div class="row">
+              <div class="col-12" *ngFor="let takeoff of availableTakeoffs; trackBy: trackByTakeoffId">
+                <div class="card mb-3 shadow-sm" [class.border-primary]="takeoff.selected">
+                  <div class="card-body p-3">
+                    <div class="row align-items-center">
+                      <div class="col-2">
+                        <div class="custom-control custom-checkbox">
+                          <input
+                            type="checkbox"
+                            class="custom-control-input"
+                            [id]="'mobile_takeoff_' + takeoff._id"
+                            [(ngModel)]="takeoff.selected"
+                            (change)="onTakeoffSelection(takeoff)">
+                          <label class="custom-control-label" [for]="'mobile_takeoff_' + takeoff._id"></label>
+                        </div>
+                      </div>
+                      <div class="col-8">
+                        <h6 class="mb-1">
+                          <span class="text-primary">
+                            {{ takeoff.takeoffNumber }}
+                          </span>
+                          <span class="badge badge-sm ml-2"
+                                [class.badge-info]="takeoff.role === 'measure'"
+                                [class.badge-warning]="takeoff.role === 'trim'">
+                            {{ takeoff.role }}
+                          </span>
+                        </h6>
+                        <p class="text-sm text-muted mb-1">
+                          <strong>Customer:</strong> {{ takeoff.customer.name }}
+                        </p>
+                        <p class="text-sm text-muted mb-1">
+                          <strong>Value:</strong> {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
+                        </p>
+                        <p class="text-sm text-muted mb-0">
+                          <strong>Completed:</strong> {{ takeoff.completedDate | date:'MM/dd/yyyy' }}
+                        </p>
+                      </div>
+                      <div class="col-2 text-right">
+                        <div ngbDropdown placement="bottom-left" (click)="$event.stopPropagation()">
+                          <button
+                            class="btn btn-sm btn-outline-secondary"
+                            ngbDropdownToggle>
+                            <i class="fas fa-ellipsis-v"></i>
+                          </button>
+                          <div ngbDropdownMenu class="dropdown-menu-arrow">
+                            <a class="dropdown-item" (click)="viewTakeoffDetails(takeoff)">
+                              <i class="fas fa-eye mr-2"></i>Details
+                            </a>
+                            <a class="dropdown-item" (click)="removeTakeoffFromList(takeoff)">
+                              <i class="fas fa-times mr-2"></i>Remove
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state for takeoffs -->
+          <div *ngIf="!isLoadingTakeoffs && availableTakeoffs.length === 0" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-inbox fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No takeoffs available</h4>
+            <p class="text-muted mb-4">You don't have any completed takeoffs ready for invoice generation.</p>
+          </div>
+        </div>
+
+        <!-- History Tab Content -->
+        <div *ngIf="activeTab === 'history'">
+          <div class="card-header border-0 pb-0">
+            <div class="row align-items-center">
+              <div class="col">
+                <h4 class="mb-0">Invoice History</h4>
+                <p class="text-muted mb-0">View your generated invoices and re-issue if needed</p>
+              </div>
+              <div class="col-auto">
+                <button class="btn btn-sm btn-outline-primary" (click)="loadInvoiceHistory()">
+                  <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div *ngIf="isLoadingHistory" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-3 text-muted">Loading invoice history...</p>
+          </div>
+
+          <!-- Invoice History Cards (for small lists) -->
+          <div *ngIf="!isLoadingHistory && invoiceHistory.length > 0 && invoiceHistory.length <= 6" class="px-4 pb-4">
+            <div class="row">
+              <div class="col-md-6 col-lg-4 mb-4" *ngFor="let invoiceGroup of invoiceHistory">
+                <div class="card shadow-sm h-100">
+                  <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5 class="mb-0">{{ invoiceGroup.invoiceNumber }}</h5>
+                      <small class="text-muted">Created: {{ invoiceGroup.createdAt | date:'MMM dd, yyyy' }}</small>
+                    </div>
+                    <span class="badge badge-lg" [ngClass]="getStatusBadgeClass(invoiceGroup.status)">
+                      {{ getStatusLabel(invoiceGroup.status) }}
+                    </span>
+                  </div>
+                  <div class="card-body">
+                    <div class="row mb-3">
+                      <div class="col-6">
+                        <small class="text-muted">Takeoffs:</small>
+                        <p class="font-weight-bold mb-0">{{ invoiceGroup.takeoffs.length }}</p>
+                      </div>
+                      <div class="col-6">
+                        <small class="text-muted">Generated:</small>
+                        <p class="font-weight-bold mb-0">
+                          {{ invoiceGroup.generatedDate | date:'MMM dd, yyyy' }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card-footer d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      Total: {{ invoiceGroup.totalAmount | currency:'USD':'symbol':'1.2-2' }}
+                    </small>
+                    <div>
+                      <button class="btn btn-sm btn-outline-primary" (click)="generatePDF(invoiceGroup)">
+                        <i class="fas fa-file-pdf mr-1"></i> PDF
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoice History Table (for large lists) -->
+          <div *ngIf="!isLoadingHistory && invoiceHistory.length > 6" class="px-4 pb-4">
+            <div class="card">
+              <div class="table-responsive">
+                <table class="table table-hover align-items-center">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Date Created</th>
+                      <th>Date Generated</th>
+                      <th>Takeoffs</th>
+                      <th>Total Value</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let invoiceGroup of invoiceHistory">
+                      <td>
+                        <span class="font-weight-bold">{{ invoiceGroup.invoiceNumber }}</span>
+                        <br>
+                        <span class="badge badge-sm" [ngClass]="getStatusBadgeClass(invoiceGroup.status)">
+                          {{ getStatusLabel(invoiceGroup.status) }}
+                        </span>
+                      </td>
+                      <td>{{ invoiceGroup.createdAt | date:'MMM dd, yyyy' }}</td>
+                      <td>{{ invoiceGroup.generatedDate | date:'MMM dd, yyyy' }}</td>
+                      <td>
+                        <span class="badge badge-primary">{{ invoiceGroup.takeoffs.length }} takeoffs</span>
+                      </td>
+                      <td>
+                        <span class="font-weight-bold text-success">
+                          {{ invoiceGroup.totalAmount | currency:'USD':'symbol':'1.2-2' }}
+                        </span>
+                      </td>
+                      <td>
+                        <div ngbDropdown placement="bottom-left" class="dropdown-hover-fix">
+                          <button
+                            class="btn btn-sm btn-icon-only btn-outline-secondary"
+                            ngbDropdownToggle
+                            aria-label="Actions">
+                            <i class="fas fa-ellipsis-v"></i>
+                          </button>
+                          <div ngbDropdownMenu class="dropdown-menu-arrow">
+                            <a class="dropdown-item" (click)="generatePDF(invoiceGroup)">
+                              <i class="fas fa-file-pdf mr-2"></i>Generate PDF
+                            </a>
+                            <a class="dropdown-item" (click)="viewInvoiceDetails(invoiceGroup)">
+                              <i class="fas fa-eye mr-2"></i>View Details
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" (click)="reissueInvoice(invoiceGroup)">
+                              <i class="fas fa-redo mr-2"></i>Re-issue
+                            </a>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state for history -->
+          <div *ngIf="!isLoadingHistory && invoiceHistory.length === 0" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-receipt fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No invoices generated yet</h4>
+            <p class="text-muted mb-4">Start by selecting takeoffs and generating your first invoice.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

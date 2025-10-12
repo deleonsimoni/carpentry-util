@@ -1,0 +1,259 @@
+.metric-card {
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+
+  .metric-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+    display: block;
+    margin: 0.35rem 0;
+  }
+
+  .metric-helper {
+    font-size: 0.8rem;
+    opacity: 0.8;
+  }
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.week-day {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid #e9ecef;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 0.75rem 1.5rem rgba(23, 43, 77, 0.1);
+    transform: translateY(-3px);
+  }
+}
+
+.week-day-header {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  .weekday-label {
+    font-weight: 600;
+    color: #5e72e4;
+  }
+
+  .weekday-date {
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .weekday-count {
+    font-size: 0.75rem;
+    margin-top: 0.35rem;
+    color: #8898aa;
+  }
+
+  &.is-today {
+    border-left: 4px solid #2dce89;
+    padding-left: 0.5rem;
+  }
+}
+
+.event-card {
+  background: #f8f9fe;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1rem;
+  box-shadow: 0 0.5rem 1rem rgba(94, 114, 228, 0.08);
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+
+  &.event-measurement {
+    border-left: 4px solid #11cdef;
+  }
+
+  &.event-production {
+    border-left: 4px solid #2dce89;
+  }
+
+  &.event-delivery {
+    border-left: 4px solid #fb6340;
+  }
+
+  &.event-follow-up {
+    border-left: 4px solid #5e72e4;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+  }
+}
+
+.empty-state {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  color: #adb5bd;
+  font-size: 0.9rem;
+
+  i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+.month-grid {
+  border-radius: 0.75rem;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.month-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.month-cell {
+  border: 1px solid #e9ecef;
+  min-height: 120px;
+  padding: 0.5rem;
+  background: #ffffff;
+  position: relative;
+
+  &.out-month {
+    background: #f8f9fe;
+    color: #adb5bd;
+  }
+}
+
+.month-cell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.month-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  max-height: 90px;
+  overflow: hidden;
+
+  li {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    margin-bottom: 0.35rem;
+    color: #525f7f;
+  }
+}
+
+.event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  display: inline-block;
+
+  &.dot-measurement {
+    background: #11cdef;
+  }
+
+  &.dot-production {
+    background: #2dce89;
+  }
+
+  &.dot-delivery {
+    background: #fb6340;
+  }
+
+  &.dot-follow-up {
+    background: #5e72e4;
+  }
+}
+
+.team-availability {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.team-member {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e9ecef;
+  background: #f8f9fe;
+}
+
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #5e72e4;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  font-weight: 600;
+}
+
+.member-info h6 {
+  font-size: 0.95rem;
+}
+
+.month-header .header {
+  background: #f8f9fe;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .week-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 992px) {
+  .week-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .week-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .week-day {
+    min-height: auto;
+  }
+}

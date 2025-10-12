@@ -14,7 +14,7 @@ try {
     cert: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/certificate.crt")
   };
 } catch (err) {
-  console.log('Certificados não encontrados')
+  console.warn('Certificados não encontrados', err?.message || err);
 }
 
 const httpsServer = https.createServer(https_options, app);
@@ -27,7 +27,7 @@ if (!module.parent) {
   });
 
   httpsServer.listen(8443, () => {
-    console.log('HTTPS Server running on port 8443');
+    console.info('HTTPS server running on port 8443');
   });
 }
 

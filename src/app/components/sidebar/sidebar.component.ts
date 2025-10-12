@@ -12,6 +12,8 @@ declare interface RouteInfo {
   class: string;
   superAdminOnly?: boolean;
   carpenterOnly?: boolean;
+  managerOnly?: boolean;
+  managementOnly?: boolean;
 }
 export const ROUTES: RouteInfo[] = [
   { path: '/home', title: 'Dashboard', icon: 'ni-tv-2 text-primary', class: '' },
@@ -23,10 +25,31 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
+    path: '/calendar',
+    title: 'Agenda',
+    icon: 'ni-calendar-grid-58 text-info',
+    class: '',
+    managementOnly: true,
+  },
+  {
+    path: '/invoice',
+    title: 'Invoice',
+    icon: 'ni-money-coins text-success',
+    class: '',
+    carpenterOnly: true,
+  },
+  {
     path: '/user-management',
     title: 'Gestão de Usuários',
     icon: 'ni-single-02 text-green',
     class: '',
+  },
+  {
+    path: '/status-management',
+    title: 'Gerenciar Status',
+    icon: 'ni-settings text-purple',
+    class: '',
+    managerOnly: true,
   },
   {
     path: '/companies',
@@ -118,10 +141,24 @@ export class SidebarComponent implements OnInit {
     if (!this.isCarpenter) {
       this.menuItems = this.menuItems.filter(item => !item.carpenterOnly);
     }
+
+    // Remove manager only routes for non-manager users
+    if (!this.isManager) {
+      this.menuItems = this.menuItems.filter(item => !item.managerOnly);
+    }
+
+    // Remove management-only rotas para quem não é manager, supervisor ou admin
+    if (!this.canAccessManagementArea) {
+      this.menuItems = this.menuItems.filter(item => !item.managementOnly);
+    }
   }
 
   get isManager() {
     return this.user && this.user.roles && UserRoles.isManager(this.user.roles);
+  }
+
+  get isSupervisor() {
+    return this.user && this.user.roles && UserRoles.isSupervisor(this.user.roles);
   }
 
   get isAdmin() {
@@ -134,6 +171,10 @@ export class SidebarComponent implements OnInit {
 
   get isCarpenter() {
     return this.user && this.user.roles && UserRoles.isCarpenter(this.user.roles);
+  }
+
+  get canAccessManagementArea() {
+    return this.isManager || this.isSupervisor || this.isAdmin || this.isSuperAdmin;
   }
 
   get userRole() {

@@ -133,7 +133,13 @@ export class TakeOffComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] != 'new') {
         this.idOrder = params['id'];
-        this.detailOrder(this.idOrder);
+        // Load carpenters first, then load takeoff details
+        if (this.idOrder) {
+          this.loadCarpentersAndTakeoffDetails(this.idOrder);
+        }
+      } else {
+        // For new takeoff, just load carpenters
+        this.listAllCarpentrys();
       }
     });
 
@@ -221,52 +227,50 @@ export class TakeOffComponent implements OnInit {
           this.spinner.hide();
           this.notification.error('Error get detail takeoff', 'Atenção');
         } else {
-          //this.carpentrys = data;
-          this.orderForm.patchValue(data[0]);
-          this.orderForm?.get('carpentry')?.setValue(data[0].carpentry._id);
-
-          this.orderForm
-            ?.get('carpentryEmail')
-            ?.setValue(data[0].carpentry.email);
-          this.emailCarpentry = data[0].carpentry.email;
-          this.nameCarpentry = data[0].carpentry.fullname;
-          this.isCarpentryFound = true;
-
-          // Handle trim carpenter if it exists
-          if (data[0].trimCarpentry) {
-            this.orderForm?.get('trimCarpentry')?.setValue(data[0].trimCarpentry._id);
-            this.emailTrimCarpentry = data[0].trimCarpentry.email;
-            this.nameTrimCarpentry = data[0].trimCarpentry.fullname;
-            this.isTrimCarpentryFound = true;
-          } else {
-            // Reset trim carpenter data when not present
-            this.orderForm?.get('trimCarpentry')?.setValue('');
-            this.emailTrimCarpentry = '';
-            this.nameTrimCarpentry = '';
-            this.isTrimCarpentryFound = false;
-          }
-
-          this.orderStatus = data[0].status;
-
-          if (this.orderStatus !== null && this.orderStatus > 1) {
-            this.orderForm.controls['carpentry'].disable();
-          }
-
-          // Disable entire form for carpentry when takeoff is completed (status >= UNDER_REVIEW)
-          if (this.orderStatus !== null && STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager)) {
-            this.orderForm.disable();
-            this.notification.info(
-              'This takeoff is completed and can no longer be edited.',
-              'Read-only mode'
-            );
-          }
-
+          this.populateFormWithData(data[0]);
           this.spinner.hide();
         }
       },
       err => {
         this.spinner.hide();
         this.notification.error('Error get detail takeoff. ', 'Erro: ');
+      }
+    );
+  }
+
+  loadCarpentersAndTakeoffDetails(takeoffId: string) {
+    this.spinner.show();
+
+    // First load carpenters
+    this.takeoffService.listAllCarpentrys().subscribe(
+      carpentersData => {
+        if (carpentersData.errors) {
+          this.spinner.hide();
+          this.notification.error('Error get carpentry', 'Atenção');
+        } else {
+          this.carpentrys = carpentersData;
+
+          // After carpenters are loaded, load takeoff details
+          this.takeoffService.detailOrder(takeoffId).subscribe(
+            takeoffData => {
+              this.spinner.hide();
+
+              if (takeoffData.errors) {
+                this.notification.error('Error get detail takeoff', 'Atenção');
+              } else {
+                this.populateFormWithData(takeoffData[0]);
+              }
+            },
+            err => {
+              this.spinner.hide();
+              this.notification.error('Error get detail takeoff. ', 'Erro: ');
+            }
+          );
+        }
+      },
+      err => {
+        this.spinner.hide();
+        this.notification.error('Error get carpentry. ', 'Erro: ');
       }
     );
   }
@@ -289,6 +293,49 @@ export class TakeOffComponent implements OnInit {
         this.notification.error('Error get carpentry. ', 'Erro: ');
       }
     );
+  }
+
+  populateFormWithData(data: any) {
+    // Populate form with takeoff data
+    this.orderForm.patchValue(data);
+
+    // Set carpenter dropdown values
+    if (data.carpentry) {
+      this.orderForm?.get('carpentry')?.setValue(data.carpentry._id);
+      this.orderForm?.get('carpentryEmail')?.setValue(data.carpentry.email);
+      this.emailCarpentry = data.carpentry.email;
+      this.nameCarpentry = data.carpentry.fullname;
+      this.isCarpentryFound = true;
+    }
+
+    // Handle trim carpenter if it exists
+    if (data.trimCarpentry) {
+      this.orderForm?.get('trimCarpentry')?.setValue(data.trimCarpentry._id);
+      this.emailTrimCarpentry = data.trimCarpentry.email;
+      this.nameTrimCarpentry = data.trimCarpentry.fullname;
+      this.isTrimCarpentryFound = true;
+    } else {
+      // Reset trim carpenter data when not present
+      this.orderForm?.get('trimCarpentry')?.setValue('');
+      this.emailTrimCarpentry = '';
+      this.nameTrimCarpentry = '';
+      this.isTrimCarpentryFound = false;
+    }
+
+    this.orderStatus = data.status;
+
+    if (this.orderStatus !== null && this.orderStatus > 1) {
+      this.orderForm.controls['carpentry'].disable();
+    }
+
+    // Disable entire form for carpentry when takeoff is completed (status >= UNDER_REVIEW)
+    if (this.orderStatus !== null && STATUS_CONSTANTS.isReadOnly(this.orderStatus, this.isManager)) {
+      this.orderForm.disable();
+      this.notification.info(
+        'This takeoff is completed and can no longer be edited.',
+        'Read-only mode'
+      );
+    }
   }
 
   onCarpenterSelected(carpenter: Carpenter): void {

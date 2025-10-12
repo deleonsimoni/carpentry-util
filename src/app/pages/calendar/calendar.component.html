@@ -1,0 +1,253 @@
+<ng-container *ngIf="hasAccess">
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-7 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Agenda de Operações</h6>
+          <p class="text-white mt-0 mb-0">Visualize medições, produções e entregas em um só lugar</p>
+        </div>
+        <div class="col-lg-5 col-5 text-right">
+          <button class="btn btn-sm btn-neutral mr-2" (click)="resetToToday()">
+            <i class="fas fa-dot-circle mr-1"></i>Hoje
+          </button>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-neutral" (click)="previousPeriod()">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-neutral" (click)="nextPeriod()">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">Planejamento da Semana</h3>
+              <small class="text-muted">Referência: {{ referenceDate | date:'MMMM yyyy':undefined:'pt-BR' }}</small>
+            </div>
+            <div class="col-auto">
+              <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'week'">
+                  <input type="radio" autocomplete="off" (click)="changeView('week')"> Semana
+                </label>
+                <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'month'">
+                  <input type="radio" autocomplete="off" (click)="changeView('month')"> Mês
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-info text-white">
+                <span class="metric-label">Utilização da semana</span>
+                <strong class="metric-value">{{ productivitySnapshot.weekUtilization }}%</strong>
+                <span class="metric-helper">Capacidade ocupada</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-warning text-white">
+                <span class="metric-label">Compromissos em atraso</span>
+                <strong class="metric-value">{{ productivitySnapshot.delayedAppointments }}</strong>
+                <span class="metric-helper">Reagendar o quanto antes</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-success text-white">
+                <span class="metric-label">Próximo horário livre</span>
+                <strong class="metric-value">{{ productivitySnapshot.nextOpenSlot }}</strong>
+                <span class="metric-helper">Ideal para novos clientes</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-primary text-white">
+                <span class="metric-label">Dia mais cheio</span>
+                <strong class="metric-value">{{ productivitySnapshot.busiestDay }}</strong>
+                <span class="metric-helper">Planeje recursos extras</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+              <div class="form-group mb-0">
+                <label class="form-control-label text-muted">Filtrar por responsável</label>
+                <select class="form-control" [(ngModel)]="teamFilter">
+                  <option *ngFor="let member of getUniqueAssignees()" [ngValue]="member">{{ member | titlecase }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6 text-md-right mt-3 mt-md-0">
+              <span class="badge badge-dot mr-2"><i class="bg-info"></i> Medição</span>
+              <span class="badge badge-dot mr-2"><i class="bg-success"></i> Produção</span>
+              <span class="badge badge-dot mr-2"><i class="bg-warning"></i> Entrega</span>
+              <span class="badge badge-dot"><i class="bg-primary"></i> Reuniões</span>
+            </div>
+          </div>
+
+          <div *ngIf="activeView === 'week'" class="week-grid">
+            <div class="week-day" *ngFor="let day of weekDays">
+              <div class="week-day-header" [class.is-today]="isToday(day.date)">
+                <span class="weekday-label">{{ day.label | uppercase }}</span>
+                <span class="weekday-date">{{ day.display }}</span>
+                <span class="weekday-count" *ngIf="eventsCountForDay(day) > 0">
+                  {{ eventsCountForDay(day) }} compromisso(s)
+                </span>
+              </div>
+
+              <div class="event-card" *ngFor="let event of eventsForDay(day)" [ngClass]="'event-' + event.type">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-1">{{ event.title }}</h5>
+                  <span class="badge" [ngClass]="{
+                      'badge-success': event.status === 'completed',
+                      'badge-warning': event.status === 'in-progress',
+                      'badge-danger': event.status === 'delayed',
+                      'badge-primary': event.status === 'scheduled'
+                    }">
+                    {{ event.status | titlecase }}
+                  </span>
+                </div>
+                <p class="text-sm text-muted mb-1">
+                  <i class="far fa-clock mr-1"></i>
+                  {{ event.start | date:'HH:mm' }} - {{ event.end | date:'HH:mm' }} | {{ event.location }}
+                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="text-sm text-primary font-weight-bold">
+                    <i class="fas fa-user mr-1"></i>{{ event.assignedTo }}
+                  </div>
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-sticky-note mr-1"></i>Resumo
+                  </button>
+                </div>
+                <p class="text-xs text-muted mt-2 mb-0" *ngIf="event.notes">{{ event.notes }}</p>
+              </div>
+
+              <div class="empty-state" *ngIf="eventsCountForDay(day) === 0">
+                <i class="fas fa-inbox text-muted"></i>
+                <span>Sem compromissos</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="activeView === 'month'" class="month-grid">
+            <div class="month-row month-header">
+              <div *ngFor="let label of ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']" class="month-cell header">
+                {{ label }}
+              </div>
+            </div>
+            <div class="month-row" *ngFor="let week of monthMatrix">
+              <div class="month-cell" *ngFor="let day of week" [class.out-month]="day.date.getMonth() !== referenceDate.getMonth()">
+                <div class="month-cell-header">
+                  <span>{{ day.display }}</span>
+                  <span class="badge badge-pill badge-light" *ngIf="eventsCountForDay(day) > 0">
+                    {{ eventsCountForDay(day) }}
+                  </span>
+                </div>
+                <ul class="month-list">
+                  <li *ngFor="let event of eventsForDay(day)">
+                    <span class="event-dot" [ngClass]="'dot-' + event.type"></span>
+                    <span class="event-title">{{ event.title }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-5">
+            <div class="col-lg-6 mb-4">
+              <div class="card shadow-sm">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="mb-0">Próximos compromissos</h5>
+                    <small class="text-muted">Organize-se antes de sair para o cliente</small>
+                  </div>
+                  <span class="badge badge-primary">{{ getUpcomingEvents().length }}</span>
+                </div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item" *ngFor="let event of getUpcomingEvents()">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 class="mb-1">{{ event.title }}</h5>
+                          <p class="text-sm text-muted mb-1">
+                            <i class="far fa-calendar mr-1"></i>
+                            {{ event.start | date:'EEEE, dd/MM HH:mm':undefined:'pt-BR' }}
+                          </p>
+                          <span class="badge badge-light text-primary">
+                            <i class="fas fa-map-marker-alt mr-1"></i>{{ event.location }}
+                          </span>
+                        </div>
+                        <div class="text-right">
+                          <span class="badge badge-secondary mb-2">{{ event.assignedTo }}</span>
+                          <div>
+                            <button class="btn btn-sm btn-outline-secondary">
+                              <i class="fas fa-share mr-1"></i>Compartilhar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="list-group-item text-center text-muted" *ngIf="getUpcomingEvents().length === 0">
+                      Nenhum compromisso futuro após o filtro atual.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+              <div class="card shadow-sm mb-4">
+                <div class="card-header border-0">
+                  <h5 class="mb-0">Disponibilidade da equipe</h5>
+                  <small class="text-muted">Garanta a melhor alocação para cada etapa</small>
+                </div>
+                <div class="card-body">
+                  <div *ngIf="teamLoading" class="text-center text-muted py-3">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 mb-0">Carregando equipe...</p>
+                  </div>
+                  <ng-container *ngIf="!teamLoading">
+                    <div class="team-availability" *ngIf="teamMembers.length > 0; else emptyTeam">
+                      <div class="team-member" *ngFor="let member of teamMembers">
+                        <div class="avatar-sm">
+                          <span class="avatar-initials">{{ getInitials(member.name) }}</span>
+                        </div>
+                        <div class="member-info">
+                          <h6 class="mb-0">{{ member.name }}</h6>
+                          <small class="text-muted">{{ member.roleLabel }}</small>
+                        </div>
+                        <div class="ml-auto text-right">
+                          <span class="badge" [ngClass]="getStatusBadgeClass(member.status)">
+                            {{ getStatusLabel(member.status) }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template #emptyTeam>
+                      <div class="text-center text-muted py-3">
+                        Nenhum membro de equipe encontrado.
+                      </div>
+                    </ng-template>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-container>

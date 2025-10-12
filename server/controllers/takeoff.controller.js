@@ -17,6 +17,7 @@ module.exports = {
   uploadDeliveryPhoto,
   updateTrimCarpenter,
   removeTrimCarpenter,
+  getTakeoffsForInvoice,
 };
 
 async function insert(idUser, body, companyFilter = {}) {
@@ -1105,7 +1106,6 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       default:
-        console.log('Field not found => ' + field.getName());
         break;
     }
 
@@ -1265,4 +1265,75 @@ async function removeTrimCarpenter(user, idTakeoff, companyFilter = {}) {
   }
 
   return updatedTakeoff;
+}
+
+/**
+ * Get takeoffs ready for invoice generation
+ * Returns takeoffs with status >= 3 (UNDER_REVIEW or higher)
+ */
+async function getTakeoffsForInvoice(user, companyFilter = {}) {
+  const invoiceCalculator = require('../services/invoice-calculator.service');
+
+  let baseQuery;
+
+  // If user is delivery or manager, show all takeoffs from their company with status >= 3
+  if (UserRoles.isDelivery(user.roles) || UserRoles.isManager(user.roles)) {
+    baseQuery = {
+      status: { $gte: 3 }, // Status 3 (UNDER_REVIEW) or higher
+      ...companyFilter
+    };
+  } else {
+    // For carpenters, only show their takeoffs with status >= 3
+    baseQuery = {
+      status: { $gte: 3 },
+      $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+      ...companyFilter
+    };
+  }
+
+  const takeoffs = await Takeoff.find(baseQuery)
+    .populate('carpentry', 'fullname email')
+    .populate('trimCarpentry', 'fullname email')
+    .populate('user', 'fullname email')
+    .sort({ updatedAt: -1 });
+
+  // Format response to match frontend expectations and calculate totalValue
+  const formattedTakeoffs = [];
+
+  for (const takeoff of takeoffs) {
+    let totalValue = 0;
+
+    try {
+      // Calculate invoice to get total value
+      const invoiceData = await invoiceCalculator.calculateInvoice(takeoff);
+      totalValue = invoiceData.total || 0;
+    } catch (error) {
+      console.error(`Error calculating totalValue for takeoff ${takeoff._id}:`, error);
+      // Continue with totalValue = 0 if calculation fails
+    }
+
+    formattedTakeoffs.push({
+      _id: takeoff._id,
+      takeoffNumber: takeoff._id, // Using ID as takeoff number for now
+      customer: {
+        name: takeoff.custumerName || 'N/A',
+        email: takeoff.user?.email || 'N/A'
+      },
+      totalValue: totalValue,
+      status: takeoff.status,
+      completedDate: takeoff.updatedAt,
+      description: `${takeoff.shipTo || ''} - Lot ${takeoff.lot || ''}`.trim(),
+      role: takeoff.trimCarpentry ? 'trim' : 'measure',
+      selected: false,
+      // Additional fields for invoice calculation
+      shipTo: takeoff.shipTo,
+      lot: takeoff.lot,
+      foremen: takeoff.foremen,
+      carpInvoice: takeoff.carpInvoice,
+      carpenter: takeoff.carpentry?.fullname || takeoff.trimCarpentry?.fullname || 'N/A',
+      manager: takeoff.user?.fullname || 'N/A'
+    });
+  }
+
+  return formattedTakeoffs;
 }

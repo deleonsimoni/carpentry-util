@@ -33,8 +33,6 @@ app.use(express.static(path.join(__dirname, distDir)));
 app.use(/^((?!(api)).)*/, (req, res) => {
   res.sendFile(path.join(__dirname, distDir + '/index.html'));
 });
-
-console.log(distDir);
 //React server
 app.use(
   express.static(

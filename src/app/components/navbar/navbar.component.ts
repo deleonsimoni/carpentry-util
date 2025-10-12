@@ -10,6 +10,7 @@ import { User } from '@app/shared/interfaces';
 import { AuthService } from '@app/shared/services';
 import { CompanyService } from '@app/shared/services/company.service';
 import { Company } from '@app/shared/interfaces/company.interface';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
 
 @Component({
   selector: 'app-navbar',
@@ -61,11 +62,11 @@ export class NavbarComponent implements OnInit {
   }
 
   get isManager() {
-    return this.user && this.user.roles && this.user.roles.includes('manager');
+    return this.user && this.user.roles && UserRoles.isManager(this.user.roles);
   }
 
   get isSuperAdmin() {
-    return this.user && this.user.roles && this.user.roles.includes('super_admin');
+    return this.user && this.user.roles && UserRoles.isSuperAdmin(this.user.roles);
   }
 
   get userRole() {

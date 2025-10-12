@@ -1,0 +1,332 @@
+<div class="header bg-gradient-primary pb-8 pt-5 pt-md-8">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-6 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">Gerenciamento de Status</h6>
+          <p class="text-white mt-0 mb-0">Configure os status e permissões do sistema</p>
+        </div>
+        <div class="col-lg-6 col-5 text-right">
+          <button class="btn btn-sm btn-neutral" (click)="openCreateModal()">
+            <i class="fas fa-plus mr-2"></i>Novo Status
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Page content -->
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <h3 class="mb-0">Lista de Status</h3>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="card-body text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Carregando...</span>
+          </div>
+          <p class="mt-3 text-muted">Carregando configurações...</p>
+        </div>
+
+        <!-- Status List -->
+        <div *ngIf="!isLoading">
+          <div class="mb-3">
+            <small class="text-muted">
+              <i class="fas fa-info-circle mr-1"></i>
+              Arraste os cards para cima ou para baixo para reordenar os status
+            </small>
+          </div>
+
+          <!-- Status Cards with Drag & Drop -->
+          <div cdkDropList (cdkDropListDropped)="onStatusDrop($event)" class="status-cards-container">
+            <div *ngFor="let status of statusConfigs"
+                 cdkDrag
+                 class="card shadow-sm mb-3 status-card"
+                 [cdkDragData]="status">
+
+              <!-- Card Header with Drag Handle -->
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <!-- Drag Handle -->
+                  <div class="drag-handle mr-3" cdkDragHandle>
+                    <i class="fas fa-grip-vertical text-muted"></i>
+                  </div>
+
+                  <!-- Status Icon and ID -->
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-sm rounded-circle mr-3"
+                         [style.background-color]="status.color">
+                      <i [class]="status.icon" style="color: white; font-size: 12px;"></i>
+                    </div>
+                    <span class="badge badge-pill mr-3"
+                          [style.background-color]="status.color + '20'"
+                          [style.color]="status.color">
+                      ID: {{ status.statusId }}
+                    </span>
+                    <h5 class="mb-0 font-weight-bold">{{ status.name }}</h5>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex align-items-center">
+                  <!-- Active Toggle -->
+                  <div class="custom-control custom-switch mr-3">
+                    <input type="checkbox" class="custom-control-input"
+                           [id]="'activeSwitch_' + status._id"
+                           [checked]="status.isActive"
+                           (change)="toggleActiveStatus(status)">
+                    <label class="custom-control-label" [for]="'activeSwitch_' + status._id">
+                      <span class="badge"
+                            [class]="status.isActive ? 'badge-success' : 'badge-secondary'">
+                        {{ status.isActive ? 'Ativo' : 'Inativo' }}
+                      </span>
+                    </label>
+                  </div>
+
+                  <!-- Dropdown Menu -->
+                  <div class="dropdown" ngbDropdown placement="bottom-right">
+                    <button class="btn btn-sm btn-icon-only text-light"
+                            type="button" ngbDropdownToggle>
+                      <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow" ngbDropdownMenu>
+                      <button class="dropdown-item" (click)="openEditModal(status)">
+                        <i class="fas fa-edit mr-2"></i>Editar
+                      </button>
+                      <button class="dropdown-item" (click)="deleteStatus(status)">
+                        <i class="fas fa-trash mr-2"></i>Excluir
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body">
+                <div class="row">
+                  <!-- Description -->
+                  <div class="col-12 mb-3" *ngIf="status.description">
+                    <small class="text-muted d-block">Descrição:</small>
+                    <span class="text-sm">{{ status.description }}</span>
+                  </div>
+
+                  <!-- Allowed Roles -->
+                  <div class="col-md-6 mb-3">
+                    <small class="text-muted d-block mb-2">Perfis Permitidos:</small>
+                    <div class="d-flex flex-wrap">
+                      <span *ngFor="let role of status.allowedRoles"
+                            class="badge badge-secondary mr-1 mb-1">
+                        {{ getRoleName(role) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Transitions -->
+                  <div class="col-md-6 mb-3">
+                    <small class="text-muted d-block mb-2">Pode Transitar Para:</small>
+                    <span class="text-sm">
+                      {{ getTransitionNames(status.canTransitionTo) || 'Nenhuma transição configurada' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="statusConfigs.length === 0" class="text-center py-5">
+              <div class="card">
+                <div class="card-body">
+                  <i class="fas fa-list-alt fa-3x text-muted mb-3"></i>
+                  <h5 class="text-muted">Nenhuma configuração de status encontrada</h5>
+                  <p class="text-muted">Clique em "Novo Status" para começar</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'"
+     *ngIf="showModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editingStatus ? 'Editar Status' : 'Novo Status' }}
+        </h5>
+        <button type="button" class="close" (click)="closeModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form [formGroup]="statusForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="row">
+            <!-- Status ID -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">ID do Status</label>
+                <input type="number" class="form-control"
+                       formControlName="statusId"
+                       [readonly]="!!editingStatus">
+                <div *ngIf="statusForm.get('statusId')?.invalid && statusForm.get('statusId')?.touched"
+                     class="invalid-feedback d-block">
+                  ID do status é obrigatório
+                </div>
+              </div>
+            </div>
+
+            <!-- Order -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Ordem</label>
+                <input type="number" class="form-control" formControlName="order">
+              </div>
+            </div>
+
+            <!-- Name -->
+            <div class="col-md-8">
+              <div class="form-group">
+                <label class="form-control-label">Nome</label>
+                <input type="text" class="form-control"
+                       formControlName="name" placeholder="Nome do status">
+                <div *ngIf="statusForm.get('name')?.invalid && statusForm.get('name')?.touched"
+                     class="invalid-feedback d-block">
+                  Nome é obrigatório (mínimo 2 caracteres)
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Status -->
+            <div class="col-md-4">
+              <div class="form-group">
+                <label class="form-control-label">Status</label>
+                <div class="custom-control custom-switch">
+                  <input type="checkbox" class="custom-control-input"
+                         id="customSwitch" formControlName="isActive">
+                  <label class="custom-control-label" for="customSwitch">Ativo</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <div class="form-group">
+                <label class="form-control-label">Descrição</label>
+                <textarea class="form-control" formControlName="description"
+                          placeholder="Descrição do status" rows="3"></textarea>
+              </div>
+            </div>
+
+            <!-- Color -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Cor</label>
+                <div class="row">
+                  <div *ngFor="let color of availableColors"
+                       class="col-2 mb-2">
+                    <div class="color-option"
+                         [style.background-color]="color"
+                         [class.selected]="statusForm.get('color')?.value === color"
+                         (click)="statusForm.patchValue({ color: color })">
+                    </div>
+                  </div>
+                </div>
+                <input type="color" class="form-control mt-2"
+                       formControlName="color">
+              </div>
+            </div>
+
+            <!-- Icon -->
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-control-label">Ícone</label>
+                <div class="row">
+                  <div *ngFor="let icon of availableIcons"
+                       class="col-2 mb-2">
+                    <div class="icon-option text-center p-2"
+                         [class.selected]="statusForm.get('icon')?.value === icon"
+                         (click)="statusForm.patchValue({ icon: icon })">
+                      <i [class]="icon"></i>
+                    </div>
+                  </div>
+                </div>
+                <input type="text" class="form-control mt-2"
+                       formControlName="icon" placeholder="Classe do ícone">
+              </div>
+            </div>
+
+            <!-- Allowed Roles -->
+            <div class="col-12">
+              <div class="form-group">
+                <label class="form-control-label">Perfis Permitidos</label>
+                <div class="row">
+                  <div *ngFor="let role of availableRoles" class="col-md-3">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input"
+                             [id]="'role_' + role.key"
+                             [checked]="isRoleSelected(role.key)"
+                             (change)="toggleRole(role.key)">
+                      <label class="custom-control-label"
+                             [for]="'role_' + role.key">
+                        {{ role.label }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="statusForm.get('allowedRoles')?.invalid && statusForm.get('allowedRoles')?.touched"
+                     class="invalid-feedback d-block">
+                  Selecione pelo menos um perfil
+                </div>
+              </div>
+            </div>
+
+            <!-- Transitions -->
+            <div class="col-12">
+              <div class="form-group">
+                <label class="form-control-label">Pode Transitar Para</label>
+                <div class="row">
+                  <div *ngFor="let config of statusConfigs" class="col-md-3">
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" class="custom-control-input"
+                             [id]="'transition_' + config.statusId"
+                             [checked]="isTransitionSelected(config.statusId)"
+                             [disabled]="config.statusId === statusForm.get('statusId')?.value"
+                             (change)="toggleTransition(config.statusId)">
+                      <label class="custom-control-label"
+                             [for]="'transition_' + config.statusId">
+                        {{ config.name }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary"
+                  [disabled]="statusForm.invalid">
+            {{ editingStatus ? 'Atualizar' : 'Criar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showModal"></div>

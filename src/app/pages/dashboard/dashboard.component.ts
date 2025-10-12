@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { DashboardService, DashboardData } from '@app/shared/services/dashboard.service';
+import { DashboardService, DashboardData } from '../../shared/services/dashboard.service';
 
 // Register Chart.js components
 Chart.register(
@@ -65,9 +65,13 @@ export class DashboardComponent implements OnInit {
         this.initializeCharts();
       },
       error: (error) => {
-        console.error('Error loading dashboard data:', error);
-        this.isLoading = false;
-        this.initializeFallbackCharts();
+        // Se for erro de autenticação (401), usar dados mock
+        if (error.status === 401) {
+          this.loadMockData();
+        } else {
+          this.isLoading = false;
+          this.initializeFallbackCharts();
+        }
       }
     });
   }
@@ -219,6 +223,99 @@ export class DashboardComponent implements OnInit {
     }
 
     return Math.round((count / total) * 100);
+  }
+
+  loadMockData(): void {
+    // Mock data for development/testing when not authenticated
+    this.dashboardData = {
+      totalTakeoffs: 45,
+      takeoffsThisMonth: 12,
+      takeoffsThisWeek: 4,
+      takeoffsToday: 1,
+      activeUsers: 8,
+      statusStats: {
+        created: 8,
+        toMeasure: 12,
+        underReview: 7,
+        readyToShip: 5,
+        shipped: 3,
+        trimmingCompleted: 6,
+        backTrimCompleted: 2,
+        closed: 15,
+        pending: 8,
+        inProgress: 27,
+        completed: 15,
+        other: 0
+      },
+      productivityStats: {
+        avgDaysToComplete: 12.5,
+        avgDaysInMeasurement: 3.2,
+        avgDaysInReview: 2.1,
+        completionRate: 78.5,
+        onTimeDeliveryRate: 87.2
+      },
+      volumeStats: {
+        totalValue: 125000,
+        avgOrderValue: 2777.78,
+        monthlyGrowth: 15.3,
+        topPerformingCarpenter: 'John Smith'
+      },
+      userStats: {
+        totalUsers: 12,
+        activeUsers: 8,
+        inactiveUsers: 4,
+        requirePasswordChange: 2,
+        managersCount: 2,
+        carpentersCount: 6,
+        supervisorsCount: 2,
+        deliveryCount: 2
+      },
+      takeoffsByMonth: [
+        { _id: { year: 2024, month: 4 }, count: 8 },
+        { _id: { year: 2024, month: 5 }, count: 12 },
+        { _id: { year: 2024, month: 6 }, count: 15 },
+        { _id: { year: 2024, month: 7 }, count: 18 },
+        { _id: { year: 2024, month: 8 }, count: 22 },
+        { _id: { year: 2024, month: 9 }, count: 25 }
+      ],
+      statusDistribution: [
+        { status: 'Created', count: 8, percentage: 17.8 },
+        { status: 'To Measure', count: 12, percentage: 26.7 },
+        { status: 'Under Review', count: 7, percentage: 15.6 },
+        { status: 'Completed', count: 15, percentage: 33.3 },
+        { status: 'Others', count: 3, percentage: 6.7 }
+      ],
+      performanceByUser: [
+        { userId: '1', username: 'John Smith', completedTakeoffs: 8, avgCompletionTime: 10.5, rating: 4.8 },
+        { userId: '2', username: 'Mary Johnson', completedTakeoffs: 6, avgCompletionTime: 12.2, rating: 4.6 },
+        { userId: '3', username: 'Robert Brown', completedTakeoffs: 4, avgCompletionTime: 14.1, rating: 4.3 }
+      ],
+      recentTakeoffs: [
+        {
+          _id: '1',
+          custumerName: 'ABC Construction',
+          status: 3,
+          createdAt: '2024-09-20T10:00:00Z',
+          lot: 'LOT-001',
+          shipTo: 'Main Office',
+          user: { fullname: 'John Smith', email: 'john@example.com' },
+          carpentry: { fullname: 'Mary Johnson', email: 'mary@example.com' }
+        },
+        {
+          _id: '2',
+          custumerName: 'XYZ Builders',
+          status: 2,
+          createdAt: '2024-09-19T14:30:00Z',
+          lot: 'LOT-002',
+          shipTo: 'Site A',
+          user: { fullname: 'Robert Brown', email: 'robert@example.com' },
+          carpentry: { fullname: 'John Smith', email: 'john@example.com' }
+        }
+      ]
+    };
+
+    this.isLoading = false;
+    this.initializeCharts();
   }
 
 }

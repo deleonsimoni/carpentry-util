@@ -24,6 +24,7 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
 import { MaterialRequestComponent } from './pages/material-request/material-request.component';
 import { ListMaterialRequestComponent } from './pages/list-material-request/list-material-request.component';
 
@@ -47,6 +48,11 @@ export function appInitializerFactory(authService: AuthService) {
     ReactiveFormsModule,
     MatSnackBarModule,
     NgxSpinnerModule,
+    ToastrModule.forRoot({
+      timeOut: 3000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+    }),
   ],
   exports: [NgxSpinnerModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

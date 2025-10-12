@@ -36,6 +36,21 @@ export const AdminLayoutRoutes: Routes = [
     loadComponent: () => import('../../pages/company-detail/company-detail.component').then(c => c.CompanyDetailComponent),
     canActivate: [PasswordChangeGuard]
   },
+  {
+    path: 'status-management',
+    loadComponent: () => import('../../pages/status-management/status-management.component').then(c => c.StatusManagementComponent),
+    canActivate: [PasswordChangeGuard]
+  },
+  {
+    path: 'invoice',
+    loadComponent: () => import('../../pages/invoice/invoice.component').then(c => c.InvoiceComponent),
+    canActivate: [PasswordChangeGuard]
+  },
+  {
+    path: 'calendar',
+    loadComponent: () => import('../../pages/calendar/calendar.component').then(c => c.CalendarComponent),
+    canActivate: [PasswordChangeGuard]
+  },
   { path: 'takeoff', component: TakeoffComponent, canActivate: [PasswordChangeGuard] },
   { path: 'icons', component: IconsComponent, canActivate: [PasswordChangeGuard] },
   { path: 'maps', component: MapsComponent, canActivate: [PasswordChangeGuard] },

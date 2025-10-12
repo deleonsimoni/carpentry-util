@@ -53,10 +53,11 @@ function uploadImage(key, file) {
   return new Promise((resolve, reject) => {
     s3.putObject(s3Config, (err, resp) => {
       if (err) {
-        console.log('Erro AWS', err);
-        reject({ success: false, data: err });
+        console.error('Erro ao enviar arquivo para a AWS S3:', err);
+        return reject({ success: false, data: err });
       }
-      resolve({ sucess: true, data: resp });
+
+      return resolve({ sucess: true, data: resp });
     });
   });
 }

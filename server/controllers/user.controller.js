@@ -60,7 +60,9 @@ async function insert(user, verificationCode) {
     // Managers não precisam trocar senha após registro
     user.requirePasswordChange = false;
     user.temporaryPassword = false;
-
+    console.log('✅ DEBUG - Profile definido como:', user.profile);
+    console.log('✅ DEBUG - requirePasswordChange:', user.requirePasswordChange);
+    console.log('✅ DEBUG - temporaryPassword:', user.temporaryPassword);
   } else {
     console.log('❌ DEBUG - NÃO é manager');
   }
@@ -115,7 +117,6 @@ async function updateImageUser(user, img) {
 
   await S3Uploader.uploadImage(fileName, buf).then(
     fileData => {
-      console.log('Imagem do usuario ' + fileName);
       return User.findOneAndUpdate(
         {
           _id: user._id,
@@ -124,7 +125,7 @@ async function updateImageUser(user, img) {
       );
     },
     err => {
-      console.log('Erro ao enviar imagem de perfil  para AWS: ' + fileName);
+      console.error('Erro ao enviar imagem de perfil para AWS:', fileName, err);
       retorno.temErro = true;
       retorno.mensagem =
         'Servidor momentaneamente inoperante. Tente novamente mais tarde.';

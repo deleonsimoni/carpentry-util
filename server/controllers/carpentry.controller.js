@@ -8,8 +8,6 @@ module.exports = {
 
 
 async function getAll(currentUser) {
-  console.log('🔍 DEBUG - Buscando carpinteiros para empresa:', currentUser?.company);
-
   // Construir filtros baseado na empresa do usuário logado
   const filters = {
     roles: UserRoles.CARPENTER
@@ -20,8 +18,6 @@ async function getAll(currentUser) {
     filters.company = currentUser.company;
   }
 
-  console.log('🔍 DEBUG - Filtros aplicados:', filters);
-
   const carpenters = await User
     .find(filters)
     .select('email fullname company')
@@ -29,8 +25,5 @@ async function getAll(currentUser) {
       createdAt: -1
     });
 
-  console.log('🔍 DEBUG - Carpinteiros encontrados:', carpenters.length);
-
   return carpenters;
 }
-

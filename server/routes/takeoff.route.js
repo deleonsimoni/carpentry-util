@@ -37,6 +37,7 @@ router.use(passport.authenticate('jwt', { session: false }));
 router.use(companyHeaderMiddleware);
 
 router.route('/').get(asyncHandler(getTakeoffs));
+router.route('/for-invoice').get(asyncHandler(getTakeoffsForInvoice));
 router.route('/:idTakeoff').get(asyncHandler(detailTakeoff));
 router.route('/:idTakeoff/generatePDF').get(asyncHandler(generatePDF));
 router.route('/:idTakeoff/update').post(asyncHandler(updateTakeoff));
@@ -191,6 +192,21 @@ async function removeTrimCarpenter(req, res) {
   } catch (error) {
     const statusCode = error.status || 500;
     res.status(statusCode).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+async function getTakeoffsForInvoice(req, res) {
+  try {
+    let response = await takeoffCtrl.getTakeoffsForInvoice(req.user, req.companyFilter);
+    res.json({
+      success: true,
+      data: response
+    });
+  } catch (error) {
+    res.status(500).json({
       success: false,
       error: error.message
     });

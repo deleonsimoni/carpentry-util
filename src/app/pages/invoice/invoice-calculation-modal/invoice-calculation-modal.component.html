@@ -1,0 +1,170 @@
+<div class="modal-header" style="background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%);">
+  <h4 class="modal-title text-white">
+    <i class="fas fa-file-invoice mr-2"></i>
+    Invoice Calculation Preview
+  </h4>
+  <button type="button" class="close text-white" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body invoice-preview" style="max-height: 80vh; overflow-y: auto; background: #fff;">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Calculating invoice...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle mr-2"></i>
+    {{ error }}
+  </div>
+
+  <!-- Invoice Content - Template Style -->
+  <div *ngIf="calculationData && !isLoading && !error" class="invoice-template">
+
+    <!-- Invoice Header -->
+    <div class="invoice-header">
+      <div class="row align-items-start">
+        <div class="col-3 text-center logo-placeholder">
+          <i class="fas fa-image fa-3x text-muted"></i>
+        </div>
+        <div class="col-6 text-center">
+          <h1 class="invoice-title">INVOICE</h1>
+          <p class="print-clearly">please print clearly</p>
+        </div>
+        <div class="col-3">
+          <div class="extra-sheets">
+            <span class="label">extra sheet(s) attached</span>
+            <div class="checkboxes">
+              <span><input type="checkbox" disabled> YES</span>
+              <span><input type="checkbox" disabled checked> NO</span>
+            </div>
+          </div>
+          <div class="invoice-number-box">
+            <div class="label">INVOICE NO.</div>
+            <div class="number">{{ calculationData.takeoffInfo.carpInvoice || 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Information -->
+    <div class="company-section">
+      <div class="info-row">
+        <span class="label">Crew Leader's Company:</span>
+        <span class="value">{{ calculationData.takeoffInfo.manager || '' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Crew Leader's Name:</span>
+        <span class="value">{{ calculationData.takeoffInfo.carpenter || '' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Contact Phone Number:</span>
+        <span class="value">_________________________________</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Invoice to:</span>
+        <span class="value">{{ calculationData.takeoffInfo.customerName || '' }}</span>
+      </div>
+    </div>
+
+    <!-- Main Grid Table -->
+    <table class="invoice-grid">
+      <!-- Headers Row 1: Builder -->
+      <thead>
+        <tr class="header-row">
+          <th rowspan="5" class="item-column"><!-- Items --></th>
+          <th colspan="2" class="builder-header">Builder</th>
+        </tr>
+        <!-- Headers Row 2: Site Location -->
+        <tr class="header-row">
+          <td colspan="2" class="site-location">Site Location<br>{{ calculationData.takeoffInfo.shipTo || '' }}</td>
+        </tr>
+        <!-- Headers Row 3: Lot # -->
+        <tr class="header-row">
+          <td colspan="2" class="lot-number">Lot #<br>{{ calculationData.takeoffInfo.lot || '' }}</td>
+        </tr>
+        <!-- Headers Row 4: Trim Size -->
+        <tr class="header-row">
+          <td colspan="2" class="trim-size">Trim Size<br>-</td>
+        </tr>
+        <!-- Headers Row 5: Quantity / Amount -->
+        <tr class="subheader-row">
+          <th class="quantity-header">Quantity</th>
+          <th class="amount-header">Amount</th>
+        </tr>
+      </thead>
+
+      <!-- Line Items Body -->
+      <tbody>
+        <tr *ngFor="let item of calculationData.calculation.lineItems">
+          <td class="item-name">{{ item.description }}</td>
+          <td class="quantity-cell">{{ item.quantity > 0 ? item.quantity : '-' }}</td>
+          <td class="amount-cell">{{ item.amount > 0 ? (item.amount | currency:'CAD':'symbol':'1.2-2') : '-' }}</td>
+        </tr>
+
+        <!-- Empty state if no items -->
+        <tr *ngIf="!calculationData.calculation.lineItems || calculationData.calculation.lineItems.length === 0">
+          <td class="item-name">No items calculated</td>
+          <td class="quantity-cell">-</td>
+          <td class="amount-cell">-</td>
+        </tr>
+
+        <!-- Totals Row -->
+        <tr class="totals-row">
+          <td class="item-name"><strong>TOTALS:</strong></td>
+          <td class="quantity-cell">→</td>
+          <td class="amount-cell"><strong>{{ calculationData.calculation.subtotal | currency:'CAD':'symbol':'1.2-2' }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Bottom Section -->
+    <div class="bottom-section">
+      <table class="totals-table">
+        <tr>
+          <td class="label-cell">EMAIL ADDRESS:</td>
+          <td class="value-cell">{{ calculationData.takeoffInfo.manager || '' }}</td>
+          <td class="label-cell right">SUBTOTAL:</td>
+          <td class="value-cell right">{{ calculationData.calculation.subtotal | currency:'CAD':'symbol':'1.2-2' }}</td>
+        </tr>
+        <tr>
+          <td class="label-cell">HST Registration Number:</td>
+          <td class="value-cell">-</td>
+          <td class="label-cell right">HST:</td>
+          <td class="value-cell right">{{ calculationData.calculation.hst | currency:'CAD':'symbol':'1.2-2' }}</td>
+        </tr>
+        <tr>
+          <td class="label-cell">Holdback from last Invoice(s):</td>
+          <td class="value-cell">-</td>
+          <td class="label-cell right"><strong>TOTAL TO BE PAID:</strong></td>
+          <td class="value-cell right total"><strong>{{ calculationData.calculation.total | currency:'CAD':'symbol':'1.2-2' }}</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="invoice-footer">
+      <span class="footer-text">WHITE &gt; TO BE MAILED TO UNION</span>
+      <span class="footer-text">PINK & YELLOW &gt; TO CONTRACTOR</span>
+      <span class="footer-text">ORANGE &gt; TO CREW LEADER</span>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-footer bg-light">
+  <button type="button" class="btn btn-secondary" (click)="close()">
+    <i class="fas fa-times mr-2"></i>Close
+  </button>
+  <button type="button" class="btn btn-info" (click)="printInvoice()" *ngIf="calculationData">
+    <i class="fas fa-print mr-2"></i>Print
+  </button>
+  <button type="button" class="btn btn-success" (click)="downloadPDF()" *ngIf="calculationData">
+    <i class="fas fa-file-pdf mr-2"></i>Download PDF
+  </button>
+</div>
