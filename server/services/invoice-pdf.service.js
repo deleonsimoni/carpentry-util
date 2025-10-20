@@ -6,7 +6,7 @@ class InvoicePDFService {
   constructor() {
     this.templatePath = 'template-invoice.pdf';
     this.fieldMapping = {
-      'BASEBOARD': 'BASEBOARD(SQ FT)',
+      'BASEBOARD(SQ FT)': 'BASEBOARD(SQ FT)',
       'SINGLE DOOR OR HANDLE': 'SINGLE DOOROR BIFOLD',
       'DOUBLE DOOR OR SLIDERS': 'DOUBLE DOOROR BIFOLD',
       'CANTINA DOOR': 'CANTINA DOOR',
@@ -80,20 +80,44 @@ class InvoicePDFService {
     for (const [ourName, pdfName] of Object.entries(this.fieldMapping)) {
       const arr = new Array(10).fill('');
 
-      // PDF supports 5 complete takeoffs (10 fields total):
-      // _9→[0], _8→[1], _7→[2], _6→[3], _5→[4], _4→[5], _3→[6], _2→[7], _1→[8], (no suffix)→[9]
+      // PDF has 5 columns, each column has 2 fields (amount + quantity)
+      // Array indices: [0,1]=Col1, [2,3]=Col2, [4,5]=Col3, [6,7]=Col4, [8,9]=Col5
+      //
+      // FILL FROM RIGHT TO LEFT (counting backwards)
+      //
+      // Example with 1 takeoff [A]:
+      //   Column 5: Takeoff A → indices [8, 9]
+      //   Columns 1-4: empty
+      //
+      // Example with 2 takeoffs [A, B]:
+      //   Column 4: Takeoff A (first selected)  → indices [6, 7]
+      //   Column 5: Takeoff B (last selected)   → indices [8, 9]
+      //   Columns 1-3: empty
+      //
+      // Example with 3 takeoffs [A, B, C]:
+      //   Column 3: Takeoff A (first)  → indices [4, 5]
+      //   Column 4: Takeoff B (middle) → indices [6, 7]
+      //   Column 5: Takeoff C (last)   → indices [8, 9]
+      //   Columns 1-2: empty
       for (let i = 0; i < calculations.length && i < 5; i++) {
         const item = calculations[i].lineItems.find(li => li.description === ourName);
         if (item) {
-          const qtyIndex = i * 2;      // 0, 2, 4, 6, 8
-          const amtIndex = i * 2 + 1;  // 1, 3, 5, 7, 9
+          // Fill from right to left: first takeoff goes to rightmost available column
+          // If we have 1 takeoff: i=0 goes to column 5 (index 4)
+          // If we have 2 takeoffs: i=0 goes to column 4 (index 3), i=1 goes to column 5 (index 4)
+          const columnIndex = 4 - (calculations.length - 1) + i;
 
-          if (qtyIndex < 10 && item.quantity > 0) {
-            arr[qtyIndex] = item.quantity.toString();
+          const amtIndex = columnIndex * 2;      // Even indices: 0, 2, 4, 6, 8
+          const qtyIndex = columnIndex * 2 + 1;  // Odd indices: 1, 3, 5, 7, 9
+
+          // Preencher amount
+          if (amtIndex < 10) {
+            arr[amtIndex] = item.amount > 0 ? item.amount.toFixed(2) : '';
           }
 
-          if (amtIndex < 10 && item.amount > 0) {
-            arr[amtIndex] = item.amount.toFixed(2);
+          // Preencher quantity
+          if (qtyIndex < 10) {
+            arr[qtyIndex] = item.quantity > 0 ? item.quantity.toString() : '';
           }
         }
       }
@@ -105,33 +129,63 @@ class InvoicePDFService {
   }
 
   async fillPDFFields(pdfDoc, data) {
-    const { takeoffs, user, invoiceNumber, grandTotals, lineItemArrays } = data;
+    const {
+      takeoffs,
+      calculations,
+      user,
+      invoiceNumber,
+      grandTotals,
+      lineItemArrays
+    } = data;
+
     const form = pdfDoc.getForm();
     const fields = form.getFields();
 
-    const customers = [...new Set(takeoffs.map(t => t.custumerName))].filter(Boolean).join(', ');
+    // Extract unique customer names for the invoice header
+    const customers = [...new Set(takeoffs.map(t => t.custumerName))]
+      .filter(Boolean)
+      .join(', ');
 
+    // Fill all PDF form fields with calculated data
     fields.forEach(field => {
       const fieldName = field.getName();
 
       try {
-        this.fillHeaderFields(field, fieldName, { user, invoiceNumber, customers, totals: grandTotals });
+        // Fill header information (invoice number, user details, totals)
+        this.fillHeaderFields(field, fieldName, {
+          user,
+          invoiceNumber,
+          customers,
+          totals: grandTotals
+        });
+
+        // Fill takeoff-specific data (builder, site, lot, trim)
         this.fillTakeoffFields(field, fieldName, takeoffs);
+
+        // Fill line item values (quantities and amounts per field)
         this.fillLineItemFields(field, fieldName, lineItemArrays);
+
+        // Fill individual takeoff totals (TOTAL1-TOTAL5)
+        this.fillTakeoffTotals(field, fieldName, calculations);
       } catch (error) {
+        // Silently skip fields that cannot be filled
       }
     });
 
+    // Update field appearances to reflect filled values
     try {
       form.updateFieldAppearances();
     } catch (error) {
+      // Continue if appearance update fails
     }
 
+    // Configure field properties for final PDF
     fields.forEach(field => {
       try {
-        field.setFontSize(11);
-        field.enableReadOnly();
+        field.setFontSize(11); // Consistent font size across all fields
+        field.enableReadOnly(); // Prevent editing in the final PDF
       } catch (error) {
+        // Skip fields that don't support these properties
       }
     });
   }
@@ -149,12 +203,13 @@ class InvoicePDFService {
       'holdback': '0.00',
       'subtotal': totals.subtotal.toFixed(2),
       'hst': totals.hst.toFixed(2),
-      'hst2': '',
+      'hst2': totals.hst.toFixed(2),
       'total': totals.total.toFixed(2)
     };
 
     if (headerFields.hasOwnProperty(fieldName)) {
-      field.setText(headerFields[fieldName]);
+      const value = headerFields[fieldName];
+      field.setText(value);
       return true;
     }
 
@@ -201,6 +256,21 @@ class InvoicePDFService {
     return false;
   }
 
+  fillTakeoffTotals(field, fieldName, calculations) {
+    // TOTAL1, TOTAL2, TOTAL3, TOTAL4, TOTAL5 - Totais individuais de cada takeoff
+    const totalMatch = fieldName.match(/^TOTAL(\d+)$/);
+    if (totalMatch) {
+      const takeoffIndex = parseInt(totalMatch[1]) - 1;
+      if (takeoffIndex < calculations.length) {
+        const total = calculations[takeoffIndex].total;
+        field.setText(total.toFixed(2));
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   fillLineItemFields(field, fieldName, lineItemArrays) {
     switch (fieldName) {
       case 'BASEBOARD(SQ FT)_1':
@@ -223,6 +293,8 @@ class InvoicePDFService {
         return true;
       case 'BASEBOARD(SQ FT)_7':
         if (lineItemArrays['BASEBOARD(SQ FT)']?.[7]) field.setText(lineItemArrays['BASEBOARD(SQ FT)'][7]);
+       // if (lineItemArrays['BASEBOARD(SQ FT)']?.[7]) field.setText("aaa");
+
         return true;
       case 'BASEBOARD(SQ FT)_8':
         if (lineItemArrays['BASEBOARD(SQ FT)']?.[8]) field.setText(lineItemArrays['BASEBOARD(SQ FT)'][8]);
@@ -949,36 +1021,56 @@ class InvoicePDFService {
 
 
       // HANDRAIL - 10 campos (sem sufixo, _1 até _9)
-      case 'HANDRAIL':
-        if (lineItemArrays['HANDRAIL']?.[0]) field.setText(lineItemArrays['HANDRAIL'][0]);
-        return true;
-      case 'HANDRAIL_1':
-        if (lineItemArrays['HANDRAIL']?.[1]) field.setText(lineItemArrays['HANDRAIL'][1]);
-        return true;
-      case 'HANDRAIL_2':
-        if (lineItemArrays['HANDRAIL']?.[2]) field.setText(lineItemArrays['HANDRAIL'][2]);
-        return true;
-      case 'HANDRAIL_3':
-        if (lineItemArrays['HANDRAIL']?.[3]) field.setText(lineItemArrays['HANDRAIL'][3]);
-        return true;
-      case 'HANDRAIL_4':
-        if (lineItemArrays['HANDRAIL']?.[4]) field.setText(lineItemArrays['HANDRAIL'][4]);
-        return true;
-      case 'HANDRAIL_5':
-        if (lineItemArrays['HANDRAIL']?.[5]) field.setText(lineItemArrays['HANDRAIL'][5]);
-        return true;
-      case 'HANDRAIL_6':
-        if (lineItemArrays['HANDRAIL']?.[6]) field.setText(lineItemArrays['HANDRAIL'][6]);
-        return true;
-      case 'HANDRAIL_7':
-        if (lineItemArrays['HANDRAIL']?.[7]) field.setText(lineItemArrays['HANDRAIL'][7]);
-        return true;
-      case 'HANDRAIL_8':
-        if (lineItemArrays['HANDRAIL']?.[8]) field.setText(lineItemArrays['HANDRAIL'][8]);
-        return true;
-      case 'HANDRAIL_9':
+
+      case 'HANDRAIL_14':
         if (lineItemArrays['HANDRAIL']?.[9]) field.setText(lineItemArrays['HANDRAIL'][9]);
         return true;
+      case 'HANDRAIL_13':
+        if (lineItemArrays['HANDRAIL']?.[8]) field.setText(lineItemArrays['HANDRAIL'][8]);
+        return true;
+
+      case 'HANDRAIL_12':
+        if (lineItemArrays['HANDRAIL']?.[7]) field.setText(lineItemArrays['HANDRAIL'][7]);
+        return true;
+      case 'HANDRAIL_11':
+        if (lineItemArrays['HANDRAIL']?.[6]) field.setText(lineItemArrays['HANDRAIL'][6]);
+        return true;
+
+      case 'HANDRAIL_10':
+        if (lineItemArrays['HANDRAIL']?.[5]) field.setText(lineItemArrays['HANDRAIL'][5]);
+        return true;
+      case 'HANDRAIL_9':
+        if (lineItemArrays['HANDRAIL']?.[4]) field.setText(lineItemArrays['HANDRAIL'][4]);
+        return true;
+
+      case 'HANDRAIL_8':
+        if (lineItemArrays['HANDRAIL']?.[3]) field.setText(lineItemArrays['HANDRAIL'][3]);
+        return true;
+      case 'HANDRAIL_7':
+        if (lineItemArrays['HANDRAIL']?.[2]) field.setText(lineItemArrays['HANDRAIL'][2]);
+        return true;
+
+      case 'HANDRAIL_6':
+        if (lineItemArrays['HANDRAIL']?.[1]) field.setText(lineItemArrays['HANDRAIL'][1]);
+        return true;
+      case 'HANDRAIL_5':
+        if (lineItemArrays['HANDRAIL']?.[0]) field.setText(lineItemArrays['HANDRAIL'][0]);
+        return true;
+
+      // Limpar campos extras do HANDRAIL (linha adicional não usada)
+      // case 'HANDRAIL_-1':
+      // case 'HANDRAIL_-2':
+      // case 'HANDRAIL_-3':
+      // case 'HANDRAIL_-4':
+      // case 'HANDRAIL_-5':
+      // case 'HANDRAIL_-6':
+      // case 'HANDRAIL_10':
+      // case 'HANDRAIL_11':
+      // case 'HANDRAIL_12':
+      // case 'HANDRAIL_13':
+      // case 'HANDRAIL_14':
+      //   field.setText('');
+      //   return true;
 
       default:
         return false;

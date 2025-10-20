@@ -29,7 +29,9 @@ export class InvoiceComponent implements OnInit {
 
   // History tab
   invoiceHistory: InvoiceGroup[] = [];
+  filteredInvoiceHistory: InvoiceGroup[] = [];
   isLoadingHistory = false;
+  lotFilter = '';
 
   // Selection state
   selectAll = false;
@@ -117,6 +119,7 @@ export class InvoiceComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.invoiceHistory = response.data;
+          this.applyLotFilter();
         }
         this.isLoadingHistory = false;
       },
@@ -124,6 +127,31 @@ export class InvoiceComponent implements OnInit {
         console.error('Erro ao carregar histórico:', error);
         this.isLoadingHistory = false;
       }
+    });
+  }
+
+  onLotFilterChange(): void {
+    this.applyLotFilter();
+  }
+
+  clearLotFilter(): void {
+    this.lotFilter = '';
+    this.applyLotFilter();
+  }
+
+  applyLotFilter(): void {
+    if (!this.lotFilter || this.lotFilter.trim() === '') {
+      this.filteredInvoiceHistory = this.invoiceHistory;
+      return;
+    }
+
+    const filterLower = this.lotFilter.toLowerCase().trim();
+
+    this.filteredInvoiceHistory = this.invoiceHistory.filter(invoice => {
+      // Check if any takeoff in this invoice has a lot number that matches the filter
+      return invoice.takeoffs.some(takeoff =>
+        takeoff.lot?.toLowerCase().includes(filterLower)
+      );
     });
   }
 

@@ -46,3 +46,5 @@ Thumbs.db
 
 # Env file
 *.env
+
+yarn.lock

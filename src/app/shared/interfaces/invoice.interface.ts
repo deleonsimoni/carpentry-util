@@ -18,6 +18,7 @@ export interface InvoiceTakeoff {
   takeoffId: string;
   takeoffNumber: string;
   customerName: string;
+  lot?: string;
   amount: number;
   description?: string;
   completedDate: Date;
@@ -43,6 +44,7 @@ export interface InvoiceGroup {
 export interface TakeoffForInvoice {
   _id: string;
   takeoffNumber: string;
+  lot?: string;
   customer: {
     name: string;
     email?: string;

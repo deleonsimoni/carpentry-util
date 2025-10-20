@@ -39,13 +39,4 @@ export class InvoiceCalculationModalComponent implements OnInit {
   close(): void {
     this.activeModal.dismiss();
   }
-
-  downloadPDF(): void {
-    // TODO: Implement PDF download
-    alert('PDF download will be implemented soon');
-  }
-
-  printInvoice(): void {
-    window.print();
-  }
 }

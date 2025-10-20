@@ -69,11 +69,6 @@ const TakeoffSchema = new mongoose.Schema(
       type: String,
     },
 
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
-
     //Carpentry
 
     comment: {
@@ -191,6 +186,7 @@ const TakeoffSchema = new mongoose.Schema(
     ],
   },
   {
+    timestamps: true, // Adds createdAt and updatedAt fields automatically
     versionKey: false,
   }
 );

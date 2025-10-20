@@ -15,32 +15,32 @@ class InvoiceCalculatorService {
     const lineItems = [];
     let subtotal = 0;
 
-    // 1. BASEBOARD (based on square footage)
+    // 1. BASEBOARD(SQ. FT.)
     const baseboardCost = await this.calculateBaseboard(takeoff);
     lineItems.push(baseboardCost);
     subtotal += baseboardCost.amount;
 
-    // 2. SINGLE DOORS
+    // 2. SINGLE DOOR OR BIFOLD
     const singleDoorsCost = await this.calculateSingleDoors(takeoff);
     lineItems.push(singleDoorsCost);
     subtotal += singleDoorsCost.amount;
 
-    // 3. DOUBLE DOORS
+    // 3. DOUBLE DOOR OR BIFOLD
     const doubleDoorsCost = await this.calculateDoubleDoors(takeoff);
     lineItems.push(doubleDoorsCost);
     subtotal += doubleDoorsCost.amount;
 
-    // 4. CANTINA DOORS
+    // 4. CANTINA DOOR
     const cantinaDoorsCost = await this.calculateCantinaDoors(takeoff);
     lineItems.push(cantinaDoorsCost);
     subtotal += cantinaDoorsCost.amount;
 
-    // 5. STD ARCHWAYS
+    // 5. STD. ARCHWAYS
     const archwaysCost = await this.calculateArchways(takeoff);
     lineItems.push(archwaysCost);
     subtotal += archwaysCost.amount;
 
-    // 6. FD ARCHWAYS (French Doors as archways)
+    // 6. TALL ARCHWAYS
     const fdArchwaysCost = await this.calculateFrenchDoors(takeoff);
     lineItems.push(fdArchwaysCost);
     subtotal += fdArchwaysCost.amount;
@@ -55,12 +55,12 @@ class InvoiceCalculatorService {
     lineItems.push(roundWindowsCost);
     subtotal += roundWindowsCost.amount;
 
-    // 9. OPEN TO ABOVE WINDOWS
+    // 9. OPEN TO ABOVE WIN.
     const openAboveCost = await this.calculateOpenAboveWindows(takeoff);
     lineItems.push(openAboveCost);
     subtotal += openAboveCost.amount;
 
-    // 10. BAY OR BOW WINDOWS
+    // 10. BAY OR BOW WINDOW
     const bayBowCost = await this.calculateBayBowWindows(takeoff);
     lineItems.push(bayBowCost);
     subtotal += bayBowCost.amount;
@@ -70,70 +70,75 @@ class InvoiceCalculatorService {
     lineItems.push(atticHatchCost);
     subtotal += atticHatchCost.amount;
 
-    // 12. CAPPING
-    const cappingCost = await this.calculateCapping(takeoff);
-    lineItems.push(cappingCost);
-    subtotal += cappingCost.amount;
-
-    // 13. SOLID COLUMNS
-    const solidColumnsCost = await this.calculateSolidColumns(takeoff);
-    lineItems.push(solidColumnsCost);
-    subtotal += solidColumnsCost.amount;
-
-    // 14. SPLIT COLUMNS
-    const splitColumnsCost = await this.calculateSplitColumns(takeoff);
-    lineItems.push(splitColumnsCost);
-    subtotal += splitColumnsCost.amount;
-
-    // 15. WIRE SHELVING
-    const shelvingCost = await this.calculateShelving(takeoff);
-    lineItems.push(shelvingCost);
-    subtotal += shelvingCost.amount;
-
-    // 16. STAIRS (STRAIGHT)
-    const straightStairsCost = await this.calculateStraightStairs(takeoff);
-    lineItems.push(straightStairsCost);
-    subtotal += straightStairsCost.amount;
-
-    // 17. STAIRS (CIRCULAR/WINDER)
-    const circularStairsCost = await this.calculateCircularStairs(takeoff);
-    lineItems.push(circularStairsCost);
-    subtotal += circularStairsCost.amount;
-
-    // 18. STAIRS HALF FLIGHT
-    const halfFlightCost = await this.calculateHalfFlightStairs(takeoff);
-    lineItems.push(halfFlightCost);
-    subtotal += halfFlightCost.amount;
-
-    // 19. DOOR CLOSER
-    const doorCloserCost = await this.calculateDoorCloser(takeoff);
-    lineItems.push(doorCloserCost);
-    subtotal += doorCloserCost.amount;
-
-    // 20. EXTERIOR LOCK
-    const exteriorLockCost = await this.calculateExteriorLock(takeoff);
-    lineItems.push(exteriorLockCost);
-    subtotal += exteriorLockCost.amount;
-
-    // 21. HANDRAIL
-    const handrailCost = await this.calculateHandrail(takeoff);
-    lineItems.push(handrailCost);
-    subtotal += handrailCost.amount;
-
-    // 22. 1/4 ROUND
-    const quarterRoundCost = await this.calculateQuarterRound(takeoff);
-    lineItems.push(quarterRoundCost);
-    subtotal += quarterRoundCost.amount;
-
-    // 23. WINDOW SEAT
+    // 12. PARAPET OPENINGS (Window Seat)
     const windowSeatCost = await this.calculateWindowSeat(takeoff);
     lineItems.push(windowSeatCost);
     subtotal += windowSeatCost.amount;
 
-    // 24. WET AREAS
+    // 13. CAPPING ALL SIZES
+    const cappingCost = await this.calculateCapping(takeoff);
+    lineItems.push(cappingCost);
+    subtotal += cappingCost.amount;
+
+    // 14. SOLID COLUMNS
+    const solidColumnsCost = await this.calculateSolidColumns(takeoff);
+    lineItems.push(solidColumnsCost);
+    subtotal += solidColumnsCost.amount;
+
+    // 15. SPLIT COLUMNS
+    const splitColumnsCost = await this.calculateSplitColumns(takeoff);
+    lineItems.push(splitColumnsCost);
+    subtotal += splitColumnsCost.amount;
+
+    // 16. WOOD SHELVING
+    const shelvingCost = await this.calculateShelving(takeoff);
+    lineItems.push(shelvingCost);
+    subtotal += shelvingCost.amount;
+
+    // 17. STAIRS (STRAIGHT)
+    const straightStairsCost = await this.calculateStraightStairs(takeoff);
+    lineItems.push(straightStairsCost);
+    subtotal += straightStairsCost.amount;
+
+    // 18. STAIRS (CIRC./WIND.)
+    const circularStairsCost = await this.calculateCircularStairs(takeoff);
+    lineItems.push(circularStairsCost);
+    subtotal += circularStairsCost.amount;
+
+    // 19. STAIRS (1/2 FLIGHT)
+    const halfFlightCost = await this.calculateHalfFlightStairs(takeoff);
+    lineItems.push(halfFlightCost);
+    subtotal += halfFlightCost.amount;
+
+    // 20. DOOR CLOSURE MECHANISM
+    const doorCloserCost = await this.calculateDoorCloser(takeoff);
+    lineItems.push(doorCloserCost);
+    subtotal += doorCloserCost.amount;
+
+    // 21. 1/4 ROUND
+    const quarterRoundCost = await this.calculateQuarterRound(takeoff);
+    lineItems.push(quarterRoundCost);
+    subtotal += quarterRoundCost.amount;
+
+    // 22. TALLER DOORS OVER 85
+    const tallerDoorsCost = await this.calculateTallerDoorsOver85(takeoff);
+    lineItems.push(tallerDoorsCost);
+    subtotal += tallerDoorsCost.amount;
+
+    // 23. WET AREAS
     const wetAreasCost = await this.calculateWetAreas(takeoff);
     lineItems.push(wetAreasCost);
     subtotal += wetAreasCost.amount;
+
+    // 24. EXTERIOR LOCKS
+    const exteriorLockCost = await this.calculateExteriorLock(takeoff);
+    lineItems.push(exteriorLockCost);
+    subtotal += exteriorLockCost.amount;
+
+    // 25. HANDRAIL
+    const handrailCost = await this.calculateHandrail(takeoff);
+    lineItems.push(handrailCost);
+    subtotal += handrailCost.amount;
 
     return {
       lineItems,
@@ -154,7 +159,7 @@ class InvoiceCalculatorService {
     );
 
     if (!baseboardTrim || !takeoff.sqFootage) {
-      return { description: 'BASEBOARD', quantity: 0, amount: 0 };
+      return { description: 'BASEBOARD(SQ FT)', quantity: 0, amount: 0 };
     }
 
     // Determine casing size from trim details
@@ -171,14 +176,14 @@ class InvoiceCalculatorService {
 
     const pricing = await InstallCost.getActivePricing('baseboard', null, casing);
     if (!pricing) {
-      return { description: 'BASEBOARD', quantity: 0, amount: 0 };
+      return { description: 'BASEBOARD(SQ FT)', quantity: 0, amount: 0 };
     }
 
     const sqFootage = parseFloat(takeoff.sqFootage) || 0;
     const amount = sqFootage * pricing.installCost;
 
     return {
-      description: 'BASEBOARD',
+      description: 'BASEBOARD(SQ FT)',
       quantity: sqFootage,
       unit: 'sqft',
       unitPrice: pricing.installCost,
@@ -419,14 +424,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate regular windows cost
+   * Labour array index 7: 'REGULAR WINDOWS'
    */
   async calculateRegularWindows(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('r/window') ||
-      l.item?.toLowerCase().includes('window') && !l.item?.toLowerCase().includes('round')
-    );
+    const labourItem = takeoff.labour?.[7]; // Index 7: REGULAR WINDOWS
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'REGULAR WINDOWS', quantity: 0, amount: 0 };
     }
 
@@ -455,13 +458,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate round top windows cost
+   * Labour array index 8: 'ROUND WINDOWS'
    */
   async calculateRoundWindows(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('round window')
-    );
+    const labourItem = takeoff.labour?.[8]; // Index 8: ROUND WINDOWS
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'ROUND TOP WINDOWS', quantity: 0, amount: 0 };
     }
 
@@ -492,13 +494,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate open to above windows cost
+   * Labour array index 9: 'OPEN TO ABOVE WIND'
    */
   async calculateOpenAboveWindows(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('open above')
-    );
+    const labourItem = takeoff.labour?.[9]; // Index 9: OPEN TO ABOVE WIND
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'OPEN TO ABOVE WIN', quantity: 0, amount: 0 };
     }
 
@@ -567,13 +568,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate attic hatch cost
+   * Labour array index 11: 'ATTIC HATCH'
    */
   async calculateAtticHatch(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('attic')
-    );
+    const labourItem = takeoff.labour?.[11]; // Index 11: ATTIC HATCH
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'ATTIC HATCH', quantity: 0, amount: 0 };
     }
 
@@ -602,13 +602,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate capping cost
+   * Labour array index 12: 'CAPPING'
    */
   async calculateCapping(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('capping')
-    );
+    const labourItem = takeoff.labour?.[12]; // Index 12: CAPPING
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'CAPPING #1 SIZES', quantity: 0, amount: 0 };
     }
 
@@ -697,13 +696,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate wire shelving cost
+   * Labour array index 13: 'SHELVING'
    */
   async calculateShelving(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('shelving')
-    );
+    const labourItem = takeoff.labour?.[13]; // Index 13: SHELVING
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'WIRE SHELVING', quantity: 0, amount: 0 };
     }
 
@@ -731,14 +729,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate straight stairs cost
+   * Labour array index 14: 'STARIS (STRAIGHT)' - Note: typo in form
    */
   async calculateStraightStairs(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('straight') &&
-      l.item?.toLowerCase().includes('stair')
-    );
+    const labourItem = takeoff.labour?.[14]; // Index 14: STARIS (STRAIGHT)
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'STAIRS (STRAIGHT)', quantity: 0, amount: 0 };
     }
 
@@ -766,15 +762,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate circular/winder stairs cost
+   * Labour array index 15: 'STAIRS (CIRC/WIND)'
    */
   async calculateCircularStairs(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      (l.item?.toLowerCase().includes('circular') ||
-       l.item?.toLowerCase().includes('winder')) &&
-      l.item?.toLowerCase().includes('stair')
-    );
+    const labourItem = takeoff.labour?.[15]; // Index 15: STAIRS (CIRC/WIND)
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'STAIRS (CIRC.-WIND.)', quantity: 0, amount: 0 };
     }
 
@@ -802,19 +795,17 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate half flight stairs cost
+   * Labour array index 16: 'STAIRS (1/2 FLIGHT)'
    */
   async calculateHalfFlightStairs(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('half flight')
-    );
+    const labourItem = takeoff.labour?.[16]; // Index 16: STAIRS (1/2 FLIGHT)
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'STAIRS (½ FLIGHT)', quantity: 0, amount: 0 };
     }
 
     const qty = parseInt(labourItem.qty) || 0;
-    // Only charge if quantity is 2 or more
-    if (qty < 2) {
+    if (qty === 0) {
       return { description: 'STAIRS (½ FLIGHT)', quantity: 0, amount: 0 };
     }
 
@@ -837,14 +828,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate door closer (hardware) cost
+   * Hardware array index 11: 'S/Closer'
    */
   async calculateDoorCloser(takeoff) {
-    const hardwareItem = takeoff.hardware?.find(h =>
-      h.type?.toLowerCase().includes('closer') ||
-      h.type?.toLowerCase().includes('s/closer')
-    );
+    const hardwareItem = takeoff.hardware?.[11]; // Index 11: S/Closer
 
-    if (!hardwareItem) {
+    if (!hardwareItem || !hardwareItem.qty) {
       return { description: 'DOOR CLOSER', quantity: 0, amount: 0 };
     }
 
@@ -872,18 +861,16 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate exterior lock cost
+   * Labour array index 23: 'EXTERIOR LOCKS'
    */
   async calculateExteriorLock(takeoff) {
-    const hardwareItem = takeoff.hardware?.find(h =>
-      h.type?.toLowerCase().includes('exterior') &&
-      h.type?.toLowerCase().includes('lock')
-    );
+    const labourItem = takeoff.labour?.[23]; // Index 23: EXTERIOR LOCKS
 
-    if (!hardwareItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'EXTERIOR LOCK', quantity: 0, amount: 0 };
     }
 
-    const qty = parseInt(hardwareItem.qty) || 0;
+    const qty = parseInt(labourItem.qty) || 0;
     if (qty === 0) {
       return { description: 'EXTERIOR LOCK', quantity: 0, amount: 0 };
     }
@@ -907,17 +894,16 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate handrail cost
+   * Trim array index 3: 'Handrail'
    */
   async calculateHandrail(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('handrail')
-    );
+    const trimItem = takeoff.trim?.[3]; // Index 3: Handrail
 
-    if (!labourItem) {
+    if (!trimItem || !trimItem.qty || trimItem.qty.trim() === '') {
       return { description: 'HANDRAIL', quantity: 0, amount: 0 };
     }
 
-    const qty = parseInt(labourItem.qty) || 0;
+    const qty = parseInt(trimItem.qty) || 0;
     if (qty === 0) {
       return { description: 'HANDRAIL', quantity: 0, amount: 0 };
     }
@@ -941,18 +927,16 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate 1/4 round cost
+   * Trim array index 9: '1/4 Round'
    */
   async calculateQuarterRound(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('1/4') ||
-      l.item?.toLowerCase().includes('quarter')
-    );
+    const trimItem = takeoff.trim?.[9]; // Index 9: 1/4 Round
 
-    if (!labourItem) {
+    if (!trimItem || !trimItem.qty || trimItem.qty.trim() === '') {
       return { description: '1/4 ROUND', quantity: 0, amount: 0 };
     }
 
-    const qty = parseInt(labourItem.qty) || 0;
+    const qty = parseInt(trimItem.qty) || 0;
     if (qty === 0) {
       return { description: '1/4 ROUND', quantity: 0, amount: 0 };
     }
@@ -976,13 +960,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate window seat cost
+   * Labour array index 22: 'WINDOW SEAT'
    */
   async calculateWindowSeat(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('window seat')
-    );
+    const labourItem = takeoff.labour?.[22]; // Index 22: WINDOW SEAT
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'WINDOW SEAT', quantity: 0, amount: 0 };
     }
 
@@ -1011,13 +994,12 @@ class InvoiceCalculatorService {
 
   /**
    * Calculate wet areas cost
+   * Labour array index 26: 'WET AREA'
    */
   async calculateWetAreas(takeoff) {
-    const labourItem = takeoff.labour?.find(l =>
-      l.item?.toLowerCase().includes('wet area')
-    );
+    const labourItem = takeoff.labour?.[26]; // Index 26: WET AREA
 
-    if (!labourItem) {
+    if (!labourItem || !labourItem.qty) {
       return { description: 'WET AREAS', quantity: 0, amount: 0 };
     }
 
@@ -1040,6 +1022,66 @@ class InvoiceCalculatorService {
       unit: 'ea',
       unitPrice: pricing.installCost,
       amount: this.roundToTwoDecimals(amount)
+    };
+  }
+
+  /**
+   * Calculate taller doors over 85"
+   * Counts all single and double doors with height >= 85"
+   */
+  async calculateTallerDoorsOver85(takeoff) {
+    let totalQty = 0;
+    let totalAmount = 0;
+
+    // Get pricing for taller doors over 85"
+    const pricing = await InstallCost.findOne({
+      item: 'tallerDoor',
+      increaseCost: 17.53,
+      isActive: true
+    });
+
+    if (!pricing) {
+      return { description: 'TALLER DOORS OVER 85', quantity: 0, amount: 0 };
+    }
+
+    // Count single doors with height >= 85"
+    if (takeoff.singleDoors && takeoff.singleDoors.length > 0) {
+      for (const door of takeoff.singleDoors) {
+        const left = parseInt(door.left) || 0;
+        const right = parseInt(door.right) || 0;
+        const qty = left + right;
+
+        if (qty > 0) {
+          const height = this.parseHeight(door.size);
+          if (height >= 85) {
+            totalQty += qty;
+            totalAmount += qty * pricing.increaseCost;
+          }
+        }
+      }
+    }
+
+    // Count double doors with height >= 85"
+    if (takeoff.doubleDoors && takeoff.doubleDoors.length > 0) {
+      for (const door of takeoff.doubleDoors) {
+        const qty = parseInt(door.qty) || 0;
+
+        if (qty > 0) {
+          const height = this.parseHeight(door.height);
+          if (height >= 85) {
+            totalQty += qty;
+            totalAmount += qty * pricing.increaseCost;
+          }
+        }
+      }
+    }
+
+    return {
+      description: 'TALLER DOORS OVER 85',
+      quantity: totalQty,
+      unit: 'ea',
+      unitPrice: pricing.increaseCost,
+      amount: this.roundToTwoDecimals(totalAmount)
     };
   }
 

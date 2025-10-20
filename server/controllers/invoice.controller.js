@@ -512,6 +512,7 @@ async function getInvoiceHistory(req, res, next) {
         takeoffId: t.takeoffId?._id || t.takeoffId,
         takeoffNumber: t.takeoffNumber,
         customerName: t.customerName,
+        lot: t.lot || t.takeoffId?.lot,
         role: t.role
       })),
       totalAmount: invoice.totalAmount,

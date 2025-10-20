@@ -1273,6 +1273,7 @@ async function removeTrimCarpenter(user, idTakeoff, companyFilter = {}) {
  */
 async function getTakeoffsForInvoice(user, companyFilter = {}) {
   const invoiceCalculator = require('../services/invoice-calculator.service');
+  const Invoice = require('../models/invoice.model');
 
   let baseQuery;
 
@@ -1283,18 +1284,30 @@ async function getTakeoffsForInvoice(user, companyFilter = {}) {
       ...companyFilter
     };
   } else {
-    // For carpenters, only show their takeoffs with status >= 3
+    // For carpenters, only show takeoffs where they are trimCarpentry with status >= 3
     baseQuery = {
       status: { $gte: 3 },
-      $or: [{ user: user._id }, { carpentry: user._id }, { trimCarpentry: user._id }],
+      trimCarpentry: user._id, // Only show takeoffs where user is trim carpenter
       ...companyFilter
     };
+  }
+
+  // Get all takeoff IDs that are already in invoices
+  const invoicesWithTakeoffs = await Invoice.find(companyFilter).select('takeoffs.takeoffId');
+  const invoicedTakeoffIds = invoicesWithTakeoffs.flatMap(invoice =>
+    invoice.takeoffs.map(t => t.takeoffId.toString())
+  );
+
+  // Exclude takeoffs that are already in invoices
+  if (invoicedTakeoffIds.length > 0) {
+    baseQuery._id = { $nin: invoicedTakeoffIds };
   }
 
   const takeoffs = await Takeoff.find(baseQuery)
     .populate('carpentry', 'fullname email')
     .populate('trimCarpentry', 'fullname email')
     .populate('user', 'fullname email')
+    .select('+updatedAt') // Explicitly select updatedAt field
     .sort({ updatedAt: -1 });
 
   // Format response to match frontend expectations and calculate totalValue

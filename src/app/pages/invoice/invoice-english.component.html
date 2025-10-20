@@ -120,29 +120,46 @@
             <table class="table align-items-center table-flush table-hover">
               <thead class="thead-light">
                 <tr>
-                  <th scope="col">
+                  <th scope="col" style="width: 50px;">
                     <div class="custom-control custom-checkbox">
                       <input
                         type="checkbox"
                         class="custom-control-input"
                         id="selectAll"
                         [(ngModel)]="selectAll"
-                        (change)="onSelectAll()">
+                        (change)="onSelectAll()"
+                        title="Select all takeoffs">
                       <label class="custom-control-label" for="selectAll"></label>
                     </div>
                   </th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Takeoff</th>
-                  <th scope="col">Role</th>
-                  <th scope="col">Value</th>
-                  <th scope="col">Completion Date</th>
-                  <th scope="col">Status</th>
-                  <th scope="col"></th>
+                  <th scope="col" style="min-width: 200px;">
+                    <i class="fas fa-user mr-1"></i>Customer
+                  </th>
+                  <th scope="col" style="min-width: 120px;">
+                    <i class="fas fa-hashtag mr-1"></i>Lot
+                  </th>
+                  <th scope="col" style="min-width: 100px;">
+                    <i class="fas fa-tag mr-1"></i>Role
+                  </th>
+                  <th scope="col" class="text-right" style="min-width: 120px;">
+                    <i class="fas fa-dollar-sign mr-1"></i>Value
+                  </th>
+                  <th scope="col" style="min-width: 140px;">
+                    <i class="fas fa-calendar-check mr-1"></i>Completion Date
+                  </th>
+                  <th scope="col" style="min-width: 120px;">
+                    <i class="fas fa-check-circle mr-1"></i>Status
+                  </th>
+                  <th scope="col" class="text-center" style="width: 80px;">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr *ngFor="let takeoff of availableTakeoffs; trackBy: trackByTakeoffId"
-                    [class.table-active]="takeoff.selected">
+                    [class.table-active]="takeoff.selected"
+                    [class.table-success]="takeoff.selected"
+                    style="transition: all 0.2s ease;">
                   <td>
                     <div class="custom-control custom-checkbox">
                       <input
@@ -150,66 +167,65 @@
                         class="custom-control-input"
                         [id]="'takeoff_' + takeoff._id"
                         [(ngModel)]="takeoff.selected"
-                        (change)="onTakeoffSelection(takeoff)">
+                        (change)="onTakeoffSelection(takeoff)"
+                        [title]="'Select takeoff ' + takeoff.takeoffNumber">
                       <label class="custom-control-label" [for]="'takeoff_' + takeoff._id"></label>
                     </div>
                   </td>
-                  <th scope="row">
-                    <div class="media align-items-center">
-                      <div class="media-body">
-                        <span class="mb-0 text-sm text-primary font-weight-bold">{{ takeoff.customer.name }}</span>
-                        <br>
-                        <small class="text-muted" *ngIf="takeoff.customer.email">
-                          {{ takeoff.customer.email }}
-                        </small>
-                      </div>
-                    </div>
-                  </th>
                   <td>
-                    <span class="badge badge-dot mr-4">
-                      <i class="bg-primary"></i>
-                      {{ takeoff.takeoffNumber }}
+                    <div>
+                      <span class="mb-0 text-sm font-weight-bold d-block">
+                        {{ takeoff.customer.name }}
+                      </span>
+                      <small class="text-muted d-block" *ngIf="takeoff.customer.email">
+                        <i class="fas fa-envelope mr-1"></i>{{ takeoff.customer.email }}
+                      </small>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge badge-lg badge-primary px-3 py-2">
+                      <i class="fas fa-map-marker-alt mr-1"></i>
+                      {{ takeoff.lot || 'N/A' }}
                     </span>
                   </td>
                   <td>
-                    <span class="badge badge-pill"
+                    <span class="badge badge-pill badge-lg px-3 py-2"
                           [class.badge-info]="takeoff.role === 'measure'"
                           [class.badge-warning]="takeoff.role === 'trim'">
+                      <i class="fas fa-wrench mr-1" *ngIf="takeoff.role === 'trim'"></i>
+                      <i class="fas fa-ruler-combined mr-1" *ngIf="takeoff.role === 'measure'"></i>
                       {{ takeoff.role | titlecase }}
                     </span>
                   </td>
-                  <td>
-                    <span class="text-success font-weight-bold">
-                      {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
-                    </span>
+                  <td class="text-right">
+                    <div class="d-flex align-items-center justify-content-end">
+                      <i class="fas fa-dollar-sign text-success mr-1"></i>
+                      <span class="text-success font-weight-bold h5 mb-0">
+                        {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
+                      </span>
+                    </div>
                   </td>
                   <td>
-                    <span class="text-sm">
-                      {{ takeoff.completedDate | date:'MM/dd/yyyy' }}
-                    </span>
+                    <div class="d-flex align-items-center">
+                      <i class="far fa-calendar text-muted mr-2"></i>
+                      <span class="text-sm">
+                        {{ takeoff.completedDate | date:'MMM dd, yyyy' }}
+                      </span>
+                    </div>
                   </td>
                   <td>
-                    <span class="badge badge-dot mr-4">
-                      <i class="bg-success"></i>
+                    <span class="badge badge-success badge-lg px-3 py-2">
+                      <i class="fas fa-check mr-1"></i>
                       Completed
                     </span>
                   </td>
-                  <td class="text-right">
-                    <div ngbDropdown placement="bottom-right" class="dropdown-hover-fix d-inline-block">
-                      <a
-                        class="btn btn-sm btn-icon-only text-dark"
-                        ngbDropdownToggle>
-                        <i class="fas fa-ellipsis-v"></i>
-                      </a>
-                      <div ngbDropdownMenu class="dropdown-menu-right dropdown-menu-arrow">
-                        <a class="dropdown-item" (click)="openCalculationModal(takeoff)">
-                          <i class="fas fa-calculator mr-2"></i>Calculate Invoice
-                        </a>
-                        <a class="dropdown-item" (click)="downloadInvoicePDF(takeoff)">
-                          <i class="fas fa-file-pdf mr-2"></i>Download PDF
-                        </a>
-                      </div>
-                    </div>
+                  <td class="text-center">
+                    <button
+                      class="btn btn-sm btn-primary"
+                      (click)="openCalculationModal(takeoff)"
+                      title="Calculate invoice for this takeoff">
+                      <i class="fas fa-calculator"></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -217,60 +233,96 @@
           </div>
 
           <!-- Mobile cards view for takeoffs -->
-          <div *ngIf="!isLoadingTakeoffs && availableTakeoffs.length > 0" class="d-block d-lg-none">
+          <div *ngIf="!isLoadingTakeoffs && availableTakeoffs.length > 0" class="d-block d-lg-none px-3">
             <div class="row">
               <div class="col-12" *ngFor="let takeoff of availableTakeoffs; trackBy: trackByTakeoffId">
-                <div class="card mb-3 shadow-sm" [class.border-primary]="takeoff.selected">
+                <div class="card mb-3 shadow-sm"
+                     [class.border-primary]="takeoff.selected"
+                     [class.bg-light]="takeoff.selected"
+                     style="transition: all 0.2s ease; border-width: 2px;">
                   <div class="card-body p-3">
-                    <div class="row align-items-center">
-                      <div class="col-2">
-                        <div class="custom-control custom-checkbox">
+                    <!-- Header with checkbox and takeoff number -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                      <div class="d-flex align-items-center">
+                        <div class="custom-control custom-checkbox mr-3">
                           <input
                             type="checkbox"
                             class="custom-control-input"
                             [id]="'mobile_takeoff_' + takeoff._id"
                             [(ngModel)]="takeoff.selected"
-                            (change)="onTakeoffSelection(takeoff)">
+                            (change)="onTakeoffSelection(takeoff)"
+                            [title]="'Select takeoff ' + takeoff.takeoffNumber">
                           <label class="custom-control-label" [for]="'mobile_takeoff_' + takeoff._id"></label>
                         </div>
-                      </div>
-                      <div class="col-8">
-                        <h6 class="mb-1">
-                          <span class="text-primary">
-                            {{ takeoff.takeoffNumber }}
+                        <div>
+                          <span class="badge badge-primary badge-lg px-3 py-2">
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            {{ takeoff.lot || 'N/A' }}
                           </span>
-                          <span class="badge badge-sm ml-2"
-                                [class.badge-info]="takeoff.role === 'measure'"
-                                [class.badge-warning]="takeoff.role === 'trim'">
-                            {{ takeoff.role }}
-                          </span>
-                        </h6>
-                        <p class="text-sm text-muted mb-1">
-                          <strong>Customer:</strong> {{ takeoff.customer.name }}
-                        </p>
-                        <p class="text-sm text-muted mb-1">
-                          <strong>Value:</strong> {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
-                        </p>
-                        <p class="text-sm text-muted mb-0">
-                          <strong>Completed:</strong> {{ takeoff.completedDate | date:'MM/dd/yyyy' }}
-                        </p>
-                      </div>
-                      <div class="col-2 text-right">
-                        <div ngbDropdown placement="bottom-left" (click)="$event.stopPropagation()">
-                          <button
-                            class="btn btn-sm btn-outline-secondary btn-block"
-                            ngbDropdownToggle>
-                            <i class="fas fa-ellipsis-v"></i>
-                          </button>
-                          <div ngbDropdownMenu class="dropdown-menu-arrow">
-                            <a class="dropdown-item" (click)="openCalculationModal(takeoff)">
-                              <i class="fas fa-calculator mr-2"></i>Calculate
-                            </a>
-                            <a class="dropdown-item" (click)="downloadInvoicePDF(takeoff)">
-                              <i class="fas fa-file-pdf mr-2"></i>PDF
-                            </a>
-                          </div>
                         </div>
+                      </div>
+                      <button
+                        class="btn btn-sm btn-primary"
+                        (click)="openCalculationModal(takeoff)"
+                        title="Calculate invoice">
+                        <i class="fas fa-calculator"></i>
+                      </button>
+                    </div>
+
+                    <!-- Customer info with avatar -->
+                    <div class="d-flex align-items-center mb-3">
+                      <div class="avatar rounded-circle bg-gradient-primary text-white mr-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                        <span class="font-weight-bold">{{ takeoff.customer.name?.charAt(0) || 'C' }}</span>
+                      </div>
+                      <div class="flex-fill">
+                        <div class="font-weight-bold text-sm mb-1">
+                          <i class="fas fa-user mr-1 text-muted"></i>
+                          {{ takeoff.customer.name }}
+                        </div>
+                        <div class="text-xs text-muted" *ngIf="takeoff.customer.email">
+                          <i class="fas fa-envelope mr-1"></i>
+                          {{ takeoff.customer.email }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Info grid -->
+                    <div class="row">
+                      <div class="col-6 mb-2">
+                        <div class="text-xs text-muted mb-1">
+                          <i class="fas fa-tag mr-1"></i>Role
+                        </div>
+                        <span class="badge badge-pill"
+                              [class.badge-info]="takeoff.role === 'measure'"
+                              [class.badge-warning]="takeoff.role === 'trim'">
+                          <i class="fas fa-wrench mr-1" *ngIf="takeoff.role === 'trim'"></i>
+                          <i class="fas fa-ruler-combined mr-1" *ngIf="takeoff.role === 'measure'"></i>
+                          {{ takeoff.role | titlecase }}
+                        </span>
+                      </div>
+                      <div class="col-6 mb-2">
+                        <div class="text-xs text-muted mb-1">
+                          <i class="fas fa-dollar-sign mr-1"></i>Value
+                        </div>
+                        <div class="text-success font-weight-bold h6 mb-0">
+                          {{ takeoff.totalValue | currency:'USD':'symbol':'1.2-2' }}
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="text-xs text-muted mb-1">
+                          <i class="far fa-calendar mr-1"></i>Completed
+                        </div>
+                        <div class="text-sm">
+                          {{ takeoff.completedDate | date:'MMM dd, yyyy' }}
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="text-xs text-muted mb-1">
+                          <i class="fas fa-check-circle mr-1"></i>Status
+                        </div>
+                        <span class="badge badge-success">
+                          <i class="fas fa-check mr-1"></i>Completed
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -292,7 +344,7 @@
         <!-- History Tab Content -->
         <div *ngIf="activeTab === 'history'">
           <div class="card-header border-0 pb-0">
-            <div class="row align-items-center">
+            <div class="row align-items-center mb-3">
               <div class="col">
                 <h4 class="mb-0">Invoice History</h4>
                 <p class="text-muted mb-0">View your generated invoices and re-issue if needed</p>
@@ -301,6 +353,31 @@
                 <button class="btn btn-sm btn-outline-primary" (click)="loadInvoiceHistory()">
                   <i class="fas fa-sync-alt"></i> Refresh
                 </button>
+              </div>
+            </div>
+            <!-- Filter by Lot -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group mb-0">
+                  <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text">
+                        <i class="fas fa-filter"></i>
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Filter by Lot number..."
+                      [(ngModel)]="lotFilter"
+                      (ngModelChange)="onLotFilterChange()">
+                    <div class="input-group-append" *ngIf="lotFilter">
+                      <button class="btn btn-outline-secondary" type="button" (click)="clearLotFilter()">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -314,64 +391,129 @@
           </div>
 
           <!-- Invoice History Cards -->
-          <div *ngIf="!isLoadingHistory && invoiceHistory.length > 0" class="px-4 pb-4">
+          <div *ngIf="!isLoadingHistory && filteredInvoiceHistory.length > 0" class="px-4 pb-4">
             <div class="row">
-              <div class="col-md-6 col-lg-4 mb-4" *ngFor="let invoiceGroup of invoiceHistory">
-                <div class="card shadow-sm h-100">
-                  <div class="card-header d-flex justify-content-between align-items-center">
-                    <div>
-                      <h5 class="mb-0">{{ invoiceGroup.invoiceNumber }}</h5>
-                      <small class="text-muted">{{ invoiceGroup.createdAt | date:'MMM dd, yyyy' }}</small>
+              <div class="col-md-6 col-xl-4 mb-4" *ngFor="let invoiceGroup of filteredInvoiceHistory">
+                <div class="card shadow-sm h-100 border-0"
+                     style="transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 0.5rem 1.5rem rgba(0,0,0,0.15)';"
+                     onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 0.125rem 0.25rem rgba(0,0,0,0.075)';">
+
+                  <!-- Card Header -->
+                  <div class="card-header bg-gradient-primary text-white border-0 d-flex justify-content-between align-items-center py-3">
+                    <div class="flex-fill">
+                      <h5 class="mb-1 font-weight-bold">
+                        <i class="fas fa-file-invoice mr-2"></i>
+                        {{ invoiceGroup.invoiceNumber }}
+                      </h5>
+                      <small class="opacity-8">
+                        <i class="far fa-calendar-alt mr-1"></i>
+                        {{ invoiceGroup.createdAt | date:'MMM dd, yyyy' }}
+                      </small>
                     </div>
-                    <span class="badge badge-lg" [ngClass]="getStatusBadgeClass(invoiceGroup.status)">
+                    <span class="badge badge-lg px-3 py-2"
+                          [class.badge-light]="invoiceGroup.status === 'draft'"
+                          [class.badge-success]="invoiceGroup.status === 'issued'"
+                          style="font-size: 0.875rem;">
+                      <i class="fas fa-check-circle mr-1" *ngIf="invoiceGroup.status === 'issued'"></i>
+                      <i class="fas fa-edit mr-1" *ngIf="invoiceGroup.status === 'draft'"></i>
                       {{ getStatusLabel(invoiceGroup.status) }}
                     </span>
                   </div>
+
+                  <!-- Card Body -->
                   <div class="card-body">
+                    <!-- Summary Stats -->
                     <div class="row mb-3">
                       <div class="col-6">
-                        <small class="text-muted">Takeoffs:</small>
-                        <p class="font-weight-bold mb-0">{{ invoiceGroup.takeoffs.length }}</p>
+                        <div class="d-flex align-items-center">
+                          <div class="icon icon-shape bg-gradient-info text-white rounded-circle shadow mr-3"
+                               style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-clipboard-list"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                              Takeoffs
+                            </small>
+                            <h4 class="font-weight-bold mb-0">{{ invoiceGroup.takeoffs.length }}</h4>
+                          </div>
+                        </div>
                       </div>
                       <div class="col-6">
-                        <small class="text-muted">Total Value:</small>
-                        <p class="font-weight-bold text-success mb-0">
-                          {{ invoiceGroup.totalAmount | currency:'USD':'symbol':'1.2-2' }}
-                        </p>
+                        <div class="d-flex align-items-center">
+                          <div class="icon icon-shape bg-gradient-success text-white rounded-circle shadow mr-3"
+                               style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-dollar-sign"></i>
+                          </div>
+                          <div>
+                            <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                              Total
+                            </small>
+                            <h4 class="font-weight-bold text-success mb-0">
+                              {{ invoiceGroup.totalAmount | currency:'USD':'symbol':'1.0-0' }}
+                            </h4>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
+                    <hr class="my-3">
+
                     <!-- Takeoffs List -->
                     <div class="mb-3">
-                      <small class="text-muted">Included Takeoffs:</small>
-                      <div class="mt-2">
-                        <span class="badge badge-outline-primary mr-1 mb-1"
-                              *ngFor="let takeoff of invoiceGroup.takeoffs">
-                          {{ takeoff.takeoffNumber }}
-                          <small class="ml-1">({{ takeoff.role }})</small>
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-list-ul text-primary mr-2"></i>
+                        <small class="text-muted font-weight-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                          Included Lots
+                        </small>
+                      </div>
+                      <div class="d-flex flex-wrap">
+                        <span class="badge badge-primary badge-pill mr-2 mb-2 px-3 py-2"
+                              *ngFor="let takeoff of invoiceGroup.takeoffs"
+                              style="font-size: 0.8rem;">
+                          <i class="fas fa-map-marker-alt mr-1"></i>
+                          {{ takeoff.lot || 'N/A' }}
+                          <span class="badge badge-light ml-2" style="font-size: 0.7rem;">
+                            {{ takeoff.role === 'measure' ? 'M' : 'T' }}
+                          </span>
                         </span>
                       </div>
                     </div>
 
                     <!-- Customer List -->
                     <div>
-                      <small class="text-muted">Customers:</small>
-                      <div class="mt-1">
-                        <small class="d-block" *ngFor="let customer of getUniqueCustomers(invoiceGroup.takeoffs)">
-                          {{ customer }}
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-users text-primary mr-2"></i>
+                        <small class="text-muted font-weight-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                          Customers
                         </small>
+                      </div>
+                      <div>
+                        <div class="d-flex align-items-center mb-1"
+                             *ngFor="let customer of getUniqueCustomers(invoiceGroup.takeoffs)">
+                          <i class="fas fa-user text-muted mr-2" style="font-size: 0.75rem;"></i>
+                          <small class="text-dark">{{ customer }}</small>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="card-footer d-flex justify-content-between align-items-center">
-                    <small class="text-muted">
-                      Issued: {{ invoiceGroup.generatedDate | date:'MMM dd, yyyy' }}
-                    </small>
-                    <div>
-                      <button class="btn btn-sm btn-success" (click)="downloadInvoiceFromHistory(invoiceGroup)">
-                        <i class="fas fa-download mr-1"></i> Download
-                      </button>
+
+                  <!-- Card Footer -->
+                  <div class="card-footer bg-light border-0 d-flex justify-content-between align-items-center py-3">
+                    <div class="text-muted">
+                      <i class="fas fa-paper-plane mr-1"></i>
+                      <small style="font-size: 0.8rem;">
+                        Issued: {{ invoiceGroup.generatedDate | date:'MMM dd, yyyy' }}
+                      </small>
                     </div>
+                    <button class="btn btn-success btn-sm shadow-sm"
+                            (click)="downloadInvoiceFromHistory(invoiceGroup)"
+                            style="transition: all 0.2s ease;"
+                            onmouseover="this.style.transform='scale(1.05)'"
+                            onmouseout="this.style.transform='scale(1)'">
+                      <i class="fas fa-download mr-2"></i>
+                      Download PDF
+                    </button>
                   </div>
                 </div>
               </div>
@@ -379,6 +521,18 @@
           </div>
 
           <!-- Empty state for history -->
+          <div *ngIf="!isLoadingHistory && filteredInvoiceHistory.length === 0 && invoiceHistory.length > 0" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-search fa-4x text-muted"></i>
+            </div>
+            <h4 class="text-muted">No invoices found</h4>
+            <p class="text-muted mb-4">No invoices match the lot filter "{{ lotFilter }}"</p>
+            <button class="btn btn-outline-primary" (click)="clearLotFilter()">
+              <i class="fas fa-times mr-2"></i>Clear Filter
+            </button>
+          </div>
+
+          <!-- Empty state - no invoices at all -->
           <div *ngIf="!isLoadingHistory && invoiceHistory.length === 0" class="text-center py-5">
             <div class="mb-4">
               <i class="fas fa-receipt fa-4x text-muted"></i>
