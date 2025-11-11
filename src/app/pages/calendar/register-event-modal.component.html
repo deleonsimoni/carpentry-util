@@ -1,0 +1,58 @@
+<div class="modal-header">
+  <h5 class="modal-title">Register New Event</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('cancel')"></button>
+</div>
+
+<div class="modal-body">
+  <form>
+    <div class="mb-3">
+      <label for="takeoff" class="form-label">Select Takeoff</label>
+      <select
+        id="takeoff"
+        class="form-select"
+        [(ngModel)]="eventData.takeoff"
+        name="takeoff"
+      >
+        <option *ngFor="let takeoff of takeoffs" [value]="takeoff.id">
+          {{ takeoff.name }}
+        </option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="status" class="form-label">Status</label>
+      <select
+        id="status"
+        class="form-select"
+        [(ngModel)]="eventData.status"
+        name="status"
+      >
+        <option value="scheduled">Scheduled</option>
+        <option value="in-progress">In Progress</option>
+        <option value="completed">Completed</option>
+        <option value="delayed">Delayed</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="notes" class="form-label">Notes</label>
+      <textarea
+        id="notes"
+        class="form-control"
+        rows="3"
+        [(ngModel)]="eventData.notes"
+        name="notes"
+        placeholder="Enter any additional information..."
+      ></textarea>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss('cancel')">
+    Cancel
+  </button>
+  <button type="button" class="btn btn-primary" (click)="save()">
+    Save Event
+  </button>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,8 @@ import { take } from 'rxjs/operators';
 import { AuthService } from '@app/shared/services';
 import { UserService, UserProfile } from '../../shared/services/user.service';
 import { UserRoles } from '../../shared/constants/user-roles.constants';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { RegisterEventModalComponent } from './register-event-modal.component';
 
 interface CalendarEvent {
   id: string;
@@ -49,8 +51,11 @@ export class CalendarComponent implements OnInit {
   teamMembers: TeamMember[] = [];
   teamLoading = false;
 
+
   weekDays: WeekDay[] = [];
   monthMatrix: WeekDay[][] = [];
+  newEvent: any = {};
+  takeoffs = ['Morning', 'Afternoon', 'Evening']; // exemplo
 
   events: CalendarEvent[] = [
     {
@@ -129,8 +134,9 @@ export class CalendarComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private router: Router
-  ) {}
+    private router: Router,
+    public modalService: NgbModal
+  ) { }
 
   ngOnInit(): void {
     this.authService
@@ -161,6 +167,28 @@ export class CalendarComponent implements OnInit {
         this.loadTeamMembers();
       });
   }
+
+  openRegisterDialog(date: Date) {
+    const modalRef = this.modalService.open(RegisterEventModalComponent, {
+      centered: true,
+      backdrop: 'static'
+    });
+    modalRef.componentInstance.date = date;
+
+    modalRef.result.then(
+      result => {
+        if (result) {
+          console.log('Evento salvo:', result);
+          this.events.push(result);
+          // aqui você pode atualizar o calendário
+        }
+      },
+      () => {
+        // Modal fechado sem salvar
+      }
+    );
+  }
+
 
   private loadTeamMembers(): void {
     this.teamLoading = true;
@@ -291,7 +319,7 @@ export class CalendarComponent implements OnInit {
     const startOfWeek = this.getStartOfWeek(this.referenceDate);
     this.weekDays = Array.from({ length: 7 }).map((_, index) => {
       const date = this.addDays(startOfWeek, index);
-      const formatter = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' });
+      const formatter = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: 'short' });
       return {
         label: this.getWeekdayLabel(date),
         date,
@@ -334,7 +362,7 @@ export class CalendarComponent implements OnInit {
   }
 
   private getWeekdayLabel(date: Date): string {
-    return new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(date);
   }
 
   private addDays(date: Date, days: number): Date {

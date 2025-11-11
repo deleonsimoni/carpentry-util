@@ -29,6 +29,6 @@ export class LandingComponent {
   }
 
   navigateToHero(): void {
-    this.router.navigate(['/hero']);
+    this.router.navigate(['/show-case']);
   }
 }

@@ -30,7 +30,7 @@ export class AuthLayoutComponent implements OnInit, OnDestroy {
   }
 
   navigateToHero(): void {
-    this.router.navigate(['/hero']);
+    this.router.navigate(['/show-case']);
   }
 
   navigateToSubscription(): void {

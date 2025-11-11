@@ -91,7 +91,7 @@ export class SubscriptionComponent {
   }
 
   navigateToLanding(): void {
-    this.router.navigate(['/hero']);
+    this.router.navigate(['/show-case']);
   }
 
   selectPlan(plan: SubscriptionPlan): void {

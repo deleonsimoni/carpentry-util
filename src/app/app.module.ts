@@ -48,6 +48,8 @@ export function appInitializerFactory(authService: AuthService) {
     ReactiveFormsModule,
     MatSnackBarModule,
     NgxSpinnerModule,
+    FormsModule,
+    ReactiveFormsModule,
     ToastrModule.forRoot({
       timeOut: 3000,
       positionClass: 'toast-top-right',

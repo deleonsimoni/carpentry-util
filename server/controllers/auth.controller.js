@@ -14,6 +14,7 @@ function generateToken(user) {
 }
 
 async function updateUser(user, body) {
+  console.log("Updating user:", user._id, "with data:", body);
   delete body.email;
   return await User.findOneAndUpdate(
     {

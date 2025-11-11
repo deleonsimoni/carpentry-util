@@ -20,8 +20,8 @@ export class AuthGuard implements CanActivate {
           return true;
         }
 
-        console.log('❌ AUTH_GUARD - Usuário não autenticado, redirecionando para /hero');
-        this.router.navigateByUrl('/hero');
+        console.log('❌ AUTH_GUARD - Usuário não autenticado, redirecionando para /show-case');
+        this.router.navigateByUrl('/show-case');
         return false;
       })
     );

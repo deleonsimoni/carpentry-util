@@ -8,7 +8,7 @@ module.exports = {
 };
 
 const transporter = nodemailer.createTransport({
-  host: "email-smtp.us-east-1.amazonaws.com", // ajuste para a sua região SES
+  host: "email-smtp.ca-central-1.amazonaws.com", // ajuste para a sua região SES
   port: 465,
   secure: true,
   auth: {
@@ -53,11 +53,10 @@ function uploadImage(key, file) {
   return new Promise((resolve, reject) => {
     s3.putObject(s3Config, (err, resp) => {
       if (err) {
-        console.error('Erro ao enviar arquivo para a AWS S3:', err);
-        return reject({ success: false, data: err });
+        console.log('Erro AWS', err);
+        reject({ success: false, data: err });
       }
-
-      return resolve({ sucess: true, data: resp });
+      resolve({ sucess: true, data: resp });
     });
   });
 }

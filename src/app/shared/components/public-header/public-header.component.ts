@@ -13,7 +13,7 @@ export class PublicHeaderComponent {
   constructor(private router: Router) {}
 
   navigateToLanding(): void {
-    this.router.navigate(['/hero']);
+    this.router.navigate(['/show-case']);
   }
 
   navigateToLogin(): void {

@@ -8,7 +8,17 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
-
+.week-day button.btn-outline-success {
+  border-color: #dc3545;
+  color: #dc3545;
+}
+.week-day button.btn-outline-success:hover {
+  background-color: #dc3545;
+  color: #fff;
+}
+.modal-content.bg-dark {
+  background-color: #1e1e1e;
+}
   .metric-value {
     font-size: 2rem;
     display: block;

@@ -3,7 +3,7 @@ const asyncHandler = require('express-async-handler');
 const passport = require('passport');
 const userCtrl = require('../controllers/user.controller');
 const authCtrl = require('../controllers/auth.controller');
-const awsCtrl = require('../controllers/aws.controller');
+const sendgridCtrl = require('../controllers/sendgrid.controller');
 const User = require('../models/user.model');
 
 const config = require('../config/config');
@@ -59,17 +59,28 @@ async function verifyEmail(req, res) {
 async function register(req, res, next) {
 
   let user = await User.findOne({email: req.body.email.toLowerCase()});
+
+  if(user && user.isVerified === false){
+      let codEmail = generateVerificationCode();
+      user.verificationCode = codEmail;
+      authCtrl.updateUser(user, { verificationCode: codEmail});
+      const emailSent = await sendVerificationEmail(user.email, codEmail); 
+      return res.status(400).json({ message: "We resend a code for your email" });
+  }
+
   if (user) return res.status(400).json({ message: "User already register" });
 
   let codEmail = generateVerificationCode();
+  req.body.verificationCode = codEmail;
+  req.body.isVerified = false;
 
-  user = await userCtrl.insert(req.body, codEmail);
+  user = await userCtrl.insert(req.body);
   user = user.toObject();
   delete user.hashedPassword;
   req.user = user;
 
   // Enviar email de verificação
-  const emailSent = await sendVerificationEmail(user.email, codEmail);
+  const emailSent = await sendVerificationEmail(user.email);
   
   return res.status(201).json({
         success: true,
@@ -77,11 +88,11 @@ async function register(req, res, next) {
       });
 }
 
-async function sendVerificationEmail(email, verificationCode) {
+async function sendVerificationEmail(email, codEmail) {
   
   const subject = "Welcome to CarpentryGo - Confirm your registration";
 
-  const verificationUrl = `https://carpentrygo.com/api/auth/verify-email?token=${verificationCode}&email=${email}`;
+  const verificationUrl = `https://carpentrygo.ca/api/auth/verify-email?token=${codEmail}&email=${email}`;
   
   const html=`
     <h2>Welcome to CarpentryGo 🎉</h2>
@@ -97,7 +108,7 @@ async function sendVerificationEmail(email, verificationCode) {
     <p>If you were not the one who registered, ignore this email.</p>
   `;
 
-  await awsCtrl.enviarEmail(email, subject, html);
+  await sendgridCtrl.enviarEmail(email, subject, html);
 
 }
 

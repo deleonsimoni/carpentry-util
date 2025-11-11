@@ -26,7 +26,7 @@ export const ROUTES: RouteInfo[] = [
   },
   {
     path: '/calendar',
-    title: 'Agenda',
+    title: 'Schedules',
     icon: 'ni-calendar-grid-58 text-info',
     class: '',
     managementOnly: true,
@@ -40,13 +40,13 @@ export const ROUTES: RouteInfo[] = [
   },
   {
     path: '/user-management',
-    title: 'Gestão de Usuários',
+    title: 'Users Management',
     icon: 'ni-single-02 text-green',
     class: '',
   },
   {
     path: '/status-management',
-    title: 'Gerenciar Status',
+    title: 'Status Management',
     icon: 'ni-settings text-purple',
     class: '',
     managerOnly: true,

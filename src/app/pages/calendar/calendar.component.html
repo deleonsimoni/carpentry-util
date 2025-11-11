@@ -4,12 +4,12 @@
     <div class="header-body">
       <div class="row align-items-center py-4">
         <div class="col-lg-7 col-7">
-          <h6 class="h2 text-white d-inline-block mb-0">Agenda de Operações</h6>
-          <p class="text-white mt-0 mb-0">Visualize medições, produções e entregas em um só lugar</p>
+          <h6 class="h2 text-white d-inline-block mb-0">Operations Schedule</h6>
+          <p class="text-white mt-0 mb-0">Visualize measurements, production, and deliveries all in one place.</p>
         </div>
         <div class="col-lg-5 col-5 text-right">
           <button class="btn btn-sm btn-neutral mr-2" (click)="resetToToday()">
-            <i class="fas fa-dot-circle mr-1"></i>Hoje
+            <i class="fas fa-dot-circle mr-1"></i>Today
           </button>
           <div class="btn-group btn-group-sm" role="group">
             <button class="btn btn-neutral" (click)="previousPeriod()">
@@ -32,16 +32,16 @@
         <div class="card-header border-0">
           <div class="row align-items-center">
             <div class="col">
-              <h3 class="mb-0">Planejamento da Semana</h3>
-              <small class="text-muted">Referência: {{ referenceDate | date:'MMMM yyyy':undefined:'pt-BR' }}</small>
+              <h3 class="mb-0">Schedules</h3>
+              <small class="text-muted">Reference: {{ referenceDate | date:'MMMM yyyy':undefined:'pt-BR' }}</small>
             </div>
             <div class="col-auto">
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'week'">
-                  <input type="radio" autocomplete="off" (click)="changeView('week')"> Semana
+                  <input type="radio" autocomplete="off" (click)="changeView('week')"> Week
                 </label>
                 <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'month'">
-                  <input type="radio" autocomplete="off" (click)="changeView('month')"> Mês
+                  <input type="radio" autocomplete="off" (click)="changeView('month')"> Month
                 </label>
               </div>
             </div>
@@ -52,30 +52,30 @@
           <div class="row mb-4">
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-info text-white">
-                <span class="metric-label">Utilização da semana</span>
+                <span class="metric-label">Your Week</span>
                 <strong class="metric-value">{{ productivitySnapshot.weekUtilization }}%</strong>
-                <span class="metric-helper">Capacidade ocupada</span>
+                <span class="metric-helper">Occupied capacity</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-warning text-white">
-                <span class="metric-label">Compromissos em atraso</span>
+                <span class="metric-label">Overdue Commitments</span>
                 <strong class="metric-value">{{ productivitySnapshot.delayedAppointments }}</strong>
-                <span class="metric-helper">Reagendar o quanto antes</span>
+                <span class="metric-helper">Reschedule as soon as possible</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-success text-white">
-                <span class="metric-label">Próximo horário livre</span>
+                <span class="metric-label">Next Free Time</span>
                 <strong class="metric-value">{{ productivitySnapshot.nextOpenSlot }}</strong>
-                <span class="metric-helper">Ideal para novos clientes</span>
+                <span class="metric-helper">Ideal for new deals</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-primary text-white">
-                <span class="metric-label">Dia mais cheio</span>
+                <span class="metric-label">Busiest Day</span>
                 <strong class="metric-value">{{ productivitySnapshot.busiestDay }}</strong>
-                <span class="metric-helper">Planeje recursos extras</span>
+                <span class="metric-helper">Plan extra resources</span>
               </div>
             </div>
           </div>
@@ -83,7 +83,7 @@
           <div class="row align-items-center mb-4">
             <div class="col-md-6">
               <div class="form-group mb-0">
-                <label class="form-control-label text-muted">Filtrar por responsável</label>
+                <label class="form-control-label text-muted">Filter by responsible</label>
                 <select class="form-control" [(ngModel)]="teamFilter">
                   <option *ngFor="let member of getUniqueAssignees()" [ngValue]="member">{{ member | titlecase }}</option>
                 </select>
@@ -103,7 +103,7 @@
                 <span class="weekday-label">{{ day.label | uppercase }}</span>
                 <span class="weekday-date">{{ day.display }}</span>
                 <span class="weekday-count" *ngIf="eventsCountForDay(day) > 0">
-                  {{ eventsCountForDay(day) }} compromisso(s)
+                  {{ eventsCountForDay(day) }} commitment(s)
                 </span>
               </div>
 
@@ -128,7 +128,7 @@
                     <i class="fas fa-user mr-1"></i>{{ event.assignedTo }}
                   </div>
                   <button class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-sticky-note mr-1"></i>Resumo
+                    <i class="fas fa-sticky-note mr-1"></i>Resume
                   </button>
                 </div>
                 <p class="text-xs text-muted mt-2 mb-0" *ngIf="event.notes">{{ event.notes }}</p>
@@ -136,14 +136,22 @@
 
               <div class="empty-state" *ngIf="eventsCountForDay(day) === 0">
                 <i class="fas fa-inbox text-muted"></i>
-                <span>Sem compromissos</span>
+                <span>No Commitments</span>
               </div>
+
+              <div class="mb-2 text-center">
+                <button class="btn btn-sm btn-outline-success"
+                        (click)="openRegisterDialog(day.date)">
+                  <i class="fas fa-plus-circle mr-1"></i> Register Event
+                </button>
+              </div>
+
             </div>
           </div>
 
           <div *ngIf="activeView === 'month'" class="month-grid">
             <div class="month-row month-header">
-              <div *ngFor="let label of ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']" class="month-cell header">
+              <div *ngFor="let label of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" class="month-cell header">
                 {{ label }}
               </div>
             </div>
@@ -170,8 +178,8 @@
               <div class="card shadow-sm">
                 <div class="card-header border-0 d-flex justify-content-between align-items-center">
                   <div>
-                    <h5 class="mb-0">Próximos compromissos</h5>
-                    <small class="text-muted">Organize-se antes de sair para o cliente</small>
+                    <h5 class="mb-0">Upcoming appointments</h5>
+                    <small class="text-muted">Get organized before heading out to meet a client</small>
                   </div>
                   <span class="badge badge-primary">{{ getUpcomingEvents().length }}</span>
                 </div>
@@ -193,14 +201,14 @@
                           <span class="badge badge-secondary mb-2">{{ event.assignedTo }}</span>
                           <div>
                             <button class="btn btn-sm btn-outline-secondary">
-                              <i class="fas fa-share mr-1"></i>Compartilhar
+                              <i class="fas fa-share mr-1"></i>Share
                             </button>
                           </div>
                         </div>
                       </div>
                     </li>
                     <li class="list-group-item text-center text-muted" *ngIf="getUpcomingEvents().length === 0">
-                      Nenhum compromisso futuro após o filtro atual.
+                        No future commitments after the current filter.
                     </li>
                   </ul>
                 </div>
@@ -210,13 +218,13 @@
             <div class="col-lg-6 mb-4">
               <div class="card shadow-sm mb-4">
                 <div class="card-header border-0">
-                  <h5 class="mb-0">Disponibilidade da equipe</h5>
-                  <small class="text-muted">Garanta a melhor alocação para cada etapa</small>
+                  <h5 class="mb-0">Team availability</h5>
+                  <small class="text-muted">Ensure the best allocation for each stage.</small>
                 </div>
                 <div class="card-body">
                   <div *ngIf="teamLoading" class="text-center text-muted py-3">
                     <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 mb-0">Carregando equipe...</p>
+                    <p class="mt-2 mb-0">Load Team...</p>
                   </div>
                   <ng-container *ngIf="!teamLoading">
                     <div class="team-availability" *ngIf="teamMembers.length > 0; else emptyTeam">
@@ -237,7 +245,7 @@
                     </div>
                     <ng-template #emptyTeam>
                       <div class="text-center text-muted py-3">
-                        Nenhum membro de equipe encontrado.
+                        No team members found..
                       </div>
                     </ng-template>
                   </ng-container>
@@ -251,3 +259,4 @@
   </div>
 </div>
 </ng-container>
+
