@@ -12,7 +12,12 @@ const localLogin = new LocalStrategy(
     usernameField: 'email',
   },
   async (email, password, done) => {
-    let user = await User.findOne({ email: email, isVerified: true });
+    let user = await User.findOne({ email: email,
+                                    $or: [
+                                      { isVerified: true },
+                                      { temporaryPassword: true }
+                                    ] });
+                                    
     if (!user || !bcrypt.compareSync(password, user.hashedPassword)) {
 
       return done(null, false, {

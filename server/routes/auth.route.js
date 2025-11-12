@@ -80,7 +80,7 @@ async function register(req, res, next) {
   req.user = user;
 
   // Enviar email de verificação
-  const emailSent = await sendVerificationEmail(user.email);
+  const emailSent = await sendVerificationEmail(user.email, codEmail);
   
   return res.status(201).json({
         success: true,

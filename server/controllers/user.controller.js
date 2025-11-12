@@ -3,6 +3,7 @@ const Joi = require('joi');
 const User = require('../models/user.model');
 const UserRoles = require('../constants/user-roles');
 const Company = require('../models/company.model');
+const sendgridCtrl = require('./sendgrid.controller');
 const S3Uploader = require('./aws.controller');
 const { v5: uuidv5 } = require('uuid');
 
@@ -239,11 +240,45 @@ async function createUser(userData, companyFilter = {}, currentUser = null) {
   const userResponse = user.toObject();
   delete userResponse.hashedPassword;
 
+  const emailSent = await sendVerificationEmail( value.email.toLowerCase(), temporaryPassword);
+
   return {
     user: userResponse,
     temporaryPassword: temporaryPassword,
     message: `Usuário criado com sucesso. Senha temporária: ${temporaryPassword}`
   };
+}
+
+async function sendVerificationEmail(email, codEmail) {
+  
+  const subject = "Welcome to CarpentryGo - This is your command to access your account";
+  const loginUrl = `https://carpentrygo.ca/login`;
+
+  const html=`
+    <h2>Welcome to CarpentryGo 🎉</h2>
+    <p>Hello, </p>
+    <p>Your password has been successfully created.</p>
+    <div style="background:#f5f5f5;padding:10px 20px;border-radius:6px;
+                  display:inline-block;font-weight:bold;font-size:1.1rem;
+                  color:#004a80;margin:15px 0;">
+        ${codEmail}
+      </div>
+
+      <p>For security reasons, we recommend changing this password after logging in.</p>
+
+      <a href="${loginUrl}"
+        style="display:inline-block;padding:10px 20px;background:#004a80;
+                color:#fff;text-decoration:none;border-radius:5px;
+                font-weight:bold;margin:15px 0;">
+        Go to Login Page
+      </a>
+
+      <p>If you didn’t request this change, please contact our support team immediately.</p>
+      <p>– The CarpentryGO Team</p>
+  `;
+
+  await sendgridCtrl.enviarEmail(email, subject, html);
+
 }
 
 // Buscar usuário por ID
@@ -364,6 +399,7 @@ async function changePassword(userId, currentPassword, newPassword) {
       hashedPassword: hashedNewPassword,
       requirePasswordChange: false,
       temporaryPassword: false,
+      isVerified:true,
       lastLogin: new Date()
     },
     { new: true }
@@ -396,6 +432,9 @@ async function resetUserPassword(userId) {
     },
     { new: true }
   ).select('-hashedPassword');
+
+    const emailSent = await sendVerificationEmail( user.email, temporaryPassword);
+
 
   return {
     message: 'Password reset successfully. New temporary password generated.',
