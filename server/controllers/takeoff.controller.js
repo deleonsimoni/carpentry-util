@@ -51,7 +51,14 @@ async function getTakeoffs(user, companyFilter = {}) {
   return await Takeoff.find(baseQuery)
     .populate('carpentry', 'fullname email')
     .populate('trimCarpentry', 'fullname email')
-    .populate('user', 'fullname email')
+    .populate({
+        path: 'user',
+        select: 'fullname email company',
+        populate: {
+          path: 'company',
+          select: 'name ' // escolha os campos da company que quiser
+        }
+    })    
     .select('custumerName carpentry trimCarpentry user status shipTo lot')
     .sort({
       createdAt: -1,

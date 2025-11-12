@@ -98,17 +98,66 @@ export class TakeOffComponent implements OnInit {
   jambaOptions = ['475', '675'];
 
   doorsStyleValues = [
-    'CARRERA',
-    'CARRETA SOLID',
-    'CLASSIC',
-    'LOGAN',
-    'LINCOLN PARK',
-    'LIVINGSTON',
-    '6 PANEL',
-    'RIVERSIDE',
-    'ROMAN',
-    'OTHER',
+  "Carrara Hollow",
+  "Carrara Solid",
+  "Classic Hollow",
+  "Classic Solid",
+  "Roman Hollow",
+  "Roman Solid",
+  "Lincoln Hollow",
+  "Lincoln Solid",
+  "Mercer Hollow",
+  "Mercer Solid",
+  "Logan Hollow",
+  "Logan Solid",
+  "Whitman Hollow",
+  "Whitman Solid",
+  "Riverside Holow",
+  "Riverside Solid",
+  "6 Panel Hollow",
+  "6 Panel Solid",
+  "Classic Hollow",
+  "Classic Solid",
+  "1 Panel Shaker",
+  "2 Panel Shaker",
+  "3 Panel Shaker"
   ];
+
+  // 🪵 Baseboard
+baseboardsValues = [
+ "Pn 4 Col",
+  "Pn 5-1/4 Col",
+  "MDF 4 Col",
+  "MDF 5-1/4 Col",
+  "MDF 7-1/4 Col",
+  "MDF 4 1Sp",
+  "MDF 5-1/4 1Sp",
+  "MDF 5-1/2 1Sp",
+  "MDF 7-1/4 1Sp",
+  "MDF 4 Flat",
+  "MDF 5 Flat",
+  "MDF Groove 5"
+];
+
+// 🚪 Casing
+casingsValues = [
+ "Pn 2-3/4 Col",
+  "Pn 3 BB Col",
+  "MDF 2-3/4 Col",
+  "MDF 2-3/4 1Sp",
+  "MDF 3-1/4 1Sp BB",
+  "MDF 3-1/2 1Sp",
+  "MDF 2-1/2 Flat",
+  "MDF 2 Flat",
+  "MDF Groove 3-1/2"
+];
+
+// 🧱 Door Stop
+doorStopsValues = [
+  "1Sp",
+  "Flat",
+  "Col"
+];
 
   constructor(
     private router: Router,

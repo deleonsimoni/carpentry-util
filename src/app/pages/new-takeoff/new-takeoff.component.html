@@ -1077,12 +1077,46 @@
                           <label class="form-control-label" for="input-city"
                             >DETAILS</label
                           >
-                          <input
-                            type="text"
-                            id="input-last-name"
-                            class="form-control form-control-alternative"
-                            formControlName="details"
-                          />
+                          <ng-container [ngSwitch]="trimForm.get('item')?.value">
+                            <select
+                              *ngSwitchCase="'Base'"
+                              class="form-control form-control-alternative"
+                              formControlName="details"
+                            >
+                              <option *ngFor="let opt of baseboardsValues" [value]="opt">
+                                {{ opt }}
+                              </option>
+                            </select>
+
+                            <select
+                              *ngSwitchCase="'Casing'"
+                              class="form-control form-control-alternative"
+                              formControlName="details"
+                            >
+                              <option *ngFor="let opt of casingsValues" [value]="opt">
+                                {{ opt }}
+                              </option>
+                            </select>
+
+                            <select
+                              *ngSwitchCase="'Doorstop'"
+                              class="form-control form-control-alternative"
+                              formControlName="details"
+                            >
+                              <option *ngFor="let opt of doorStopsValues" [value]="opt">
+                                {{ opt }}
+                              </option>
+                            </select>
+
+                            <!-- Se não for nenhum desses, mostra input normal -->
+                            <input
+                              *ngSwitchDefault
+                              type="text"
+                              id="input-details"
+                              class="form-control form-control-alternative"
+                              formControlName="details"
+                            />
+                          </ng-container>
                         </div>
                       </div>
                       <div class="col-6">
@@ -1090,8 +1124,12 @@
                           <label class="form-control-label" for="input-city"
                             >QTY</label
                           >
-
-                          <app-number-input formControlName="qty" [min]="0" [max]="10" [readonly]="isReadonly"></app-number-input>
+                            <input
+                              type="text"
+                              id="input-details"
+                              class="form-control form-control-alternative"
+                              formControlName="qty"
+                            />
                         </div>
                       </div>
                     </div>
