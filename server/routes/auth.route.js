@@ -74,7 +74,7 @@ async function register(req, res, next) {
   req.body.verificationCode = codEmail;
   req.body.isVerified = false;
 
-  user = await userCtrl.insert(req.body);
+  user = await userCtrl.insert(req.body, codEmail);
   user = user.toObject();
   delete user.hashedPassword;
   req.user = user;
