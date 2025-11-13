@@ -162,7 +162,7 @@
                             <a
                               *ngIf="order.status >= TakeoffStatus.UNDER_REVIEW && isManager"
                               class="dropdown-item"
-                              (click)="geratePDF(order._id, order.custumerName)"
+                              (click)="geratePDF(order._id, order.shipTo, order.lot)"
                             >
                               <i class="fas fa-file-pdf mr-2"></i>Generate PDF
                             </a>
@@ -322,7 +322,7 @@
 
                     <a
                       *ngIf="myOrder.status >= TakeoffStatus.UNDER_REVIEW && isManager"
-                      (click)="geratePDF(myOrder._id, myOrder.custumerName)"
+                      (click)="geratePDF(myOrder._id, myOrder.shipTo, myOrder.lot)"
                       class="btn btn-primary"
                       >Generate PDF</a
                     >

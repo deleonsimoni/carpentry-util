@@ -58,6 +58,7 @@ export class TakeOffComponent implements OnInit {
   readonly STATUS = STATUS_CONSTANTS;
   readonly TakeoffStatus = TakeoffStatus;
   readonly MESSAGES = MESSAGES;
+  isCustomHeight: boolean[] = [];
 
   emailRegex: RegExp =
     /^(?=.{1,254}$)(?=.{1,64}@)[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+(\.[-!#$%&'*+/0-9=?A-Z^_`a-z{|}~]+)*@[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$/;
@@ -125,15 +126,15 @@ export class TakeOffComponent implements OnInit {
 
   // 🪵 Baseboard
 baseboardsValues = [
- "Pn 4 Col",
-  "Pn 5-1/4 Col",
+ "Pine 4 Col",
+  "Pine 5-1/4 Col",
   "MDF 4 Col",
   "MDF 5-1/4 Col",
   "MDF 7-1/4 Col",
-  "MDF 4 1Sp",
-  "MDF 5-1/4 1Sp",
-  "MDF 5-1/2 1Sp",
-  "MDF 7-1/4 1Sp",
+  "MDF 4 1 Step",
+  "MDF 5-1/4 1 Step",
+  "MDF 5-1/2 1 Step",
+  "MDF 7-1/4 1 Step",
   "MDF 4 Flat",
   "MDF 5 Flat",
   "MDF Groove 5"
@@ -141,12 +142,12 @@ baseboardsValues = [
 
 // 🚪 Casing
 casingsValues = [
- "Pn 2-3/4 Col",
-  "Pn 3 BB Col",
+ "Pine 2-3/4 Col",
+  "Pine 3 BB Col",
   "MDF 2-3/4 Col",
-  "MDF 2-3/4 1Sp",
-  "MDF 3-1/4 1Sp BB",
-  "MDF 3-1/2 1Sp",
+  "MDF 2-3/4 1 Step",
+  "MDF 3-1/4 1 Step BB",
+  "MDF 3-1/2 1 Step",
   "MDF 2-1/2 Flat",
   "MDF 2 Flat",
   "MDF Groove 3-1/2"
@@ -154,7 +155,7 @@ casingsValues = [
 
 // 🧱 Door Stop
 doorStopsValues = [
-  "1Sp",
+  "1 Strp",
   "Flat",
   "Col"
 ];
@@ -1221,9 +1222,19 @@ doorStopsValues = [
       },
     ];
 
+    const standardHeights = ['80', '84', '96'];
+
     const arrayForm = this.orderForm.get('singleDoors') as FormArray;
+    arrayForm.clear();
+
+    this.isCustomHeight = [];
+
 
     dadosPrePreenchidos.forEach(dados => {
+
+      const isCustom = !!dados.height && !standardHeights.includes(dados.height as string);
+      this.isCustomHeight.push(isCustom);
+
       const formGroup = this.builder.group({
         size: [{ value: dados.size, disabled: false }, []],
         height: [{ value: dados.height, disabled: false }, []],
@@ -1237,6 +1248,8 @@ doorStopsValues = [
 
       arrayForm.push(formGroup);
     });
+
+
   }
 
   preFillFrenchDoors() {
@@ -1277,12 +1290,38 @@ doorStopsValues = [
     });
   }
 
-  updateSingleDoorSize(index: number): void {
+onHeightChange(event: Event, index: number) {
+  const value = (event.target as HTMLSelectElement).value;
+  const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+  const control = singleDoorsArray.at(index).get('height');
+
+  if (value === 'custom') {
+    // muda para input e mantém o valor atual (se houver)
+    this.isCustomHeight[index] = true;
+    control?.setValue(''); // limpa para digitação
+  } else {
+    this.isCustomHeight[index] = false;
+    control?.setValue(value);
+    this.updateSingleDoorSize(index);
+  }
+}
+
+updateSingleDoorSize(index: number): void {
     const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
     const singleDoorForm = singleDoorsArray.at(index) as FormGroup;
+ 
     this.updateSizeHeightForIndex(singleDoorForm);
-  }
+}
 
+onCustomHeightBlur(index: number) {
+  const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+  const heightValue = singleDoorsArray.at(index).get('height')?.value;
+  if (!heightValue) {
+    // se o campo custom foi deixado vazio, volta a ser combo
+    this.isCustomHeight[index] = false;
+  }
+}
+  
   private updateSizeHeightForIndex(formGroup: FormGroup): void {
     const size = formGroup.get('size')?.value || '';
     const height = formGroup.get('height')?.value || '';

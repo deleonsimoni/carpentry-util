@@ -198,15 +198,17 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       //cantinaDoors
+      
       case 'cantina1':
-        field.setText(takeoff.cantinaDoors[0].name);
+        field.setText("STEEL STD");
         break;
       case 'cantina2':
-        field.setText(takeoff.cantinaDoors[1].name);
+        field.setText("SOLID STD");
         break;
       case 'cantinaSwing1':
         field.setText(takeoff.cantinaDoors[0].swing);
         break;
+
       case 'cantinaSwing2':
         field.setText(takeoff.cantinaDoors[1].swing);
         break;
@@ -232,6 +234,8 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
       case 'frenchJamb1':
         field.setText(takeoff.frenchDoors[0].jamb);
         break;
+
+        
       case 'frenchSize2':
         field.setText(
           takeoff.frenchDoors[1].size + ' ' + takeoff.frenchDoors[1].swing
@@ -495,91 +499,220 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
       //Arches
 
       case 'archesCol1':
-        field.setText(takeoff.arches[0].col1);
+        field.setText(takeoff.arches[0].size);
         break;
       case 'archesCol2':
-        field.setText(takeoff.arches[0].col2);
+        field.setText(takeoff.arches[0].height);
         break;
       case 'archesCol3':
-        field.setText(takeoff.arches[0].col3);
+        field.setText(takeoff.arches[0].jamb);
         break;
       case 'archesCol4':
-        field.setText(takeoff.arches[0].col4);
+        field.setText(takeoff.arches[0].col3);
         break;
       case 'archesCol5':
-        field.setText(takeoff.arches[0].col5);
+        field.setText(takeoff.arches[0].col4);
+        break;
+      case 'archesCol6':
+        field.setText('');
+        break;
+      case 'archesCol7':
+        field.setText('');
+        break;
+      case 'archesCol8':
+        field.setText('');
+        break;
+      case 'archesCol9':
+        field.setText('');
+        break;
+      case 'archesCola':
+        field.setText('');
+        break;
+      case 'archesColb':
+        field.setText('');
+        break;
+      case 'archesColc':
+        field.setText('');
+        break;
+      case 'archesCol1d':
+        field.setText('');
+        break;
+      case 'archesCol1e':
+        field.setText('');
         break;
 
       case 'archesCol12':
-        field.setText(takeoff.arches[1].col1);
+        field.setText(takeoff.arches[1].size);
         break;
       case 'archesCol22':
-        field.setText(takeoff.arches[1].col2);
+        field.setText(takeoff.arches[1].height);
         break;
       case 'archesCol32':
-        field.setText(takeoff.arches[1].col3);
+        field.setText(takeoff.arches[1].jamb);
         break;
       case 'archesCol42':
-        field.setText(takeoff.arches[1].col4);
+        field.setText(takeoff.arches[1].col3);
         break;
       case 'archesCol52':
-        field.setText(takeoff.arches[1].col5);
+        field.setText(takeoff.arches[1].col4);
+        break;
+      case 'archesCol62':
+        field.setText('');
+        break;
+      case 'archesCol72':
+        field.setText('');
+        break;
+      case 'archesCol82':
+        field.setText('');
+        break;
+      case 'archesCol92':
+        field.setText('');
+        break;
+      case 'archesCola2':
+        field.setText('');
+        break;
+      case 'archesColb2':
+        field.setText('');
+        break;
+      case 'archesColc2':
+        field.setText('');
+        break;
+      case 'archesCol1d2':
+        field.setText('');
+        break;
+      case 'archesCole2':
+        field.setText('');
         break;
 
-      case 'archesSize3':
+      case 'archesCol13':
         field.setText(takeoff.arches[2].size);
         break;
-      case 'archesCol13':
-        field.setText(takeoff.arches[2].col1);
-        break;
       case 'archesCol23':
-        field.setText(takeoff.arches[2].col2);
+        field.setText(takeoff.arches[2].height);
         break;
       case 'archesCol33':
-        field.setText(takeoff.arches[2].col3);
+        field.setText(takeoff.arches[2].jamb);
         break;
       case 'archesCol43':
-        field.setText(takeoff.arches[2].col4);
+        field.setText(takeoff.arches[2].col3);
         break;
       case 'archesCol53':
-        field.setText(takeoff.arches[2].col5);
+        field.setText(takeoff.arches[2].col4);
+        break;
+      case 'archesCol63':
+        field.setText('');
+        break;
+      case 'archesCol73':
+        field.setText('');
+        break;
+      case 'archesCol83':
+        field.setText('');
+        break;
+      case 'archesCol93':
+        field.setText('');
+        break;
+      case 'archesCola3':
+        field.setText('');
+        break;
+      case 'archesColb3':
+        field.setText('');
+        break;
+      case 'archesColc3':
+        field.setText('');
+        break;
+      case 'archesCol1d3':
+        field.setText('');
+        break;
+      case 'archesCole3':
+        field.setText('');
         break;
 
-      case 'archesSize4':
+
+      case 'archesCol14':
         field.setText(takeoff.arches[3].size);
         break;
-      case 'archesCol14':
-        field.setText(takeoff.arches[3].col1);
-        break;
       case 'archesCol24':
-        field.setText(takeoff.arches[3].col2);
+        field.setText(takeoff.arches[3].height);
         break;
       case 'archesCol34':
-        field.setText(takeoff.arches[3].col3);
+        field.setText(takeoff.arches[3].jamb);
         break;
       case 'archesCol44':
-        field.setText(takeoff.arches[3].col4);
+        field.setText(takeoff.arches[3].col3);
         break;
       case 'archesCol54':
-        field.setText(takeoff.arches[3].col5);
+        field.setText(takeoff.arches[3].col4);
+        break;
+      case 'archesCol64':
+        field.setText('');
+        break;
+      case 'archesCol74':
+        field.setText('');
+        break;
+      case 'archesCol84':
+        field.setText('');
+        break;
+      case 'archesCol94':
+        field.setText('');
+        break;
+      case 'archesCola4':
+        field.setText('');
+        break;
+      case 'archesColb4':
+        field.setText('');
+        break;
+      case 'archesColc4':
+        field.setText('');
+        break;
+      case 'archesCol1d4':
+        field.setText('');
+        break;
+      case 'archesCole4':
+        field.setText('');
         break;
 
       case 'archesCol15':
-        field.setText(takeoff.arches[4].col1);
+        field.setText(takeoff.arches[4].size);
         break;
       case 'archesCol25':
-        field.setText(takeoff.arches[4].col2);
+        field.setText(takeoff.arches[4].height);
         break;
       case 'archesCol35':
-        field.setText(takeoff.arches[4].col3);
+        field.setText(takeoff.arches[4].jamb);
         break;
       case 'archesCol45':
-        field.setText(takeoff.arches[4].col4);
+        field.setText(takeoff.arches[4].col3);
         break;
       case 'archesCol55':
-        field.setText(takeoff.arches[4].col5);
+        field.setText(takeoff.arches[4].col4);
         break;
-
+      case 'archesCol65':
+        field.setText('');
+        break;
+      case 'archesCol75':
+        field.setText('');
+        break;
+      case 'archesCol85':
+        field.setText('');
+        break;
+      case 'archesCol95':
+        field.setText('');
+        break;
+      case 'archesCola5':
+        field.setText('');
+        break;
+      case 'archesColb5':
+        field.setText('');
+        break;
+      case 'archesColc5':
+        field.setText('');
+        break;
+      case 'archesCol1d5':
+        field.setText('');
+        break;
+      case 'archesCole5':
+        field.setText('');
+        break;
       //trim
 
       case 'trimDetails1':

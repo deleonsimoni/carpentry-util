@@ -65,7 +65,7 @@ export class TakeoffComponent implements OnInit {
     );
   }
 
-  geratePDF(idOrder, custumerName) {
+  geratePDF(idOrder, job, lot) {
     this.spinner.show();
 
     this.takeoffService.generatePDF(idOrder).subscribe(
@@ -76,7 +76,7 @@ export class TakeoffComponent implements OnInit {
         } else {
           const link = document.createElement('a');
           link.href = data;
-          link.download = `${custumerName}.pdf`;
+          link.download = `${job} ${lot}.pdf`;
           link.click();
 
           this.spinner.hide();

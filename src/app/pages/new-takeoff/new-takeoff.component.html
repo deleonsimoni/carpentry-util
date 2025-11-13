@@ -666,18 +666,21 @@
                             formControlName="size"
                           >
                             <option value=""></option>
-                            <option value="18">20"</option>
+                            <option value="18">18"</option>
+                            <option value="20">20"</option>
                             <option value="24">24"</option>
-                            <option value="26">28"</option>
-                            <option value="28">32"</option>
-                            <option value="30">36"</option>
-                            <option value="32">40"</option>
-                            <option value="32">44"</option>
-                            <option value="32">48"</option>
-                            <option value="32">56"</option>
-                            <option value="32">64"</option>
-                            <option value="32">68"</option>
-                            <option value="32">72"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
+                            <option value="36">36"</option>
+                            <option value="40">40"</option>
+                            <option value="44">44"</option>
+                            <option value="48">48"</option>
+                            <option value="56">56"</option>
+                            <option value="64">64"</option>
+                            <option value="68">68"</option>
+                            <option value="72">72"</option>
                           </select>
                         </div>
                       </div>
@@ -789,15 +792,27 @@
                           <div class="form-group">
                             <label class="form-control-label">HEIGHT</label>
                             <select
+                              *ngIf="!isCustomHeight[i]"
                               class="form-control form-control-alternative"
                               formControlName="height"
-                              (change)="updateSingleDoorSize(i)"
+                              (change)="onHeightChange($event, i)"
                             >
                               <option value=""></option>
                               <option value="80">80"</option>
                               <option value="84">84"</option>
                               <option value="96">96"</option>
+                              <option value="custom">Custom</option>
+
                             </select>
+
+                             <input
+                                *ngIf="isCustomHeight[i]"
+                                type="text"
+                                class="form-control form-control-alternative"
+                                formControlName="height"
+                                (blur)="onCustomHeightBlur(i)"                
+                            />
+
                           </div>
                         </div>
                       </div>

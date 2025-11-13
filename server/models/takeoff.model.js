@@ -92,6 +92,7 @@ const TakeoffSchema = new mongoose.Schema(
         size: { type: String },
         left: { type: String },
         right: { type: String },
+        height: { type: String },
         jamb: { type: String },
       },
     ],
@@ -118,6 +119,8 @@ const TakeoffSchema = new mongoose.Schema(
     arches: [
       {
         size: { type: String },
+        height: { type: String },
+        jamb: { type: String },
         col1: { type: String },
         col2: { type: String },
         col3: { type: String },
