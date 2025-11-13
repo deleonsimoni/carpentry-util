@@ -321,7 +321,7 @@
                     </div>
 
                     <a
-                      *ngIf="myOrder.status >= TakeoffStatus.UNDER_REVIEW && isManager"
+                      *ngIf="myOrder.status >= TakeoffStatus.UNDER_REVIEW"
                       (click)="geratePDF(myOrder._id, myOrder.shipTo, myOrder.lot)"
                       class="btn btn-primary"
                       >Generate PDF</a

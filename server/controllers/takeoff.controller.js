@@ -139,7 +139,9 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
     ...companyFilter
   };
 
-  let takeoff = await Takeoff.findOne(baseQuery);
+  let takeoff = await Takeoff.findOne(baseQuery)
+      .populate('company', 'name')
+      ;
 
   const filePath = 'template.pdf';
 
@@ -158,7 +160,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(dd + '/' + mm + '/' + yyyy);
         break;
       case 'contractor':
-        field.setText(user.fullname || '');
+        field.setText(takeoff.company.name || '');
         break;
       case 'custumerName':
         field.setText(takeoff.custumerName || '');
@@ -194,7 +196,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.comment || '');
         break;
       case 'preHugs':
-        field.setText(takeoff.preHugs || '');
+        field.setText(takeoff.doorsStyle || '');
         break;
 
       //cantinaDoors

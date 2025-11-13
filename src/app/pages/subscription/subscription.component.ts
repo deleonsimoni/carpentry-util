@@ -25,16 +25,30 @@ export class SubscriptionComponent {
 
   plans: SubscriptionPlan[] = [
     {
-      name: 'Basic',
-      price: '$29',
+      name: 'Starter',
+      price: '$49',
       period: 'per month',
-      description: 'Perfect for small carpentry businesses',
+      description: 'Ideal para pequenos negócios de carpintaria',
       features: [
-        'Pode criar até 50 takeoffs por mês',
-        '2 carpenter assignments',
-        'Basic reporting',
-        'Email support',
-        'Mobile access'
+        'Quarterly 10% OFF $129.00',
+        'Yearly 20% OFF $469.00',
+        'Up to 2 users',
+        'Up to 30 takeoffs monthly'
+      ],
+      highlighted: false,
+      buttonText: 'Start Free Trial',
+      buttonClass: 'btn-outline-primary'
+    },
+    {
+      name: 'Basic',
+      price: '$99',
+      period: 'per month',
+      description: 'Perfeito para equipes de pequeno porte',
+      features: [
+        'Quarterly 10% OFF $259.00',
+        'Yearly 20% OFF $949.00',
+        'Up to 5 users',
+        'Up to 70 takeoffs monthly'
       ],
       highlighted: false,
       buttonText: 'Start Free Trial',
@@ -42,18 +56,14 @@ export class SubscriptionComponent {
     },
     {
       name: 'Professional',
-      price: '$59',
+      price: '$199',
       period: 'per month',
-      description: 'Ideal for growing businesses',
+      description: 'Para negócios em expansão',
       features: [
-        'Até 250 takeoffs por mês',
-        'Unlimited carpenter assignments',
-        'Advanced reporting & analytics',
-        'Priority support',
-        'Mobile access',
-        'PDF generation',
-        'Delivery tracking',
-        'Custom fields'
+        'Quarterly 10% OFF $537.00',
+        'Yearly 20% OFF $1,899.00',
+        'Up to 15 users',
+        'Up to 260 takeoffs monthly'
       ],
       highlighted: true,
       buttonText: 'Start Free Trial',
@@ -61,18 +71,14 @@ export class SubscriptionComponent {
     },
     {
       name: 'Enterprise',
-      price: '$99',
+      price: '$399',
       period: 'per month',
-      description: 'For large teams and companies',
+      description: 'Para grandes empresas e uso ilimitado',
       features: [
-        'Takeoffs ilimitados',
-        'Multi-company management',
-        'Advanced user roles',
-        'API access',
-        'Custom integrations',
-        'Dedicated support',
-        'Custom branding',
-        'SLA guarantee'
+        'Quarterly 10% OFF $999.00',
+        'Yearly 20% OFF $3,798.00',
+        'Unlimited users',
+        'Unlimited takeoffs'
       ],
       highlighted: false,
       buttonText: 'Contact Sales',
