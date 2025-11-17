@@ -51,7 +51,7 @@ export class TakeoffActionsComponent {
    * Only show during TO_MEASURE status
    */
   shouldShowSaveProgress(): boolean {
-    return this.currentStatus === TakeoffStatus.TO_MEASURE;
+    return this.currentStatus >= TakeoffStatus.TO_MEASURE;
   }
 
   /**

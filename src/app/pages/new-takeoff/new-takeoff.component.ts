@@ -476,11 +476,15 @@ doorStopsValues = [
       data => {
         this.spinner.hide();
 
-        if (!data.errors) {
+        if (!data.errors && data.success != false) {
           this.notification.success('Takeoff Created', 'Success');
           this.router.navigate(['/takeoff']);
         } else {
-          this.notification.error('Error create Takeoff', 'Atenção');
+          if(data.code == "TAKEOFF_ALREADY_EXISTS") {
+            this.notification.error('A takeoff with the same lot and job already exists', 'TAKEOFF ALREADY EXISTS');
+          } else {
+            this.notification.error('Error create Takeoff', 'Attention');
+          }
         }
       },
       err => {

@@ -29,6 +29,21 @@ async function insert(idUser, body, companyFilter = {}) {
     body.company = companyFilter.company;
   }
 
+  const exists = await Takeoff.findOne({
+    shipTo: body.shipTo,
+    lot: body.lot,
+    // caso precise filtrar por empresa também:
+    ...(body.company && { company: body.company })
+  });
+
+  if(exists) {
+    return {
+      success: false,
+      code: "TAKEOFF_ALREADY_EXISTS",
+      message: "Já existe um Takeoff com este ShipTo e Lot."
+    };
+  }
+
   return await new Takeoff(body).save();
 }
 

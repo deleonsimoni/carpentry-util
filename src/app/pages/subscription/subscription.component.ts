@@ -28,7 +28,7 @@ export class SubscriptionComponent {
       name: 'Starter',
       price: '$49',
       period: 'per month',
-      description: 'Ideal para pequenos negócios de carpintaria',
+      description: 'Ideal for small carpentry businesses just getting started.',
       features: [
         'Quarterly 10% OFF $129.00',
         'Yearly 20% OFF $469.00',
@@ -43,7 +43,7 @@ export class SubscriptionComponent {
       name: 'Basic',
       price: '$99',
       period: 'per month',
-      description: 'Perfeito para equipes de pequeno porte',
+      description: 'Perfect for small teams that need to organize their operations',
       features: [
         'Quarterly 10% OFF $259.00',
         'Yearly 20% OFF $949.00',
@@ -58,7 +58,7 @@ export class SubscriptionComponent {
       name: 'Professional',
       price: '$199',
       period: 'per month',
-      description: 'Para negócios em expansão',
+      description: 'Designed for growing businesses looking for increased efficiency and advanced features',
       features: [
         'Quarterly 10% OFF $537.00',
         'Yearly 20% OFF $1,899.00',
@@ -73,7 +73,7 @@ export class SubscriptionComponent {
       name: 'Enterprise',
       price: '$399',
       period: 'per month',
-      description: 'Para grandes empresas e uso ilimitado',
+      description: 'Built for large companies requiring unlimited usage and full support',
       features: [
         'Quarterly 10% OFF $999.00',
         'Yearly 20% OFF $3,798.00',
