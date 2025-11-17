@@ -93,7 +93,7 @@ async function detailTakeoff(idUser, idTakeoff, companyFilter = {}) {
 }
 
 async function updateTakeoff(user, body, idTakeoff, companyFilter = {}) {
-  body.status = 2;
+  //body.status = 2;
 
   const baseQuery = {
     $and: [{ _id: idTakeoff }],

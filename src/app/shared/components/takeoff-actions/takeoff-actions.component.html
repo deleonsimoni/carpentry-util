@@ -15,7 +15,6 @@
 
     <!-- Save Progress Button -->
     <button
-      *ngIf="shouldShowSaveProgress()"
       (click)="saveProgress()"
       class="btn btn-primary"
       [disabled]="!isFormValid || isLoading"

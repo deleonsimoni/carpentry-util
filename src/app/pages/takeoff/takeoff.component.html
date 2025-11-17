@@ -238,7 +238,7 @@
                     <div class="avatar-group">
                       {{
                         isManager
-                          ? myOrder.carpentry.fullname
+                          ? myOrder.carpentry?.fullname
                           : (myOrder.user.company.name | titlecase)
                       }}
                     </div>

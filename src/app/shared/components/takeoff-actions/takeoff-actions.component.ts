@@ -140,7 +140,7 @@ export class TakeoffActionsComponent {
 
   // Event handlers
   saveProgress() {
-    if (this.shouldShowSaveProgress() && this.isFormValid) {
+    if ( this.isFormValid) {
       this.onSaveProgress.emit();
     }
   }

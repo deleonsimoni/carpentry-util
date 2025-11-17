@@ -10,6 +10,15 @@
     }
   }
 
+  button.delete-arch-btn:disabled,
+  button.delete-arch-btn[disabled] {
+    background-color: #c0c0c0 !important;
+    border-color: #a8a8a8 !important;
+    color: #fff !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+  }
+
   // Ensure select dropdowns have consistent sizing
   select.form-control {
     min-width: 80px;
@@ -30,6 +39,7 @@
 
   // Force maximum 2 columns on mobile for better layout
   .row {
+
     // For sections with 4 columns (col-3), make them 2x2 on mobile
     .col-3 {
       flex: 0 0 50%;
@@ -85,7 +95,8 @@
   width: 100%;
   padding: 0 1rem;
 
-  .left-buttons, .right-buttons {
+  .left-buttons,
+  .right-buttons {
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -108,7 +119,8 @@
     gap: 0.75rem;
     align-items: stretch;
 
-    .left-buttons, .right-buttons {
+    .left-buttons,
+    .right-buttons {
       display: flex;
       gap: 0.25rem;
       justify-content: center;
@@ -157,4 +169,3 @@
     }
   }
 }
-

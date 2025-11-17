@@ -17,7 +17,6 @@ const TakeoffSchema = new mongoose.Schema(
     carpentry: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
     },
     trimCarpentry: {
       type: mongoose.Schema.Types.ObjectId,
@@ -125,7 +124,7 @@ const TakeoffSchema = new mongoose.Schema(
         col2: { type: String },
         col3: { type: String },
         col4: { type: String },
-        col5: { type: String },
+        qty: { type: String },
       },
     ],
 

@@ -99,66 +99,66 @@ export class TakeOffComponent implements OnInit {
   jambaOptions = ['475', '675'];
 
   doorsStyleValues = [
-  "Carrara Hollow",
-  "Carrara Solid",
-  "Classic Hollow",
-  "Classic Solid",
-  "Roman Hollow",
-  "Roman Solid",
-  "Lincoln Hollow",
-  "Lincoln Solid",
-  "Mercer Hollow",
-  "Mercer Solid",
-  "Logan Hollow",
-  "Logan Solid",
-  "Whitman Hollow",
-  "Whitman Solid",
-  "Riverside Holow",
-  "Riverside Solid",
-  "6 Panel Hollow",
-  "6 Panel Solid",
-  "Classic Hollow",
-  "Classic Solid",
-  "1 Panel Shaker",
-  "2 Panel Shaker",
-  "3 Panel Shaker"
+    "Carrara Hollow",
+    "Carrara Solid",
+    "Classic Hollow",
+    "Classic Solid",
+    "Roman Hollow",
+    "Roman Solid",
+    "Lincoln Hollow",
+    "Lincoln Solid",
+    "Mercer Hollow",
+    "Mercer Solid",
+    "Logan Hollow",
+    "Logan Solid",
+    "Whitman Hollow",
+    "Whitman Solid",
+    "Riverside Holow",
+    "Riverside Solid",
+    "6 Panel Hollow",
+    "6 Panel Solid",
+    "Classic Hollow",
+    "Classic Solid",
+    "1 Panel Shaker",
+    "2 Panel Shaker",
+    "3 Panel Shaker"
   ];
 
   // 🪵 Baseboard
-baseboardsValues = [
- "Pine 4 Col",
-  "Pine 5-1/4 Col",
-  "MDF 4 Col",
-  "MDF 5-1/4 Col",
-  "MDF 7-1/4 Col",
-  "MDF 4 1 Step",
-  "MDF 5-1/4 1 Step",
-  "MDF 5-1/2 1 Step",
-  "MDF 7-1/4 1 Step",
-  "MDF 4 Flat",
-  "MDF 5 Flat",
-  "MDF Groove 5"
-];
+  baseboardsValues = [
+    "Pine 4 Col",
+    "Pine 5-1/4 Col",
+    "MDF 4 Col",
+    "MDF 5-1/4 Col",
+    "MDF 7-1/4 Col",
+    "MDF 4 1 Step",
+    "MDF 5-1/4 1 Step",
+    "MDF 5-1/2 1 Step",
+    "MDF 7-1/4 1 Step",
+    "MDF 4 Flat",
+    "MDF 5 Flat",
+    "MDF Groove 5"
+  ];
 
-// 🚪 Casing
-casingsValues = [
- "Pine 2-3/4 Col",
-  "Pine 3 BB Col",
-  "MDF 2-3/4 Col",
-  "MDF 2-3/4 1 Step",
-  "MDF 3-1/4 1 Step BB",
-  "MDF 3-1/2 1 Step",
-  "MDF 2-1/2 Flat",
-  "MDF 2 Flat",
-  "MDF Groove 3-1/2"
-];
+  // 🚪 Casing
+  casingsValues = [
+    "Pine 2-3/4 Col",
+    "Pine 3 BB Col",
+    "MDF 2-3/4 Col",
+    "MDF 2-3/4 1 Step",
+    "MDF 3-1/4 1 Step BB",
+    "MDF 3-1/2 1 Step",
+    "MDF 2-1/2 Flat",
+    "MDF 2 Flat",
+    "MDF Groove 3-1/2"
+  ];
 
-// 🧱 Door Stop
-doorStopsValues = [
-  "1 Strp",
-  "Flat",
-  "Col"
-];
+  // 🧱 Door Stop
+  doorStopsValues = [
+    "1 Strp",
+    "Flat",
+    "Col"
+  ];
 
   constructor(
     private router: Router,
@@ -372,6 +372,8 @@ doorStopsValues = [
       this.isTrimCarpentryFound = false;
     }
 
+    this.populateArches(data.arches);
+
     this.orderStatus = data.status;
 
     if (this.orderStatus !== null && this.orderStatus > 1) {
@@ -386,6 +388,33 @@ doorStopsValues = [
         'Read-only mode'
       );
     }
+  }
+
+  private populateArches(archesFromDb: any[]) {
+    const arrayForm = this.orderForm.get('arches') as FormArray;
+    arrayForm.clear();
+
+    // Se não houver arches no banco → cria 1 linha vazia
+    if (!archesFromDb || archesFromDb.length === 0) {
+      this.addArch();
+      return;
+    }
+
+    // Preenche com os existentes
+    archesFromDb.forEach(a => {
+      arrayForm.push(
+        this.builder.group({
+          size: a.size || '',
+          height: a.height || '',
+          heightCustom: a.heightCustom || '',
+          jamb: a.jamb || '',
+          jambCustom: a.jambCustom || '',
+          col3: a.col3 || '',
+          col4: a.col4 || '',
+          qty: a.qty || '',
+        })
+      );
+    });
   }
 
   onCarpenterSelected(carpenter: Carpenter): void {
@@ -480,7 +509,7 @@ doorStopsValues = [
           this.notification.success('Takeoff Created', 'Success');
           this.router.navigate(['/takeoff']);
         } else {
-          if(data.code == "TAKEOFF_ALREADY_EXISTS") {
+          if (data.code == "TAKEOFF_ALREADY_EXISTS") {
             this.notification.error('A takeoff with the same lot and job already exists', 'TAKEOFF ALREADY EXISTS');
           } else {
             this.notification.error('Error create Takeoff', 'Attention');
@@ -496,6 +525,10 @@ doorStopsValues = [
 
   updateOrder() {
     this.spinner.show();
+
+    if (!this.orderForm.value.trimCarpentry || this.orderForm.value.trimCarpentry.trim() === '') {
+      delete this.orderForm.value.trimCarpentry;
+    }
 
     this.takeoffService
       .updateOrder(this.orderForm.value, this.idOrder)
@@ -575,6 +608,14 @@ doorStopsValues = [
 
   autoSaveCarpenterAssignment() {
     this.spinner.show();
+
+    if (!this.orderForm.value.trimCarpentry || this.orderForm.value.trimCarpentry.trim() === '') {
+      this.orderForm.value.trimCarpentry = null;
+    }
+
+    if (!this.orderForm.value.carpentry || this.orderForm.value.carpentry.trim() === '') {
+      this.orderForm.value.carpentry = null;
+    }
 
     this.takeoffService
       .updateOrder(this.orderForm.value, this.idOrder)
@@ -733,7 +774,6 @@ doorStopsValues = [
     this.orderForm = this.builder.group({
       carpentry: [
         { value: null, disabled: this.shouldDisableFormField() },
-        [Validators.required],
       ],
       trimCarpentry: [
         { value: null, disabled: this.shouldDisableFormField() },
@@ -753,8 +793,13 @@ doorStopsValues = [
       ],
       shipTo: [
         { value: null, disabled: this.shouldDisableFormField() },
+        [Validators.required],
+
       ],
-      lot: [{ value: null, disabled: this.shouldDisableFormField() }],
+      lot: [{ value: null, disabled: this.shouldDisableFormField() },
+      [Validators.required],
+
+      ],
       type: [{ value: null, disabled: this.shouldDisableFormField() }],
       elev: [{ value: null, disabled: this.shouldDisableFormField() }],
       sqFootage: [
@@ -854,6 +899,7 @@ doorStopsValues = [
   }
 
   preFillArches() {
+
     const dadosPrePreenchidos = [
       { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
       { size: '', height: '', heightCustom: '', jamb: '', jambCustom: '', col3: '', col4: '', qty: '' },
@@ -878,6 +924,31 @@ doorStopsValues = [
 
       arrayForm.push(formGroup);
     });
+  }
+
+  addArch() {
+    const arrayForm = this.orderForm.get('arches') as FormArray;
+
+    const novoArch = this.builder.group({
+      size: '',
+      height: '',
+      heightCustom: '',
+      jamb: '',
+      jambCustom: '',
+      col3: '',
+      col4: '',
+      qty: '',
+    });
+
+    arrayForm.push(novoArch);
+  }
+
+  removeArch(index: number) {
+    const arrayForm = this.orderForm.get('arches') as FormArray;
+
+    if (arrayForm.length > 5) {
+      arrayForm.removeAt(index);
+    }
   }
 
   preFillRoundWindow() {
@@ -1019,6 +1090,10 @@ doorStopsValues = [
       { item: 'RAILING', qty: '' },
       { item: 'BASEMENTS STAIRS', qty: '' },
       { item: 'WET AREA', qty: '' },
+      { item: 'PARAPET OPENINGS', qty: '' },
+      { item: 'SOLID COLUMNS', qty: '' },
+      { item: 'SPLIT COLUMNS', qty: '' },
+
       { item: '', qty: '' },
       { item: '', qty: '' },
     ];
@@ -1042,33 +1117,34 @@ doorStopsValues = [
     const dadosPrePreenchidos = [
       { item: 'Base', details: '', qty: '' },
       { item: 'Casing', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: 'Handrail', details: '', qty: '' },
       { item: 'Brackets', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
-      { item: 'Burlap', details: '', qty: '' },
-      { item: 'Burlap', details: '', qty: '' },
-      { item: 'Doorstop', details: '', qty: '' },
+      { item: 'Burlap 1-1/4"', details: '', qty: '' },
+      { item: 'Burlap 1-5/8”', details: '', qty: '' },
+      { item: 'Oak', details: '', qty: '' },
       { item: '1/4 Round', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: '1X3', details: '', qty: '' },
       { item: '1X2', details: '', qty: '' },
       { item: 'Attic Hatch', details: '', qty: '' },
       { item: 'Filler', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: 'Window Seat', details: '', qty: '' },
       { item: 'Capping', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: 'Build out', details: '', qty: '' },
       { item: 'Build out', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: 'Crown/Cove', details: '', qty: '' },
       { item: 'Flex Base', details: '', qty: '' },
       { item: 'Columns', details: '', qty: '' },
-      { item: '', details: '', qty: '' },
       { item: 'SHOEMOULD', details: '', qty: '' },
-      { item: '1/4 ROUND', details: '', qty: '' },
+      { item: 'Oak Combo', details: '', qty: '' },
       { item: 'Doorstop', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+      { item: '', details: '', qty: '' },
+
     ];
 
     const arrayForm = this.orderForm.get('trim') as FormArray;
@@ -1085,6 +1161,7 @@ doorStopsValues = [
 
       arrayForm.push(formGroup);
     });
+    
   }
 
   preFillHardware() {
@@ -1294,38 +1371,38 @@ doorStopsValues = [
     });
   }
 
-onHeightChange(event: Event, index: number) {
-  const value = (event.target as HTMLSelectElement).value;
-  const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
-  const control = singleDoorsArray.at(index).get('height');
+  onHeightChange(event: Event, index: number) {
+    const value = (event.target as HTMLSelectElement).value;
+    const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+    const control = singleDoorsArray.at(index).get('height');
 
-  if (value === 'custom') {
-    // muda para input e mantém o valor atual (se houver)
-    this.isCustomHeight[index] = true;
-    control?.setValue(''); // limpa para digitação
-  } else {
-    this.isCustomHeight[index] = false;
-    control?.setValue(value);
-    this.updateSingleDoorSize(index);
+    if (value === 'custom') {
+      // muda para input e mantém o valor atual (se houver)
+      this.isCustomHeight[index] = true;
+      control?.setValue(''); // limpa para digitação
+    } else {
+      this.isCustomHeight[index] = false;
+      control?.setValue(value);
+      this.updateSingleDoorSize(index);
+    }
   }
-}
 
-updateSingleDoorSize(index: number): void {
+  updateSingleDoorSize(index: number): void {
     const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
     const singleDoorForm = singleDoorsArray.at(index) as FormGroup;
- 
-    this.updateSizeHeightForIndex(singleDoorForm);
-}
 
-onCustomHeightBlur(index: number) {
-  const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
-  const heightValue = singleDoorsArray.at(index).get('height')?.value;
-  if (!heightValue) {
-    // se o campo custom foi deixado vazio, volta a ser combo
-    this.isCustomHeight[index] = false;
+    this.updateSizeHeightForIndex(singleDoorForm);
   }
-}
-  
+
+  onCustomHeightBlur(index: number) {
+    const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+    const heightValue = singleDoorsArray.at(index).get('height')?.value;
+    if (!heightValue) {
+      // se o campo custom foi deixado vazio, volta a ser combo
+      this.isCustomHeight[index] = false;
+    }
+  }
+
   private updateSizeHeightForIndex(formGroup: FormGroup): void {
     const size = formGroup.get('size')?.value || '';
     const height = formGroup.get('height')?.value || '';
