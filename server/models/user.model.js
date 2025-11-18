@@ -39,6 +39,14 @@ const UserSchema = new mongoose.Schema(
     homePhone: {
       type: String,
     },
+    hstRegistrationNumber: {
+      type: String,
+      required: true,
+    },
+    companyName: {
+      type: String,
+      required: true,
+    },
     address: {
       street: {
         type: String,

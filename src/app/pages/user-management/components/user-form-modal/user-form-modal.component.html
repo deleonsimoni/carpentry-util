@@ -129,6 +129,48 @@
     </div>
 
     <div class="row ">
+      <!-- HST Registration Number -->
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-file-invoice mr-1 text-muted"></i>
+            HST Registration Number <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('hstRegistrationNumber')"
+            formControlName="hstRegistrationNumber"
+            placeholder="Enter HST number">
+          <div *ngIf="hasError('hstRegistrationNumber')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('hstRegistrationNumber') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Company Name -->
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            <i class="fas fa-building mr-1 text-muted"></i>
+            Company Name <span class="text-danger">*</span>
+          </label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            [class.is-invalid]="hasError('companyName')"
+            formControlName="companyName"
+            placeholder="Enter company name">
+          <div *ngIf="hasError('companyName')" class="invalid-feedback">
+            <i class="fas fa-exclamation-circle mr-1"></i>
+            {{ getErrorMessage('companyName') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row ">
       <!-- Mobile Phone -->
       <div class="col-md-6">
         <div class="form-group">

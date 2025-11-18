@@ -16,6 +16,8 @@ export interface UserProfile {
   lastLogin?: string;
   mobilePhone?: string;
   homePhone?: string;
+  hstRegistrationNumber?: string;
+  companyName?: string;
 }
 
 export interface UserListResponse {
@@ -36,6 +38,8 @@ export interface CreateUserRequest {
   profile?: UserProfileType;
   mobilePhone?: string;
   homePhone?: string;
+  hstRegistrationNumber: string;
+  companyName: string;
 }
 
 export interface CreateUserResponse {
@@ -51,6 +55,8 @@ export interface UpdateUserRequest {
   status?: UserStatusType;
   mobilePhone?: string;
   homePhone?: string;
+  hstRegistrationNumber?: string;
+  companyName?: string;
 }
 
 export interface PasswordChangeRequest {

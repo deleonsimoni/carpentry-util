@@ -196,13 +196,14 @@ class InvoicePDFService {
     const headerFields = {
       'invoice': invoiceNumber,
       "Crew Leader's Name": user.fullname || '',
-      "Crew Leader's Company": user.fullname || '',
-      "Contact Phone Number": '',
+      "Crew Leader's Company": user.companyName || user.fullname || '',
+      "Company Name": user.companyName || '',
+      "Contact Phone Number": user.mobilePhone || user.homePhone || '',
       "Invoice to": customers || '',
       'email': user.email || '',
       'holdback': '0.00',
       'subtotal': totals.subtotal.toFixed(2),
-      'hst': totals.hst.toFixed(2),
+      'hst': user.hstRegistrationNumber,
       'hst2': totals.hst.toFixed(2),
       'total': totals.total.toFixed(2)
     };

@@ -68,7 +68,9 @@ export class UserFormModalComponent implements OnInit {
       profile: ['', Validators.required],
       status: ['active'],
       mobilePhone: ['', [Validators.pattern(/^[\d\s\(\)\-\+]+$/)]],
-      homePhone: ['', [Validators.pattern(/^[\d\s\(\)\-\+]+$/)]]
+      homePhone: ['', [Validators.pattern(/^[\d\s\(\)\-\+]+$/)]],
+      hstRegistrationNumber: ['', Validators.required],
+      companyName: ['', Validators.required]
     });
   }
 
@@ -80,7 +82,9 @@ export class UserFormModalComponent implements OnInit {
         profile: this.userData.profile,
         status: this.userData.status,
         mobilePhone: this.userData.mobilePhone || '',
-        homePhone: this.userData.homePhone || ''
+        homePhone: this.userData.homePhone || '',
+        hstRegistrationNumber: this.userData.hstRegistrationNumber || '',
+        companyName: this.userData.companyName || ''
       });
 
       // Email não deve ser editável em modo de edição
@@ -152,6 +156,12 @@ export class UserFormModalComponent implements OnInit {
     if (formValue.homePhone !== (this.userData.homePhone || '')) {
       updateData.homePhone = formValue.homePhone || undefined;
     }
+    if (formValue.hstRegistrationNumber !== (this.userData.hstRegistrationNumber || '')) {
+      updateData.hstRegistrationNumber = formValue.hstRegistrationNumber;
+    }
+    if (formValue.companyName !== (this.userData.companyName || '')) {
+      updateData.companyName = formValue.companyName;
+    }
 
     // Se não há mudanças, fechar modal
     if (Object.keys(updateData).length === 0) {
@@ -205,7 +215,9 @@ export class UserFormModalComponent implements OnInit {
       email: 'Email',
       profile: 'Perfil',
       mobilePhone: 'Celular',
-      homePhone: 'Telefone'
+      homePhone: 'Telefone',
+      hstRegistrationNumber: 'HST Registration Number',
+      companyName: 'Company Name'
     };
     return labels[fieldName] || fieldName;
   }

@@ -92,7 +92,7 @@ async function seedInstallCosts() {
     console.log(`📊 Version: 2025-2027`);
 
     // Connect to MongoDB
-    await mongoose.connect(config.mongo.host, {
+    await mongoose.connect('mongodb://localhost:27017/carpentryutildb', {
       keepAlive: true,
       useNewUrlParser: true,
       useUnifiedTopology: true

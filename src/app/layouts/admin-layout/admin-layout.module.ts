@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ClipboardModule } from 'ngx-clipboard';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 import { AdminLayoutRoutes } from './admin-layout.routing';
 import { DashboardComponent } from '../../pages/dashboard/dashboard.component';
@@ -15,7 +15,6 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { SharedModule } from '@app/shared/shared.module';
 import { ProfileUserComponent } from '@app/pages/profile-user/profile-user.component';
 import { CarpenterAutocompleteComponent } from '@app/shared/components/carpenter-autocomplete/carpenter-autocomplete.component';
-// import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   imports: [

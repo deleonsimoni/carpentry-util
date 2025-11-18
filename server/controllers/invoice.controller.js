@@ -142,8 +142,8 @@ async function previewInvoiceCalculation(req, res, next) {
     };
 
     const takeoff = await Takeoff.findOne(baseQuery)
-      .populate('carpentry', 'fullname email')
-      .populate('user', 'fullname email');
+      .populate('carpentry', 'fullname email hstRegistrationNumber companyName')
+      .populate('user', 'fullname email hstRegistrationNumber companyName');
 
     if (!takeoff) {
       return res.status(404).json({
@@ -168,7 +168,9 @@ async function previewInvoiceCalculation(req, res, next) {
           carpInvoice: takeoff.carpInvoice,
           status: takeoff.status,
           carpenter: takeoff.carpentry?.fullname,
-          manager: takeoff.user?.fullname
+          manager: takeoff.user?.fullname,
+          hstRegistrationNumber: takeoff.carpentry?.hstRegistrationNumber || takeoff.user?.hstRegistrationNumber,
+          companyName: takeoff.carpentry?.companyName || takeoff.user?.companyName
         },
         calculation: invoiceData
       }
@@ -435,8 +437,11 @@ async function generateMultiTakeoffInvoicePDF(req, res, next) {
     const hst = calculations.reduce((sum, calc) => sum + calc.hst, 0);
     const totalAmount = calculations.reduce((sum, calc) => sum + calc.total, 0);
 
+    // Get full user data with hstRegistrationNumber and companyName
+    const fullUser = await User.findById(user._id).select('fullname email mobilePhone homePhone hstRegistrationNumber companyName');
+
     // Generate multi-takeoff PDF using service
-    const pdfBase64 = await invoicePDFService.generateMultiTakeoffPDF(takeoffs, user, invoiceNumber);
+    const pdfBase64 = await invoicePDFService.generateMultiTakeoffPDF(takeoffs, fullUser || user, invoiceNumber);
 
     // Save invoice to database
     const invoiceData = {
@@ -602,8 +607,8 @@ async function downloadInvoiceById(req, res, next) {
       });
     }
 
-    // Get user who generated the invoice for PDF
-    const generatedByUser = await User.findById(invoice.generatedBy);
+    // Get user who generated the invoice for PDF (with all fields)
+    const generatedByUser = await User.findById(invoice.generatedBy).select('fullname email mobilePhone homePhone hstRegistrationNumber companyName');
 
     // Regenerate PDF using service
     const pdfBase64 = await invoicePDFService.generateMultiTakeoffPDF(

@@ -6,7 +6,7 @@ import { InvoiceService } from '../../shared/services/invoice.service';
 import { Invoice, TakeoffForInvoice, InvoiceGroup } from '../../shared/interfaces/invoice.interface';
 import { InvoiceCalculationModalComponent } from './invoice-calculation-modal/invoice-calculation-modal.component';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { ToastrService } from 'ngx-toastr';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-invoice',
@@ -41,7 +41,7 @@ export class InvoiceComponent implements OnInit {
     private invoiceService: InvoiceService,
     private modalService: NgbModal,
     private spinner: NgxSpinnerService,
-    private toastr: ToastrService
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -208,12 +208,18 @@ export class InvoiceComponent implements OnInit {
 
   generateInvoice(): void {
     if (this.selectedTakeoffs.length === 0) {
-      this.toastr.warning('Please select at least one takeoff to generate an invoice', 'No Selection');
+      this.snackBar.open('Please select at least one takeoff to generate an invoice', 'Close', {
+        duration: 3000,
+        panelClass: ['warning-snackbar']
+      });
       return;
     }
 
     if (this.selectedTakeoffs.length > 5) {
-      this.toastr.error('Maximum 5 takeoffs can be selected per invoice', 'Too Many Selected');
+      this.snackBar.open('Maximum 5 takeoffs can be selected per invoice', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
       return;
     }
 
@@ -232,24 +238,35 @@ export class InvoiceComponent implements OnInit {
           link.download = `invoice_multi_takeoff_${new Date().getTime()}.pdf`;
           link.click();
 
-          this.toastr.success(
+          this.snackBar.open(
             `Invoice ${response.data.invoiceNumber} generated successfully with ${response.data.takeoffCount} takeoff(s). Total: $${response.data.totalAmount.toFixed(2)}`,
-            'Success'
+            'Close',
+            {
+              duration: 4000,
+              panelClass: ['success-snackbar']
+            }
           );
 
           this.clearSelection();
           this.loadTakeoffsForInvoice();
           this.loadInvoiceHistory(); // Reload history to show the new invoice
         } else {
-          this.toastr.error('Failed to generate invoice PDF', 'Error');
+          this.snackBar.open('Failed to generate invoice PDF', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
         }
       },
       error: (error) => {
         this.spinner.hide();
         console.error('Error generating invoice:', error);
-        this.toastr.error(
+        this.snackBar.open(
           error.error?.message || 'Failed to generate invoice. Please try again.',
-          'Error'
+          'Close',
+          {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
         );
       }
     });
@@ -348,17 +365,27 @@ export class InvoiceComponent implements OnInit {
           link.download = `${invoiceGroup.invoiceNumber}_${new Date().getTime()}.pdf`;
           link.click();
 
-          this.toastr.success(`Invoice ${invoiceGroup.invoiceNumber} downloaded successfully`, 'Success');
+          this.snackBar.open(`Invoice ${invoiceGroup.invoiceNumber} downloaded successfully`, 'Close', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
         } else {
-          this.toastr.error('Failed to download invoice PDF', 'Error');
+          this.snackBar.open('Failed to download invoice PDF', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
         }
       },
       error: (error) => {
         this.spinner.hide();
         console.error('Error downloading invoice:', error);
-        this.toastr.error(
+        this.snackBar.open(
           error.error?.message || 'Failed to download invoice. Please try again.',
-          'Download Error'
+          'Close',
+          {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
         );
       }
     });
@@ -401,15 +428,22 @@ export class InvoiceComponent implements OnInit {
           modalRef.componentInstance.calculationData = response.data;
           modalRef.componentInstance.takeoffId = takeoff._id;
         } else {
-          this.toastr.error('Failed to calculate invoice', 'Error');
+          this.snackBar.open('Failed to calculate invoice', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
         }
       },
       error: (error) => {
         this.spinner.hide();
         console.error('Error calculating invoice:', error);
-        this.toastr.error(
+        this.snackBar.open(
           error.error?.message || 'Failed to calculate invoice. Please try again.',
-          'Calculation Error'
+          'Close',
+          {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
         );
       }
     });
@@ -432,17 +466,27 @@ export class InvoiceComponent implements OnInit {
           link.download = `invoice_${takeoff.takeoffNumber}_${new Date().getTime()}.pdf`;
           link.click();
 
-          this.toastr.success('Invoice PDF generated successfully', 'Success');
+          this.snackBar.open('Invoice PDF generated successfully', 'Close', {
+            duration: 3000,
+            panelClass: ['success-snackbar']
+          });
         } else {
-          this.toastr.error('Failed to generate PDF', 'Error');
+          this.snackBar.open('Failed to generate PDF', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
         }
       },
       error: (error) => {
         this.spinner.hide();
         console.error('Error generating PDF:', error);
-        this.toastr.error(
+        this.snackBar.open(
           error.error?.message || 'Failed to generate PDF. Please try again.',
-          'PDF Generation Error'
+          'Close',
+          {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          }
         );
       }
     });

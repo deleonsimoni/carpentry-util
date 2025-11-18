@@ -29,6 +29,8 @@ export interface InvoiceCalculationPreview {
     status: number;
     carpenter: string;
     manager: string;
+    hstRegistrationNumber?: string;
+    companyName?: string;
   };
   calculation: InvoiceCalculation;
 }

@@ -101,6 +101,7 @@ InvoiceSchema.index({ generatedDate: -1 });
 /**
  * Static method to generate next invoice number
  * Format: INV-YYYY-NNN (e.g., INV-2024-001)
+ * Automatically increments if invoice number already exists
  */
 InvoiceSchema.statics.generateInvoiceNumber = async function(companyId) {
   const year = new Date().getFullYear();
@@ -122,10 +123,37 @@ InvoiceSchema.statics.generateInvoiceNumber = async function(companyId) {
     nextNumber = lastNumber + 1;
   }
 
-  // Pad with zeros (e.g., 1 -> "001")
-  const paddedNumber = String(nextNumber).padStart(3, '0');
+  // Loop to find next available number if current one exists
+  let invoiceNumber;
+  let attempts = 0;
+  const maxAttempts = 100; // Prevent infinite loop
 
-  return `${prefix}${paddedNumber}`;
+  while (attempts < maxAttempts) {
+    // Pad with zeros (e.g., 1 -> "001")
+    const paddedNumber = String(nextNumber).padStart(3, '0');
+    invoiceNumber = `${prefix}${paddedNumber}`;
+
+    // Check if this number already exists
+    const existing = await this.findOne({
+      company: companyId,
+      invoiceNumber: invoiceNumber
+    });
+
+    if (!existing) {
+      // Found an available number
+      break;
+    }
+
+    // Number exists, try next one
+    nextNumber++;
+    attempts++;
+  }
+
+  if (attempts >= maxAttempts) {
+    throw new Error('Unable to generate unique invoice number. Please contact support.');
+  }
+
+  return invoiceNumber;
 };
 
 module.exports = mongoose.model('Invoice', InvoiceSchema);

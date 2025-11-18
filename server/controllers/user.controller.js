@@ -207,6 +207,8 @@ async function createUser(userData, companyFilter = {}, currentUser = null) {
     profile: Joi.string().valid(UserRoles.SUPERVISOR, UserRoles.DELIVERY, UserRoles.MANAGER, UserRoles.CARPENTER).required(),
     mobilePhone: Joi.string().optional(),
     homePhone: Joi.string().optional(),
+    hstRegistrationNumber: Joi.string().required(),
+    companyName: Joi.string().required(),
     address: Joi.object().optional(),
     socialMedia: Joi.object().optional()
   });
@@ -304,6 +306,8 @@ async function updateUser(id, updateData, companyFilter = {}, currentUser = null
     status: Joi.string().valid('active', 'inactive').optional(),
     mobilePhone: Joi.string().optional(),
     homePhone: Joi.string().optional(),
+    hstRegistrationNumber: Joi.string().optional(),
+    companyName: Joi.string().optional(),
     address: Joi.object().optional(),
     socialMedia: Joi.object().optional()
   });

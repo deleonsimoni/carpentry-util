@@ -55,8 +55,8 @@
     <!-- Company Information -->
     <div class="company-section">
       <div class="info-row">
-        <span class="label">Crew Leader's Company:</span>
-        <span class="value">{{ calculationData.takeoffInfo.manager || '' }}</span>
+        <span class="label">Company Name:</span>
+        <span class="value">{{ calculationData.takeoffInfo.companyName || 'N/A' }}</span>
       </div>
       <div class="info-row">
         <span class="label">Crew Leader's Name:</span>
@@ -134,7 +134,7 @@
         </tr>
         <tr>
           <td class="label-cell">HST Registration Number:</td>
-          <td class="value-cell">-</td>
+          <td class="value-cell">{{ calculationData.takeoffInfo.hstRegistrationNumber || 'N/A' }}</td>
           <td class="label-cell right">HST:</td>
           <td class="value-cell right">{{ calculationData.calculation.hst | currency:'CAD':'symbol':'1.2-2' }}</td>
         </tr>
