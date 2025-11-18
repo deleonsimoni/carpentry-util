@@ -501,7 +501,7 @@ export class TakeOffComponent implements OnInit {
   saveOrder() {
     this.spinner.show();
 
-    this.takeoffService.saveOrder(this.orderForm.value).subscribe(
+    this.takeoffService.saveOrder(this.orderForm.getRawValue()).subscribe(
       data => {
         this.spinner.hide();
 
@@ -526,12 +526,13 @@ export class TakeOffComponent implements OnInit {
   updateOrder() {
     this.spinner.show();
 
-    if (!this.orderForm.value.trimCarpentry || this.orderForm.value.trimCarpentry.trim() === '') {
-      delete this.orderForm.value.trimCarpentry;
+    const formData = this.orderForm.getRawValue();
+    if (!formData.trimCarpentry || formData.trimCarpentry.trim() === '') {
+      delete formData.trimCarpentry;
     }
 
     this.takeoffService
-      .updateOrder(this.orderForm.value, this.idOrder)
+      .updateOrder(formData, this.idOrder)
       .subscribe(
         data => {
           this.spinner.hide();
@@ -589,7 +590,7 @@ export class TakeOffComponent implements OnInit {
     this.spinner.show();
 
     this.takeoffService
-      .updateOrder(this.orderForm.value, this.idOrder)
+      .updateOrder(this.orderForm.getRawValue(), this.idOrder)
       .subscribe(
         data => {
           this.spinner.hide();
@@ -609,16 +610,17 @@ export class TakeOffComponent implements OnInit {
   autoSaveCarpenterAssignment() {
     this.spinner.show();
 
-    if (!this.orderForm.value.trimCarpentry || this.orderForm.value.trimCarpentry.trim() === '') {
-      this.orderForm.value.trimCarpentry = null;
+    const formData = this.orderForm.getRawValue();
+    if (!formData.trimCarpentry || formData.trimCarpentry.trim() === '') {
+      formData.trimCarpentry = null;
     }
 
-    if (!this.orderForm.value.carpentry || this.orderForm.value.carpentry.trim() === '') {
-      this.orderForm.value.carpentry = null;
+    if (!formData.carpentry || formData.carpentry.trim() === '') {
+      formData.carpentry = null;
     }
 
     this.takeoffService
-      .updateOrder(this.orderForm.value, this.idOrder)
+      .updateOrder(formData, this.idOrder)
       .subscribe(
         data => {
           this.spinner.hide();
@@ -678,7 +680,7 @@ export class TakeOffComponent implements OnInit {
     this.spinner.show();
 
     this.takeoffService
-      .finalizeOrder(this.orderForm.value, this.idOrder)
+      .finalizeOrder(this.orderForm.getRawValue(), this.idOrder)
       .subscribe(
         data => {
           this.spinner.hide();
@@ -701,7 +703,7 @@ export class TakeOffComponent implements OnInit {
     this.spinner.show();
 
     this.takeoffService
-      .backOrderToCarpentry(this.orderForm.value, this.idOrder)
+      .backOrderToCarpentry(this.orderForm.getRawValue(), this.idOrder)
       .subscribe(
         data => {
           this.spinner.hide();
