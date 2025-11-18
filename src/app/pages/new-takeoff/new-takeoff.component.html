@@ -1139,7 +1139,7 @@
             <div class="box-bottom row" *ngIf="idOrder">
               <!-- New Centralized Actions Component -->
               <app-takeoff-actions [currentStatus]="orderStatus" [isManager]="isManager" [userRole]="userRole"
-                [takeoffId]="idOrder" [customerName]="orderForm.get('custumerName')?.value"
+                [takeoffId]="idOrder" [customerName]="orderForm.get('custumerName')?.value" [carpentry]="orderForm.get('carpentry')?.value"
                 [isFormValid]="orderForm.valid" [isLoading]="isAdvancingStatus" (onSaveProgress)="updateOrder()"
                 (onCompleteMeasurement)="finalizeOrderPopUp()" (onApproveForShipping)="approveForShipping()"
                 (onBackToMeasurement)="backToMeasurement()" (onMarkAsShipped)="markAsShipped()"

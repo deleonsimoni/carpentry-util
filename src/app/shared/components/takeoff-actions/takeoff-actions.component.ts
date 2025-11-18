@@ -19,6 +19,7 @@ export class TakeoffActionsComponent {
   @Input() userRole: string = ''; // New input for user role
   @Input() takeoffId: string = '';
   @Input() customerName: string = ''; // For delivery photo modal
+  @Input() carpentry: string = ''; 
   @Input() isFormValid: boolean = true;
   @Input() isLoading: boolean = false;
 
@@ -92,7 +93,7 @@ export class TakeoffActionsComponent {
    * Show when takeoff is CREATED and needs to be sent to carpenter
    */
   shouldShowSendToCarpenter(): boolean {
-    return this.isManager && this.currentStatus === TakeoffStatus.CREATED;
+    return this.isManager && this.currentStatus === TakeoffStatus.CREATED && this.carpentry !== '';
   }
 
   /**
