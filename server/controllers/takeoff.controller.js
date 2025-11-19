@@ -332,7 +332,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
 
       //SingleDoors
       case 'singleSize1':
-        field.setText(takeoff.singleDoors[0].size);
+        field.setText(
+          takeoff.singleDoors[0].size && takeoff.singleDoors[0].height
+            ? `${takeoff.singleDoors[0].size}x${takeoff.singleDoors[0].height}`
+            : `${takeoff.singleDoors[0].size || ""}${takeoff.singleDoors[0].height || ""}`
+        );
         break;
       case 'singleLeft1':
         field.setText(takeoff.singleDoors[0].left);
@@ -345,7 +349,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize2':
-        field.setText(takeoff.singleDoors[1].size);
+        field.setText(
+          takeoff.singleDoors[1].size && takeoff.singleDoors[1].height
+            ? `${takeoff.singleDoors[1].size}x${takeoff.singleDoors[1].height}`
+            : `${takeoff.singleDoors[1].size || ""}${takeoff.singleDoors[1].height || ""}`
+        );       
         break;
       case 'singleLeft2':
         field.setText(takeoff.singleDoors[1].left);
@@ -358,7 +366,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize3':
-        field.setText(takeoff.singleDoors[2].size);
+        field.setText(
+          takeoff.singleDoors[2].size && takeoff.singleDoors[2].height
+            ? `${takeoff.singleDoors[2].size}x${takeoff.singleDoors[2].height}`
+            : `${takeoff.singleDoors[2].size || ""}${takeoff.singleDoors[2].height || ""}`
+        );
         break;
       case 'singleLeft3':
         field.setText(takeoff.singleDoors[2].left);
@@ -371,7 +383,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize4':
-        field.setText(takeoff.singleDoors[3].size);
+        field.setText(
+          takeoff.singleDoors[3].size && takeoff.singleDoors[3].height
+            ? `${takeoff.singleDoors[3].size}x${takeoff.singleDoors[3].height}`
+            : `${takeoff.singleDoors[3].size || ""}${takeoff.singleDoors[3].height || ""}`
+        );
         break;
       case 'singleLeft4':
         field.setText(takeoff.singleDoors[3].left);
@@ -384,7 +400,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize5':
-        field.setText(takeoff.singleDoors[4].size);
+        field.setText(
+          takeoff.singleDoors[4].size && takeoff.singleDoors[4].height
+            ? `${takeoff.singleDoors[4].size}x${takeoff.singleDoors[4].height}`
+            : `${takeoff.singleDoors[4].size || ""}${takeoff.singleDoors[4].height || ""}`
+        );
         break;
       case 'singleLeft5':
         field.setText(takeoff.singleDoors[4].left);
@@ -397,7 +417,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize6':
-        field.setText(takeoff.singleDoors[5].size);
+        field.setText(
+          takeoff.singleDoors[5].size && takeoff.singleDoors[5].height
+            ? `${takeoff.singleDoors[5].size}x${takeoff.singleDoors[5].height}`
+            : `${takeoff.singleDoors[5].size || ""}${takeoff.singleDoors[5].height || ""}`
+        );
         break;
       case 'singleLeft6':
         field.setText(takeoff.singleDoors[5].left);
@@ -410,7 +434,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize7':
-        field.setText(takeoff.singleDoors[6].size);
+        field.setText(
+          takeoff.singleDoors[6].size && takeoff.singleDoors[6].height
+            ? `${takeoff.singleDoors[6].size}x${takeoff.singleDoors[6].height}`
+            : `${takeoff.singleDoors[6].size || ""}${takeoff.singleDoors[6].height || ""}`
+        );
         break;
       case 'singleLeft7':
         field.setText(takeoff.singleDoors[6].left);
@@ -423,7 +451,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize8':
-        field.setText(takeoff.singleDoors[7].size);
+        field.setText(
+          takeoff.singleDoors[7].size && takeoff.singleDoors[7].height
+            ? `${takeoff.singleDoors[7].size}x${takeoff.singleDoors[7].height}`
+            : `${takeoff.singleDoors[7].size || ""}${takeoff.singleDoors[7].height || ""}`
+        );
         break;
       case 'singleLeft8':
         field.setText(takeoff.singleDoors[7].left);
@@ -436,7 +468,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize9':
-        field.setText(takeoff.singleDoors[8].size);
+        field.setText(
+          takeoff.singleDoors[8].size && takeoff.singleDoors[8].height
+            ? `${takeoff.singleDoors[8].size}x${takeoff.singleDoors[8].height}`
+            : `${takeoff.singleDoors[8].size || ""}${takeoff.singleDoors[8].height || ""}`
+        );
         break;
       case 'singleLeft9':
         field.setText(takeoff.singleDoors[8].left);
@@ -449,7 +485,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize10':
-        field.setText(takeoff.singleDoors[9].size);
+        field.setText(
+          takeoff.singleDoors[9].size && takeoff.singleDoors[9].height
+            ? `${takeoff.singleDoors[9].size}x${takeoff.singleDoors[9].height}`
+            : `${takeoff.singleDoors[9].size || ""}${takeoff.singleDoors[9].height || ""}`
+        );
         break;
       case 'singleLeft10':
         field.setText(takeoff.singleDoors[9].left);
@@ -462,7 +502,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize11':
-        field.setText(takeoff.singleDoors[10].size);
+        field.setText(
+          takeoff.singleDoors[10].size && takeoff.singleDoors[10].height
+            ? `${takeoff.singleDoors[10].size}x${takeoff.singleDoors[10].height}`
+            : `${takeoff.singleDoors[10].size || ""}${takeoff.singleDoors[10].height || ""}`
+        );
         break;
       case 'singleLeft11':
         field.setText(takeoff.singleDoors[10].left);
@@ -475,7 +519,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize12':
-        field.setText(takeoff.singleDoors[11].size);
+        field.setText(
+          takeoff.singleDoors[11].size && takeoff.singleDoors[11].height
+            ? `${takeoff.singleDoors[11].size}x${takeoff.singleDoors[11].height}`
+            : `${takeoff.singleDoors[11].size || ""}${takeoff.singleDoors[11].height || ""}`
+        );
         break;
       case 'singleLeft12':
         field.setText(takeoff.singleDoors[11].left);
@@ -488,7 +536,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize13':
-        field.setText(takeoff.singleDoors[12].size);
+        field.setText(
+          takeoff.singleDoors[12].size && takeoff.singleDoors[12].height
+            ? `${takeoff.singleDoors[12].size}x${takeoff.singleDoors[12].height}`
+            : `${takeoff.singleDoors[12].size || ""}${takeoff.singleDoors[12].height || ""}`
+        );
         break;
       case 'singleLeft13':
         field.setText(takeoff.singleDoors[12].left);
@@ -501,7 +553,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'singleSize14':
-        field.setText(takeoff.singleDoors[13].size);
+        field.setText(
+          takeoff.singleDoors[13].size && takeoff.singleDoors[13].height
+            ? `${takeoff.singleDoors[13].size}x${takeoff.singleDoors[13].height}`
+            : `${takeoff.singleDoors[13].size || ""}${takeoff.singleDoors[13].height || ""}`
+        );
         break;
       case 'singleLeft14':
         field.setText(takeoff.singleDoors[13].left);
@@ -514,8 +570,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       //Arches
-
-      case 'archesCol1':
+      case 'size1':
         field.setText(takeoff.arches[0].size);
         break;
       case 'archesCol2':
@@ -558,7 +613,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText('');
         break;
 
-      case 'archesCol12':
+      case 'size2':
         field.setText(takeoff.arches[1].size);
         break;
       case 'archesCol22':
@@ -601,7 +656,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText('');
         break;
 
-      case 'archesCol13':
+      case 'size3':
         field.setText(takeoff.arches[2].size);
         break;
       case 'archesCol23':
@@ -645,7 +700,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
 
-      case 'archesCol14':
+      case 'size4':
         field.setText(takeoff.arches[3].size);
         break;
       case 'archesCol24':
@@ -688,7 +743,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText('');
         break;
 
-      case 'archesCol15':
+      case 'size5':
         field.setText(takeoff.arches[4].size);
         break;
       case 'archesCol25':

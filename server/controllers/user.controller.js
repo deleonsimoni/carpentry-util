@@ -410,7 +410,7 @@ async function changePassword(userId, currentPassword, newPassword) {
   ).select('-hashedPassword');
 
   return {
-    message: 'Senha alterada com sucesso',
+    message: 'Password changed successfully',
     user: updatedUser
   };
 }

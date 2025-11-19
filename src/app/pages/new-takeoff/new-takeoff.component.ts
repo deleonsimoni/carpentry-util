@@ -1207,6 +1207,21 @@ export class TakeOffComponent implements OnInit {
         size: '',
         left: '',
         right: '',
+        height: '',
+        jamb: '475',
+      },
+      {
+        size: '',
+        left: '',
+        right: '',
+        height: '',
+        jamb: '475',
+      },
+      {
+        size: '',
+        left: '',
+        right: '',
+        height: '',
         jamb: '475',
       },
       {
@@ -1219,29 +1234,19 @@ export class TakeOffComponent implements OnInit {
         size: '',
         left: '',
         right: '',
+        height: '',
         jamb: '475',
       },
       {
         size: '',
         left: '',
         right: '',
+        height: '',
         jamb: '475',
       },
       {
         size: '',
-        left: '',
-        right: '',
-        jamb: '475',
-      },
-      {
-        size: '',
-        left: '',
-        right: '',
-        jamb: '475',
-      },
-      {
-        size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '475',
@@ -1249,7 +1254,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '475',
@@ -1257,7 +1262,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
@@ -1265,7 +1270,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
@@ -1273,7 +1278,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
@@ -1281,7 +1286,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
@@ -1289,7 +1294,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
@@ -1297,7 +1302,7 @@ export class TakeOffComponent implements OnInit {
       },
       {
         size: '',
-        height: '80',
+        height: '',
         left: '',
         right: '',
         jamb: '',
