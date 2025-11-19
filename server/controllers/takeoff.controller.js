@@ -36,7 +36,7 @@ async function insert(idUser, body, companyFilter = {}) {
     ...(body.company && { company: body.company })
   });
 
-  if(exists) {
+  if (exists) {
     return {
       success: false,
       code: "TAKEOFF_ALREADY_EXISTS",
@@ -67,13 +67,13 @@ async function getTakeoffs(user, companyFilter = {}) {
     .populate('carpentry', 'fullname email')
     .populate('trimCarpentry', 'fullname email')
     .populate({
-        path: 'user',
-        select: 'fullname email company',
-        populate: {
-          path: 'company',
-          select: 'name ' // escolha os campos da company que quiser
-        }
-    })    
+      path: 'user',
+      select: 'fullname email company',
+      populate: {
+        path: 'company',
+        select: 'name ' // escolha os campos da company que quiser
+      }
+    })
     .select('custumerName carpentry trimCarpentry user status shipTo lot')
     .sort({
       createdAt: -1,
@@ -147,6 +147,8 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
   const yyyy = today.getFullYear();
   let mm = today.getMonth() + 1; // Months start at 0!
   let dd = today.getDate();
+  customHeight = '';
+
 
   const baseQuery = {
     $and: [{ _id: idTakeoff }],
@@ -155,8 +157,8 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
   };
 
   let takeoff = await Takeoff.findOne(baseQuery)
-      .populate('company', 'name')
-      ;
+    .populate('company', 'name')
+    ;
 
   const filePath = 'template.pdf';
 
@@ -215,7 +217,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       //cantinaDoors
-      
+
       case 'cantina1':
         field.setText("STEEL STD");
         break;
@@ -252,7 +254,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.frenchDoors[0].jamb);
         break;
 
-        
+
       case 'frenchSize2':
         field.setText(
           takeoff.frenchDoors[1].size + ' ' + takeoff.frenchDoors[1].swing
@@ -353,7 +355,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
           takeoff.singleDoors[1].size && takeoff.singleDoors[1].height
             ? `${takeoff.singleDoors[1].size}x${takeoff.singleDoors[1].height}`
             : `${takeoff.singleDoors[1].size || ""}${takeoff.singleDoors[1].height || ""}`
-        );       
+        );
         break;
       case 'singleLeft2':
         field.setText(takeoff.singleDoors[1].left);
@@ -570,223 +572,315 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       //Arches
+
+      case 'archesSize4':
+        field.setText('8\' (96")');
+        break;
+
+      case 'archesSize55':
+        field.setText('6/8 (80")');
+        break;
+
       case 'size1':
         field.setText(takeoff.arches[0].size);
         break;
+      case 'archesCol1':
+        field.setText(takeoff.arches[0]?.jamb == 475 ? takeoff.arches[0].qty : "");
+        break;
       case 'archesCol2':
-        field.setText(takeoff.arches[0].height);
+        field.setText(takeoff.arches[0]?.jamb == 675 ? takeoff.arches[0].qty : "");
         break;
-      case 'archesCol3':
-        field.setText(takeoff.arches[0].jamb);
+
+      case 'archesCol13':
+        customHeight == '' ? customHeight = takeoff.arches[0]?.height : '';
+        field.setText(takeoff.arches[0]?.height != "80" && takeoff.arches[0]?.height != "96" && takeoff.arches[0] ? "X" : "");
         break;
-      case 'archesCol4':
-        field.setText(takeoff.arches[0].col3);
+      case 'archesCol14':
+        field.setText(takeoff.arches[0]?.height == "80" ? "X" : "");
         break;
-      case 'archesCol5':
-        field.setText(takeoff.arches[0].col4);
-        break;
-      case 'archesCol6':
-        field.setText('');
-        break;
-      case 'archesCol7':
-        field.setText('');
-        break;
-      case 'archesCol8':
-        field.setText('');
-        break;
-      case 'archesCol9':
-        field.setText('');
-        break;
-      case 'archesCola':
-        field.setText('');
-        break;
-      case 'archesColb':
-        field.setText('');
-        break;
-      case 'archesColc':
-        field.setText('');
-        break;
-      case 'archesCol1d':
-        field.setText('');
-        break;
-      case 'archesCol1e':
-        field.setText('');
+      case 'archesCol15':
+        field.setText(takeoff.arches[0]?.height == "96" ? "X" : "");
         break;
 
       case 'size2':
         field.setText(takeoff.arches[1].size);
         break;
+      case 'archesCol2':
+        field.setText(takeoff.arches[1]?.jamb == 475 ? takeoff.arches[1].qty : "");
+        break;
       case 'archesCol22':
-        field.setText(takeoff.arches[1].height);
+        field.setText(takeoff.arches[1]?.jamb == 675 ? takeoff.arches[1].qty : "");
         break;
-      case 'archesCol32':
-        field.setText(takeoff.arches[1].jamb);
+
+      case 'archesCol23':
+        customHeight == '' ? customHeight = takeoff.arches[1]?.height : '';
+        field.setText(takeoff.arches[1]?.height != "80" && takeoff.arches[1]?.height != "96" && takeoff.arches[1] ? "X" : "");
         break;
-      case 'archesCol42':
-        field.setText(takeoff.arches[1].col3);
+      case 'archesCol24':
+        field.setText(takeoff.arches[1]?.height == "80" ? "X" : "");
         break;
-      case 'archesCol52':
-        field.setText(takeoff.arches[1].col4);
+      case 'archesCol25':
+        field.setText(takeoff.arches[1]?.height == "96" ? "X" : "");
         break;
-      case 'archesCol62':
-        field.setText('');
-        break;
-      case 'archesCol72':
-        field.setText('');
-        break;
-      case 'archesCol82':
-        field.setText('');
-        break;
-      case 'archesCol92':
-        field.setText('');
-        break;
-      case 'archesCola2':
-        field.setText('');
-        break;
-      case 'archesColb2':
-        field.setText('');
-        break;
-      case 'archesColc2':
-        field.setText('');
-        break;
-      case 'archesCol1d2':
-        field.setText('');
-        break;
-      case 'archesCole2':
-        field.setText('');
-        break;
+
 
       case 'size3':
         field.setText(takeoff.arches[2].size);
         break;
-      case 'archesCol23':
-        field.setText(takeoff.arches[2].height);
+      case 'archesCol3':
+        field.setText(takeoff.arches[2]?.jamb == 475 ? takeoff.arches[2].qty : "");
+        break;
+      case 'archesCol32':
+        field.setText(takeoff.arches[2]?.jamb == 675 ? takeoff.arches[2].qty : "");
         break;
       case 'archesCol33':
-        field.setText(takeoff.arches[2].jamb);
+        customHeight == '' ? customHeight = takeoff.arches[2]?.height : '';
+        field.setText(takeoff.arches[2]?.height != "80" && takeoff.arches[2]?.height != "96" && takeoff.arches[2] ? "X" : "");
         break;
-      case 'archesCol43':
-        field.setText(takeoff.arches[2].col3);
+      case 'archesCol34':
+        field.setText(takeoff.arches[2]?.height == "80" ? "X" : "");
         break;
-      case 'archesCol53':
-        field.setText(takeoff.arches[2].col4);
-        break;
-      case 'archesCol63':
-        field.setText('');
-        break;
-      case 'archesCol73':
-        field.setText('');
-        break;
-      case 'archesCol83':
-        field.setText('');
-        break;
-      case 'archesCol93':
-        field.setText('');
-        break;
-      case 'archesCola3':
-        field.setText('');
-        break;
-      case 'archesColb3':
-        field.setText('');
-        break;
-      case 'archesColc3':
-        field.setText('');
-        break;
-      case 'archesCol1d3':
-        field.setText('');
-        break;
-      case 'archesCole3':
-        field.setText('');
+      case 'archesCol35':
+        field.setText(takeoff.arches[2]?.height == "96" ? "X" : "");
         break;
 
 
       case 'size4':
         field.setText(takeoff.arches[3].size);
         break;
-      case 'archesCol24':
-        field.setText(takeoff.arches[3].height);
+      case 'archesCol4':
+        field.setText(takeoff.arches[3]?.jamb == 475 ? takeoff.arches[3].qty : "");
         break;
-      case 'archesCol34':
-        field.setText(takeoff.arches[3].jamb);
+      case 'archesCol42':
+        field.setText(takeoff.arches[3]?.jamb == 675 ? takeoff.arches[3].qty : "");
+        break;
+      case 'archesCol43':
+        customHeight == '' ? customHeight = takeoff.arches[3]?.height : '';
+        field.setText(takeoff.arches[3]?.height != "80" && takeoff.arches[3]?.height != "96" && takeoff.arches[3] ? "X" : "");
         break;
       case 'archesCol44':
-        field.setText(takeoff.arches[3].col3);
+        field.setText(takeoff.arches[3]?.height == "80" ? "X" : "");
         break;
-      case 'archesCol54':
-        field.setText(takeoff.arches[3].col4);
-        break;
-      case 'archesCol64':
-        field.setText('');
-        break;
-      case 'archesCol74':
-        field.setText('');
-        break;
-      case 'archesCol84':
-        field.setText('');
-        break;
-      case 'archesCol94':
-        field.setText('');
-        break;
-      case 'archesCola4':
-        field.setText('');
-        break;
-      case 'archesColb4':
-        field.setText('');
-        break;
-      case 'archesColc4':
-        field.setText('');
-        break;
-      case 'archesCol1d4':
-        field.setText('');
-        break;
-      case 'archesCole4':
-        field.setText('');
+      case 'archesCol45':
+        field.setText(takeoff.arches[3]?.height == "96" ? "X" : "");
         break;
 
       case 'size5':
         field.setText(takeoff.arches[4].size);
         break;
-      case 'archesCol25':
-        field.setText(takeoff.arches[4].height);
+      case 'archesCol5':
+        field.setText(takeoff.arches[4]?.jamb == 475 ? takeoff.arches[4].qty : "");
         break;
-      case 'archesCol35':
-        field.setText(takeoff.arches[4].jamb);
+      case 'archesCol52':
+        field.setText(takeoff.arches[4]?.jamb == 675 ? takeoff.arches[4].qty : "");
         break;
-      case 'archesCol45':
-        field.setText(takeoff.arches[4].col3);
+      case 'archesCol53':
+        customHeight == '' ? customHeight = takeoff.arches[4]?.height : '';
+        field.setText(takeoff.arches[4]?.height != "80" && takeoff.arches[4]?.height != "96" && takeoff.arches[4] ? "X" : "");
+        break;
+      case 'archesCol54':
+        field.setText(takeoff.arches[4]?.height == "80" ? "X" : "");
         break;
       case 'archesCol55':
-        field.setText(takeoff.arches[4].col4);
+        field.setText(takeoff.arches[4]?.height == "96" ? "X" : "");
+        break;
+
+      case 'size6':
+        field.setText(takeoff.arches[5]?.size);
+        break;
+      case 'archesCol6':
+        field.setText(takeoff.arches[5]?.jamb == 475 ? takeoff.arches[5].qty : "");
+        break;
+      case 'archesCol62':
+        field.setText(takeoff.arches[5]?.jamb == 675 ? takeoff.arches[5].qty : "");
+        break;
+      case 'archesCol63':
+        customHeight == '' ? customHeight = takeoff.arches[5]?.height : '';
+        field.setText(takeoff.arches[5]?.height != "80" && takeoff.arches[5]?.height != "96" && takeoff.arches[5] ? "X" : "");
+        break;
+      case 'archesCol64':
+        field.setText(takeoff.arches[5]?.height == "80" ? "X" : "");
         break;
       case 'archesCol65':
-        field.setText('');
+        field.setText(takeoff.arches[5]?.height == "96" ? "X" : "");
+        break;
+
+      case 'size7':
+        field.setText(takeoff.arches[6]?.size);
+        break;
+      case 'archesCol7':
+        field.setText(takeoff.arches[6]?.jamb == 475 ? takeoff.arches[6].qty : "");
+        break;
+      case 'archesCol72':
+        field.setText(takeoff.arches[6]?.jamb == 675 ? takeoff.arches[6].qty : "");
+        break;
+      case 'archesCol73':
+        customHeight == '' ? customHeight = takeoff.arches[6]?.height : '';
+        field.setText(takeoff.arches[6]?.height != "80" && takeoff.arches[6]?.height != "96" && takeoff.arches[6] ? "X" : "");
+        break;
+      case 'archesCol74':
+        field.setText(takeoff.arches[6]?.height == "80" ? "X" : "");
         break;
       case 'archesCol75':
-        field.setText('');
+        field.setText(takeoff.arches[6]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 8 --------
+      case 'size8':
+        field.setText(takeoff.arches[7]?.size);
+        break;
+      case 'archesCol8':
+        field.setText(takeoff.arches[7]?.jamb == 475 ? takeoff.arches[7].qty : "");
+        break;
+      case 'archesCol82':
+        field.setText(takeoff.arches[7]?.jamb == 675 ? takeoff.arches[7].qty : "");
+        break;
+      case 'archesCol83':
+        customHeight == '' ? customHeight = takeoff.arches[7]?.height : '';
+        field.setText(takeoff.arches[7]?.height != "80" && takeoff.arches[7]?.height != "96" && takeoff.arches[7] ? "X" : "");
+        break;
+      case 'archesCol84':
+        field.setText(takeoff.arches[7]?.height == "80" ? "X" : "");
         break;
       case 'archesCol85':
-        field.setText('');
+        field.setText(takeoff.arches[7]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 9 --------
+      case 'size9':
+        field.setText(takeoff.arches[8]?.size);
+        break;
+      case 'archesCol9':
+        field.setText(takeoff.arches[8]?.jamb == 475 ? takeoff.arches[8].qty : "");
+        break;
+      case 'archesCol92':
+        field.setText(takeoff.arches[8]?.jamb == 675 ? takeoff.arches[8].qty : "");
+        break;
+      case 'archesCol93':
+        customHeight == '' ? customHeight = takeoff.arches[8]?.height : '';
+        field.setText(takeoff.arches[8]?.height != "80" && takeoff.arches[8]?.height != "96" && takeoff.arches[8] ? "X" : "");
+        break;
+      case 'archesCol94':
+        field.setText(takeoff.arches[8]?.height == "80" ? "X" : "");
         break;
       case 'archesCol95':
-        field.setText('');
+        field.setText(takeoff.arches[8]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 10 --------
+      case 'size10':
+        field.setText(takeoff.arches[9]?.size);
+        break;
+      case 'archesCol1a':
+        field.setText(takeoff.arches[9]?.jamb == 475 ? takeoff.arches[9].qty : "");
+        break;
+      case 'archesCola2':
+        field.setText(takeoff.arches[9]?.jamb == 675 ? takeoff.arches[9].qty : "");
+        break;
+      case 'archesCola3':
+        customHeight == '' ? customHeight = takeoff.arches[9]?.height : '';
+        field.setText(takeoff.arches[9]?.height != "80" && takeoff.arches[9]?.height != "96" && takeoff.arches[9] ? "X" : "");
+        break;
+      case 'archesCola4':
+        field.setText(takeoff.arches[9]?.height == "80" ? "X" : "");
         break;
       case 'archesCola5':
-        field.setText('');
+        field.setText(takeoff.arches[9]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 11 --------
+      case 'size11':
+        field.setText(takeoff.arches[10]?.size);
+        break;
+      case 'archesCol1b':
+        field.setText(takeoff.arches[10]?.jamb == 475 ? takeoff.arches[10].qty : "");
+        break;
+      case 'archesColb2':
+        field.setText(takeoff.arches[10]?.jamb == 675 ? takeoff.arches[10].qty : "");
+        break;
+      case 'archesColb3':
+        customHeight == '' ? customHeight = takeoff.arches[10]?.height : '';
+        field.setText(takeoff.arches[10]?.height != "80" && takeoff.arches[10]?.height != "96" && takeoff.arches[10] ? "X" : "");
+        break;
+      case 'archesColb4':
+        field.setText(takeoff.arches[10]?.height == "80" ? "X" : "");
         break;
       case 'archesColb5':
-        field.setText('');
+        field.setText(takeoff.arches[10]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 12 --------
+      case 'size12':
+        field.setText(takeoff.arches[11]?.size);
+        break;
+      case 'archesCol1c':
+        field.setText(takeoff.arches[11]?.jamb == 475 ? takeoff.arches[11].qty : "");
+        break;
+      case 'archesColc2':
+        field.setText(takeoff.arches[11]?.jamb == 675 ? takeoff.arches[11].qty : "");
+        break;
+      case 'archesColc3':
+        customHeight == '' ? customHeight = takeoff.arches[11]?.height : '';
+        field.setText(takeoff.arches[11]?.height != "80" && takeoff.arches[11]?.height != "96" && takeoff.arches[11] ? "X" : "");
+        break;
+      case 'archesColc4':
+        field.setText(takeoff.arches[11]?.height == "80" ? "X" : "");
         break;
       case 'archesColc5':
-        field.setText('');
+        field.setText(takeoff.arches[11]?.height == "96" ? "X" : "");
         break;
-      case 'archesCol1d5':
-        field.setText('');
+
+
+      // -------- ARCH 13 --------
+      case 'size13':
+        field.setText(takeoff.arches[12]?.size);
+        break;
+      case 'archesCol1d':
+        field.setText(takeoff.arches[12]?.jamb == 475 ? takeoff.arches[12].qty : "");
+        break;
+      case 'archesCold2':
+        field.setText(takeoff.arches[12]?.jamb == 675 ? takeoff.arches[12].qty : "");
+        break;
+      case 'archesCold3':
+        customHeight == '' ? customHeight = takeoff.arches[12]?.height : '';
+        field.setText(takeoff.arches[12]?.height != "80" && takeoff.arches[12]?.height != "96" && takeoff.arches[12] ? "X" : "");
+        break;
+      case 'archesCold4':
+        field.setText(takeoff.arches[12]?.height == "80" ? "X" : "");
+        break;
+      case 'archesCold5':
+        field.setText(takeoff.arches[12]?.height == "96" ? "X" : "");
+        break;
+
+
+      // -------- ARCH 13 --------
+      case 'size14':
+        field.setText(takeoff.arches[13]?.size);
+        break;
+      case 'archesCol1e':
+        field.setText(takeoff.arches[13]?.jamb == 475 ? takeoff.arches[13].qty : "");
+        break;
+      case 'archesCole2':
+        field.setText(takeoff.arches[13]?.jamb == 675 ? takeoff.arches[13].qty : "");
+        break;
+      case 'archesCole3':
+        customHeight == '' ? customHeight = takeoff.arches[13]?.height : '';
+        field.setText(takeoff.arches[13]?.height != "80" && takeoff.arches[13]?.height != "96" && takeoff.arches[13] ? "X" : "");
+        break;
+      case 'archesCole4':
+        field.setText(takeoff.arches[13]?.height == "80" ? "X" : "");
         break;
       case 'archesCole5':
-        field.setText('');
+        field.setText(takeoff.arches[13]?.height == "96" ? "X" : "");
         break;
-      //trim
 
+
+      //trim
       case 'trimDetails1':
         field.setText(takeoff.trim[0].details);
         break;
@@ -1325,6 +1419,10 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
     field.enableReadOnly();
   });
 
+  console.log('Custom heights for arches:', customHeight);
+
+  form.getField("archesSize3").setText(customHeight);
+
   return await pdfDoc.saveAsBase64({ dataUri: true });
 }
 
@@ -1439,7 +1537,7 @@ async function updateTrimCarpenter(user, trimCarpenterId, idTakeoff, companyFilt
     { trimCarpentry: trimCarpenterId },
     { new: true }
   ).populate('trimCarpentry', 'fullname email')
-   .populate('carpentry', 'fullname email');
+    .populate('carpentry', 'fullname email');
 
   if (!updatedTakeoff) {
     const error = new Error('Takeoff not found or access denied');
@@ -1468,7 +1566,7 @@ async function removeTrimCarpenter(user, idTakeoff, companyFilter = {}) {
     { $unset: { trimCarpentry: "" } },
     { new: true }
   ).populate('carpentry', 'fullname email')
-   .populate('trimCarpentry', 'fullname email');
+    .populate('trimCarpentry', 'fullname email');
 
   if (!updatedTakeoff) {
     const error = new Error('Takeoff not found or access denied');
