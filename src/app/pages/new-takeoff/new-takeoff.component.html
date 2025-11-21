@@ -317,12 +317,12 @@
               <hr class="my-4" />
               <!-- Address -->
               <h6 class="heading-small text mb-4">
-                <button *ngIf="!isVisibleCantinaDoors && !isReadonly" (click)="showHideFormCantina()"
+                <button *ngIf="!isVisibleCantinaDoors" (click)="showHideFormCantina()"
                   class="btn btn-warning">
                   <i class="ni ni-bold-down"></i> CANTINA DOORS - Click to Show
                 </button>
 
-                <button *ngIf="isVisibleCantinaDoors && !isReadonly" (click)="showHideFormCantina()"
+                <button *ngIf="isVisibleCantinaDoors" (click)="showHideFormCantina()"
                   class="btn btn-warning">
                   <i class="ni ni-bold-up"></i> CANTINA DOORS - Click to Hide
                 </button>
@@ -381,12 +381,12 @@
               <hr class="my-4" />
               <!-- Address -->
               <h6 class="heading-small text mb-4">
-                <button *ngIf="!isVisibleFrenchDoors && !isReadonly" (click)="showHideFormFrench()"
+                <button *ngIf="!isVisibleFrenchDoors" (click)="showHideFormFrench()"
                   class="btn btn-warning">
                   <i class="ni ni-bold-down"></i> FRENCH DOORS - Click to Show
                 </button>
 
-                <button *ngIf="isVisibleFrenchDoors && !isReadonly" (click)="showHideFormFrench()"
+                <button *ngIf="isVisibleFrenchDoors" (click)="showHideFormFrench()"
                   class="btn btn-warning">
                   <i class="ni ni-bold-up"></i> FRENCH DOORS - Click to Hide
                 </button>
