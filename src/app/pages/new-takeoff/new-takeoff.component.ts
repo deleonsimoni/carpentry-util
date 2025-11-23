@@ -1416,7 +1416,7 @@ export class TakeOffComponent implements OnInit {
 
     let combinedValue = '';
     if (size && height) {
-      combinedValue = `${size}/${height}"`;
+      combinedValue = `${size}x${height}`;
     } else if (size) {
       combinedValue = size;
     }
