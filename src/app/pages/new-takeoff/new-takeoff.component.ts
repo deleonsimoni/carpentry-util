@@ -1163,7 +1163,7 @@ export class TakeOffComponent implements OnInit {
 
       arrayForm.push(formGroup);
     });
-    
+
   }
 
   preFillHardware() {
@@ -1587,6 +1587,10 @@ export class TakeOffComponent implements OnInit {
    */
   approveForShipping(): void {
     if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.UNDER_REVIEW) {
+      return;
+    }
+    if (this.orderForm?.get('trimCarpentry')?.value == '' && !this.isTrimCarpentryFound) {
+      this.notification.info('Set the trim carpenter from takeoff', 'Trim Carpenter');
       return;
     }
     this.advanceToSpecificStatus(TakeoffStatus.READY_TO_SHIP);

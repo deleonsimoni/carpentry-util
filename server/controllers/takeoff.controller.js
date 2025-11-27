@@ -55,6 +55,11 @@ async function getTakeoffs(user, companyFilter = {}) {
     baseQuery = {
       ...companyFilter // Only company filter for delivery users
     };
+  } if (UserRoles.isSupervisor(user.roles)) {
+    baseQuery = {
+      $or: [{ company: user.company }],
+      ...companyFilter // Only company filter for delivery users
+    };
   } else {
     // For other users (manager, carpenter), use existing logic
     baseQuery = {
@@ -80,12 +85,23 @@ async function getTakeoffs(user, companyFilter = {}) {
     });
 }
 
-async function detailTakeoff(idUser, idTakeoff, companyFilter = {}) {
-  const baseQuery = {
-    $and: [{ _id: idTakeoff }],
-    $or: [{ user: idUser }, { carpentry: idUser }, { trimCarpentry: idUser }],
-    ...companyFilter
-  };
+async function detailTakeoff(idUser, idTakeoff, companyFilter = {}, idCompany, roles) {
+
+  let baseQuery;
+
+  if (UserRoles.isSupervisor(roles)) {
+    baseQuery = {
+      $and: [{ _id: idTakeoff }],
+      $or: [{ company: idCompany }],
+      ...companyFilter // Only company filter for delivery users
+    };
+  } else {
+    baseQuery = {
+      $and: [{ _id: idTakeoff }],
+      $or: [{ user: idUser }, { carpentry: idUser }, { trimCarpentry: idUser }],
+      ...companyFilter
+    };
+  }
 
   return await Takeoff.find(baseQuery)
     .populate('carpentry', 'fullname email')
@@ -148,7 +164,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
   let mm = today.getMonth() + 1; // Months start at 0!
   let dd = today.getDate();
   customHeight = '';
-
+  let height;
 
   const baseQuery = {
     $and: [{ _id: idTakeoff }],
@@ -573,11 +589,11 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
 
       //Arches
 
-      case 'archesSize4':
+      case 'archesSize55':
         field.setText('8\' (96")');
         break;
 
-      case 'archesSize55':
+      case 'archesSize4':
         field.setText('6/8 (80")');
         break;
 
@@ -592,14 +608,21 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'archesCol13':
-        customHeight == '' ? customHeight = takeoff.arches[0]?.height : '';
-        field.setText(takeoff.arches[0]?.height != "80" && takeoff.arches[0]?.height != "96" && takeoff.arches[0] ? "X" : "");
+        height = takeoff.arches[0]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[0]?.height
+        } else {
+          field.setText("");
+        }
+
         break;
       case 'archesCol14':
-        field.setText(takeoff.arches[0]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[0]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol15':
-        field.setText(takeoff.arches[0]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[0]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
       case 'size2':
@@ -613,14 +636,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         break;
 
       case 'archesCol23':
-        customHeight == '' ? customHeight = takeoff.arches[1]?.height : '';
-        field.setText(takeoff.arches[1]?.height != "80" && takeoff.arches[1]?.height != "96" && takeoff.arches[1] ? "X" : "");
+        height = takeoff.arches[1]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[1]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol24':
-        field.setText(takeoff.arches[1]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[1]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol25':
-        field.setText(takeoff.arches[1]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[1]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -634,14 +663,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[2]?.jamb == 675 ? takeoff.arches[2].qty : "");
         break;
       case 'archesCol33':
-        customHeight == '' ? customHeight = takeoff.arches[2]?.height : '';
-        field.setText(takeoff.arches[2]?.height != "80" && takeoff.arches[2]?.height != "96" && takeoff.arches[2] ? "X" : "");
+        height = takeoff.arches[2]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[2]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol34':
-        field.setText(takeoff.arches[2]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[2]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol35':
-        field.setText(takeoff.arches[2]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[2]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -655,14 +690,22 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[3]?.jamb == 675 ? takeoff.arches[3].qty : "");
         break;
       case 'archesCol43':
-        customHeight == '' ? customHeight = takeoff.arches[3]?.height : '';
-        field.setText(takeoff.arches[3]?.height != "80" && takeoff.arches[3]?.height != "96" && takeoff.arches[3] ? "X" : "");
+
+        height = takeoff.arches[3]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[3]?.height
+        } else {
+          field.setText("");
+        }
+
         break;
       case 'archesCol44':
-        field.setText(takeoff.arches[3]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[3]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol45':
-        field.setText(takeoff.arches[3]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[3]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
       case 'size5':
@@ -675,14 +718,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[4]?.jamb == 675 ? takeoff.arches[4].qty : "");
         break;
       case 'archesCol53':
-        customHeight == '' ? customHeight = takeoff.arches[4]?.height : '';
-        field.setText(takeoff.arches[4]?.height != "80" && takeoff.arches[4]?.height != "96" && takeoff.arches[4] ? "X" : "");
+        height = takeoff.arches[4]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[4]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol54':
-        field.setText(takeoff.arches[4]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[4]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol55':
-        field.setText(takeoff.arches[4]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[4]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
       case 'size6':
@@ -695,14 +744,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[5]?.jamb == 675 ? takeoff.arches[5].qty : "");
         break;
       case 'archesCol63':
-        customHeight == '' ? customHeight = takeoff.arches[5]?.height : '';
-        field.setText(takeoff.arches[5]?.height != "80" && takeoff.arches[5]?.height != "96" && takeoff.arches[5] ? "X" : "");
+        height = takeoff.arches[5]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[5]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol64':
-        field.setText(takeoff.arches[5]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[5]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol65':
-        field.setText(takeoff.arches[5]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[5]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
       case 'size7':
@@ -715,14 +770,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[6]?.jamb == 675 ? takeoff.arches[6].qty : "");
         break;
       case 'archesCol73':
-        customHeight == '' ? customHeight = takeoff.arches[6]?.height : '';
-        field.setText(takeoff.arches[6]?.height != "80" && takeoff.arches[6]?.height != "96" && takeoff.arches[6] ? "X" : "");
+        height = takeoff.arches[6]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[6]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol74':
-        field.setText(takeoff.arches[6]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[6]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol75':
-        field.setText(takeoff.arches[6]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[6]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -737,14 +798,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[7]?.jamb == 675 ? takeoff.arches[7].qty : "");
         break;
       case 'archesCol83':
-        customHeight == '' ? customHeight = takeoff.arches[7]?.height : '';
-        field.setText(takeoff.arches[7]?.height != "80" && takeoff.arches[7]?.height != "96" && takeoff.arches[7] ? "X" : "");
+        height = takeoff.arches[7]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[7]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol84':
-        field.setText(takeoff.arches[7]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[7]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol85':
-        field.setText(takeoff.arches[7]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[7]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -759,14 +826,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[8]?.jamb == 675 ? takeoff.arches[8].qty : "");
         break;
       case 'archesCol93':
-        customHeight == '' ? customHeight = takeoff.arches[8]?.height : '';
-        field.setText(takeoff.arches[8]?.height != "80" && takeoff.arches[8]?.height != "96" && takeoff.arches[8] ? "X" : "");
+        height = takeoff.arches[8]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[8]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCol94':
-        field.setText(takeoff.arches[8]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[8]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCol95':
-        field.setText(takeoff.arches[8]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[8]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -781,14 +854,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[9]?.jamb == 675 ? takeoff.arches[9].qty : "");
         break;
       case 'archesCola3':
-        customHeight == '' ? customHeight = takeoff.arches[9]?.height : '';
-        field.setText(takeoff.arches[9]?.height != "80" && takeoff.arches[9]?.height != "96" && takeoff.arches[9] ? "X" : "");
+        height = takeoff.arches[9]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[9]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCola4':
-        field.setText(takeoff.arches[9]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[9]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCola5':
-        field.setText(takeoff.arches[9]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[9]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -803,14 +882,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[10]?.jamb == 675 ? takeoff.arches[10].qty : "");
         break;
       case 'archesColb3':
-        customHeight == '' ? customHeight = takeoff.arches[10]?.height : '';
-        field.setText(takeoff.arches[10]?.height != "80" && takeoff.arches[10]?.height != "96" && takeoff.arches[10] ? "X" : "");
+        height = takeoff.arches[10]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[10]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesColb4':
-        field.setText(takeoff.arches[10]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[10]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesColb5':
-        field.setText(takeoff.arches[10]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[10]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -825,14 +910,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[11]?.jamb == 675 ? takeoff.arches[11].qty : "");
         break;
       case 'archesColc3':
-        customHeight == '' ? customHeight = takeoff.arches[11]?.height : '';
-        field.setText(takeoff.arches[11]?.height != "80" && takeoff.arches[11]?.height != "96" && takeoff.arches[11] ? "X" : "");
+        height = takeoff.arches[11]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[11]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesColc4':
-        field.setText(takeoff.arches[11]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[11]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesColc5':
-        field.setText(takeoff.arches[11]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[11]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -847,14 +938,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[12]?.jamb == 675 ? takeoff.arches[12].qty : "");
         break;
       case 'archesCold3':
-        customHeight == '' ? customHeight = takeoff.arches[12]?.height : '';
-        field.setText(takeoff.arches[12]?.height != "80" && takeoff.arches[12]?.height != "96" && takeoff.arches[12] ? "X" : "");
+        height = takeoff.arches[12]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[12]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCold4':
-        field.setText(takeoff.arches[12]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[12]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCold5':
-        field.setText(takeoff.arches[12]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[12]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 
@@ -869,14 +966,20 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         field.setText(takeoff.arches[13]?.jamb == 675 ? takeoff.arches[13].qty : "");
         break;
       case 'archesCole3':
-        customHeight == '' ? customHeight = takeoff.arches[13]?.height : '';
-        field.setText(takeoff.arches[13]?.height != "80" && takeoff.arches[13]?.height != "96" && takeoff.arches[13] ? "X" : "");
+        height = takeoff.arches[13]?.height?.replace(/"/g, '') || "";
+
+        if (height !== "80" && height !== "96" && height !== "") {
+          field.setText("X");
+          customHeight = takeoff.arches[13]?.height
+        } else {
+          field.setText("");
+        }
         break;
       case 'archesCole4':
-        field.setText(takeoff.arches[13]?.height == "80" ? "X" : "");
+        field.setText(takeoff.arches[13]?.height.replace('"', '') == "80" ? "X" : "");
         break;
       case 'archesCole5':
-        field.setText(takeoff.arches[13]?.height == "96" ? "X" : "");
+        field.setText(takeoff.arches[13]?.height.replace('"', '') == "96" ? "X" : "");
         break;
 
 

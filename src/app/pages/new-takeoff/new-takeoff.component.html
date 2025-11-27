@@ -317,13 +317,11 @@
               <hr class="my-4" />
               <!-- Address -->
               <h6 class="heading-small text mb-4">
-                <button *ngIf="!isVisibleCantinaDoors" (click)="showHideFormCantina()"
-                  class="btn btn-warning">
+                <button *ngIf="!isVisibleCantinaDoors" (click)="showHideFormCantina()" class="btn btn-warning">
                   <i class="ni ni-bold-down"></i> CANTINA DOORS - Click to Show
                 </button>
 
-                <button *ngIf="isVisibleCantinaDoors" (click)="showHideFormCantina()"
-                  class="btn btn-warning">
+                <button *ngIf="isVisibleCantinaDoors" (click)="showHideFormCantina()" class="btn btn-warning">
                   <i class="ni ni-bold-up"></i> CANTINA DOORS - Click to Hide
                 </button>
               </h6>
@@ -381,13 +379,11 @@
               <hr class="my-4" />
               <!-- Address -->
               <h6 class="heading-small text mb-4">
-                <button *ngIf="!isVisibleFrenchDoors" (click)="showHideFormFrench()"
-                  class="btn btn-warning">
+                <button *ngIf="!isVisibleFrenchDoors" (click)="showHideFormFrench()" class="btn btn-warning">
                   <i class="ni ni-bold-down"></i> FRENCH DOORS - Click to Show
                 </button>
 
-                <button *ngIf="isVisibleFrenchDoors" (click)="showHideFormFrench()"
-                  class="btn btn-warning">
+                <button *ngIf="isVisibleFrenchDoors" (click)="showHideFormFrench()" class="btn btn-warning">
                   <i class="ni ni-bold-up"></i> FRENCH DOORS - Click to Hide
                 </button>
               </h6>
@@ -586,6 +582,9 @@
                               <option value='30"'>30"</option>
                               <option value='32"'>32"</option>
                               <option value='34"'>34"</option>
+                              <option value='36"'>36"</option>
+                              <option value='38"'>38"</option>
+
                             </select>
                           </div>
                         </div>
@@ -595,9 +594,9 @@
                             <select *ngIf="!isCustomHeight[i]" class="form-control form-control-alternative"
                               formControlName="height" (change)="onHeightChange($event, i)">
                               <option value=""></option>
-                                <option value='80"'>80"</option> 
-                                <option value='84"'>84"</option>
-                                <option value='96"'>96"</option>
+                              <option value='80"'>80"</option>
+                              <option value='84"'>84"</option>
+                              <option value='96"'>96"</option>
                               <option value="custom">Custom</option>
 
                             </select>
@@ -1129,8 +1128,9 @@
             <div class="box-bottom row" *ngIf="idOrder">
               <!-- New Centralized Actions Component -->
               <app-takeoff-actions [currentStatus]="orderStatus" [isManager]="isManager" [userRole]="userRole"
-                [takeoffId]="idOrder" [customerName]="orderForm.get('custumerName')?.value" [carpentry]="orderForm.get('carpentry')?.value"
-                [isFormValid]="orderForm.valid" [isLoading]="isAdvancingStatus" (onSaveProgress)="updateOrder()"
+                [takeoffId]="idOrder" [customerName]="orderForm.get('custumerName')?.value"
+                [carpentry]="orderForm.get('carpentry')?.value" [isFormValid]="orderForm.valid"
+                [isLoading]="isAdvancingStatus" (onSaveProgress)="updateOrder()"
                 (onCompleteMeasurement)="finalizeOrderPopUp()" (onApproveForShipping)="approveForShipping()"
                 (onBackToMeasurement)="backToMeasurement()" (onMarkAsShipped)="markAsShipped()"
                 (onSendToCarpenter)="sendToCarpenter()" (onMarkTrimmingCompleted)="markTrimmingCompleted()"

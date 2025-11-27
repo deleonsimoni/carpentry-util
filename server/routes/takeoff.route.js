@@ -108,7 +108,10 @@ async function detailTakeoff(req, res) {
   let response = await takeoffCtrl.detailTakeoff(
     req.user._id,
     req.params.idTakeoff,
-    req.companyFilter
+    req.companyFilter,
+    req.user.company,
+    req.user.roles,
+
   );
   res.json(response);
 }
