@@ -408,15 +408,11 @@
                               <option value="26">26"</option>
                               <option value="28">28"</option>
                               <option value="30">30"</option>
-                              <option value='32"'>32"</option>
-                              <option value='36"'>36"</option>
-                              <option value='40"'>40"</option>
-                              <option value='44"'>44"</option>
-                              <option value='48"'>48"</option>
-                              <option value='52"'>52"</option>
-                              <option value='56"'>56"</option>
-                              <option value='60"'>60"</option>
-                              <option value='64"'>64"</option>
+                              <option value="32">32"</option>
+                              <option value="52">52"</option>
+                              <option value="56">56"</option>
+                              <option value="60">60"</option>
+                              <option value="64">64"</option>
                             </select>
                           </div>
                         </div>
@@ -427,7 +423,7 @@
                               <option value=""></option>
                               <option value="RH">RH</option>
                               <option value="LH">LH</option>
-                              <option value="DD">DOUBLE</option>
+                              <option value="DOUBLE">DOUBLE</option>
                             </select>
                           </div>
                         </div>
@@ -439,9 +435,9 @@
                             <label class="form-control-label">HEIGHT</label>
                             <select class="form-control form-control-alternative" formControlName="height">
                               <option value=""></option>
-                              <option value='80"'>80"</option>
-                              <option value='84"'>84"</option>
-                              <option value='96"'>96"</option>
+                              <option value="80">80"</option>
+                              <option value="84">84"</option>
+                              <option value="96">96"</option>
                             </select>
                           </div>
                         </div>
@@ -496,15 +492,15 @@
                           <select class="form-control form-control-alternative" formControlName="size">
                             <option value=""></option>
 
-                            <option value='32"'>32"</option>
-                            <option value='36"'>36"</option>
-                            <option value='40"'>40"</option>
-                            <option value='44"'>44"</option>
-                            <option value='48"'>48"</option>
-                            <option value='52"'>52"</option>
-                            <option value='56"'>56"</option>
-                            <option value='60"'>60"</option>
-                            <option value='64"'>64"</option>
+                            <option value="32">32"</option>
+                            <option value="36">36"</option>
+                            <option value="40">40"</option>
+                            <option value="44">44"</option>
+                            <option value="48">48"</option>
+                            <option value="52">52"</option>
+                            <option value="56">56"</option>
+                            <option value="60">60"</option>
+                            <option value="64">64"</option>
                           </select>
                         </div>
                       </div>
@@ -513,9 +509,9 @@
                           <label class="form-control-label" for="input-city">HEIGHT</label>
 
                           <select class="form-control form-control-alternative" formControlName="height">
-                            <option value='80"'>80"</option>
-                            <option value='84"'>84"</option>
-                            <option value='96"'>96"</option>
+                            <option value="80">80"</option>
+                            <option value="84">84"</option>
+                            <option value="96">96"</option>
                           </select>
                         </div>
                       </div>
@@ -680,7 +676,7 @@
                           </button>
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-2">
                         <div class="form-group">
 
                           <label class="form-control-label" for="input-city">SIZE</label>
@@ -690,14 +686,14 @@
                             placeholder="000" maxlength="3" pattern="[0-9]{1,3}" />
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">HEIGHT</label>
 
                           <select class="form-control form-control-alternative" formControlName="height">
                             <option value=""></option>
-                            <option value='80"'>80"</option>
-                            <option value='96"'>96"</option>
+                            <option value="80">80"</option>
+                            <option value="96">96"</option>
                             <option value="custom">Custom</option>
                           </select>
                           <br />
@@ -706,7 +702,7 @@
                             placeholder="Enter height" />
                         </div>
                       </div>
-                      <div class="col-3">
+                      <div class="col-2">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">JAMB</label>
 
@@ -720,6 +716,20 @@
                           <input *ngIf="archesForm.get('jamb')?.value === 'custom'" type="text"
                             class="form-control form-control-alternative" formControlName="jambCustom"
                             placeholder="Enter jamb" />
+                        </div>
+                      </div>
+                      <div class="col-2">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col3" />
+                        </div>
+                      </div>
+                      <div class="col-1">
+                        <div class="form-group">
+                          <label class="form-control-label" for="input-city"></label>
+                          <input type="text" id="input-last-name" class="form-control form-control-alternative"
+                            formControlName="col4" />
                         </div>
                       </div>
                       <div class="col-2">
@@ -928,12 +938,12 @@
 
                           <select class="form-control form-control-alternative" formControlName="size">
                             <option value=""></option>
-                            <option value='18"'>18"</option>
-                            <option value='24"'>24"</option>
-                            <option value='26"'>26"</option>
-                            <option value='28"'>28"</option>
-                            <option value='30"'>30"</option>
-                            <option value='32"'>32"</option>
+                            <option value="18">18"</option>
+                            <option value="24">24"</option>
+                            <option value="26">26"</option>
+                            <option value="28">28"</option>
+                            <option value="30">30"</option>
+                            <option value="32">32"</option>
                           </select>
                         </div>
                       </div>
