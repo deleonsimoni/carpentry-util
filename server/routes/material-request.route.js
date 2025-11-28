@@ -14,6 +14,7 @@ router.use(companyHeaderMiddleware);
 
 router.route('/').get(asyncHandler(getMaterialRequest));
 router.route('/:id').get(asyncHandler(detailMaterialRequest));
+router.route("/pdf/:id").get(asyncHandler(generatePDF));
 
 router.route('/').post(asyncHandler(createMaterialRequest));
 
@@ -51,3 +52,27 @@ async function update(req, res) {
   );
   res.json(response);
 }
+
+async function generatePDF(req, res) {
+
+  const result = await materialRequestCtrl.generatePDF(
+    req.user,
+    req.params.id
+  );
+
+  if (!result) {
+    return res.status(404).json({ error: "Material Request not found" });
+  }
+
+  const { pdfDoc, customerName } = result;
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=material-request-${customerName}.pdf`
+  );
+
+  pdfDoc.pipe(res);
+  pdfDoc.end();
+}
+

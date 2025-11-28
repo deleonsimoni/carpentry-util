@@ -11,6 +11,14 @@ export class MaterialRequestService {
     return this.http.post<any>(`/api/material-request`, form);
   }
 
+  downloadPDF(id: any) {
+    return this.http.get(`/api/material-request/pdf/${id}`, {
+      observe: 'response',    // permite acessar headers
+      responseType: 'blob'    // PDF binário
+    });
+  }
+
+
   getFromUser() {
     return this.http.get<any>(`/api/material-request`);
   }

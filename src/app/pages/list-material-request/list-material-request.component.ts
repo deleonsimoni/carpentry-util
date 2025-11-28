@@ -68,4 +68,36 @@ export class ListMaterialRequestComponent implements OnInit {
     this.router.navigate(['/material-request', id]);
   }
 
+  downloadPdf(id: string) {
+    this.spinner.show();
+
+    this.materialRequestService.downloadPDF(id).subscribe(resp => {
+      this.spinner.hide();
+
+      const blob = resp.body as Blob;
+
+      const contentDisposition = resp.headers.get('Content-Disposition');
+      let filename = 'material-request.pdf'; // default
+      if (contentDisposition) {
+        const matches = /filename="?(.+)"?/.exec(contentDisposition);
+        if (matches && matches[1]) {
+          filename = matches[1];
+        }
+      }
+
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+      err => {
+        this.spinner.hide();
+        this.notification.error('Error generate PDF. ', 'Error: ');
+      }
+    );
+
+  }
+
 }

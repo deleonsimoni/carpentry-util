@@ -4,12 +4,14 @@ const fs = require('fs');
 const UserRoles = require('../constants/user-roles');
 const sendgridCtrl = require('./sendgrid.controller');
 const materialRequestEmailTemplate = require('../templates/materialRequestEmailTemplate');
+const materialRequestPdfTemplatePDF = require("../templates/materialRequestEmailTemplatePDF");
 
 module.exports = {
   createMaterialRequest,
   detailMaterialRequest,
   getMaterialRequest,
-  update
+  update,
+  generatePDF
 };
 
 async function createMaterialRequest(user, body, companyFilter = {}) {
@@ -77,7 +79,7 @@ async function getMaterialRequest(user, companyFilter = {}) {
         select: 'name ' // escolha os campos da company que quiser
       }
     })
-    .select('customerName carpentry user status requestType')
+    .select('customerName carpentry user status requestType deliveryOrPickupDate')
     .sort({
       createdAt: -1,
     });
@@ -108,3 +110,44 @@ async function update(user, body, id, companyFilter = {}) {
 
   return await MaterialRequest.findOneAndUpdate(baseQuery, body);
 }
+
+async function generatePDF(user, idMR) {
+  try {
+    const mr = await MaterialRequest.findById(idMR)
+      .populate('carpentry', 'fullname email')
+      .populate({
+        path: 'user',
+        select: 'fullname email company',
+        populate: {
+          path: 'company',
+          select: 'name '
+        }
+      });
+
+    if (!mr) return null;
+
+    const pdfDoc = materialRequestPdfTemplatePDF({
+      user: mr.carpentry?.fullname ? mr.carpentry?.fullname : mr.user?.fullname,
+      date: new Date(mr.deliveryOrPickupDate).toLocaleDateString("en-US"),
+      customerName: mr.customerName,
+      requestType: mr.requestType,
+      deliveryOrPickupDate: mr.deliveryOrPickupDate,
+      deliveryAddressStreet: mr.deliveryAddressStreet,
+      deliveryAddressCity: mr.deliveryAddressCity,
+      deliveryAddressProvince: mr.deliveryAddressProvince,
+      deliveryAddressPostalCode: mr.deliveryAddressPostalCode,
+      deliveryInstruction: mr.deliveryInstruction,
+      material: mr.material
+    });
+
+    return {
+      pdfDoc,
+      customerName: mr.customerName
+    };
+
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
