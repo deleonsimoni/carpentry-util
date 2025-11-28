@@ -1,1 +1,237 @@
-<p>material-request works!</p>
+<div class="card-body">
+  <form [formGroup]="materialRequestForm">
+
+    <!-- Title + Badges -->
+    <div class="d-flex align-items-center mb-4">
+      <h6 class="heading-small text-muted mb-0 mr-3">Material Request</h6>
+      <span class="badge badge-pill badge-primary mr-2">
+        <i class="fas fa-box mr-1"></i>
+        New Request
+      </span>
+      <span class="badge badge-pill badge-info">
+        <i class="fas fa-clipboard-check mr-1"></i>
+        Required Fields
+      </span>
+    </div>
+
+    <div class="pl-lg-4">
+      <div class="row">
+
+        <!-- Customer Name -->
+        <div class="col-lg-6">
+          <div class="card border-primary mb-3">
+            <div class="card-header bg-primary text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-user-tag mr-2"></i>
+                <strong>Customer Name</strong>
+                <span class="badge badge-light badge-sm ml-2">Required</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <input type="text"
+                     class="form-control"
+                     placeholder="Enter the customer name..."
+                     formControlName="customerName">
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Type -->
+        <div class="col-lg-6">
+          <div class="card border-info mb-3">
+            <div class="card-header bg-info text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-truck mr-2"></i>
+                <strong>Request Type</strong>
+                <span class="badge badge-light badge-sm ml-2">Required</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="custom-control custom-radio mb-2">
+                <input type="radio" id="pickup" value="PICKUP"
+                       formControlName="requestType"
+                       class="custom-control-input">
+                <label class="custom-control-label" for="pickup">Pickup</label>
+              </div>
+
+              <div class="custom-control custom-radio">
+                <input type="radio" id="delivery" value="DELIVERY"
+                       formControlName="requestType"
+                       class="custom-control-input">
+                <label class="custom-control-label" for="delivery">Delivery</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery/Pickup Date -->
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card border-info mb-3">
+            <div class="card-header bg-info text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-calendar-day mr-2"></i>
+                <strong>Delivery or Pickup Date</strong>
+                <span class="badge badge-light badge-sm ml-2">Required</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <input type="date"
+                     class="form-control"
+                     formControlName="deliveryOrPickupDate">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Address (only if selected) -->
+      <div class="row" *ngIf="materialRequestForm.get('requestType')?.value === 'DELIVERY'">
+        <div class="col-lg-12">
+          <div class="card border-warning mb-3">
+            <div class="card-header bg-warning text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-map-marker-alt mr-2"></i>
+                <strong>Delivery Address</strong>
+                <span class="badge badge-light badge-sm ml-2">Required for Delivery</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="row">
+                <div class="col-lg-6 mb-3">
+                  <input type="text"
+                         class="form-control"
+                         placeholder="Street"
+                         formControlName="deliveryAddressStreet">
+                </div>
+
+                <div class="col-lg-6 mb-3">
+                  <input type="text"
+                         class="form-control"
+                         placeholder="City"
+                         formControlName="deliveryAddressCity">
+                </div>
+
+                <div class="col-lg-6 mb-3">
+                  <input type="text"
+                         class="form-control"
+                         placeholder="Province"
+                         formControlName="deliveryAddressProvince">
+                </div>
+
+                <div class="col-lg-6 mb-3">
+                  <input type="text"
+                         class="form-control"
+                         placeholder="Postal Code"
+                         formControlName="deliveryAddressPostalCode">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delivery Instructions -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card border-dark mb-3">
+            <div class="card-header bg-dark text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-info-circle mr-2"></i>
+                <strong>Delivery Instructions</strong>
+                <span class="badge badge-light badge-sm ml-2">Optional</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <textarea class="form-control"
+                        rows="3"
+                        placeholder="Enter special delivery instructions..."
+                        formControlName="deliveryInstruction">
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Material List -->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card border-success mb-3">
+            <div class="card-header bg-success text-white py-2">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-boxes mr-2"></i>
+                <strong>Material List</strong>
+                <span class="badge badge-light badge-sm ml-2">Required</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+
+              <div formArrayName="material">
+
+                <div *ngFor="let item of materialControls; let i = index"
+                     [formGroupName]="i"
+                     class="border rounded p-3 mb-3">
+
+                  <div class="row">
+                    <div class="col-lg-4 mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="Description"
+                             formControlName="description">
+                    </div>
+
+                    <div class="col-lg-3 mb-3">
+                      <input type="number"
+                             min="1"
+                             class="form-control"
+                             placeholder="Qty"
+                             formControlName="quantity">
+                    </div>
+
+                    <div class="col-lg-4 mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="Notes"
+                             formControlName="notes">
+                    </div>
+
+                    <div class="col-lg-1 d-flex align-items-center">
+                      <button type="button"
+                              class="btn btn-sm btn-outline-danger"
+                              (click)="removeMaterial(i)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button type="button"
+                      class="btn btn-sm btn-outline-success"
+                      (click)="addMaterial()">
+                <i class="fas fa-plus"></i> Add Material
+              </button>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="row">
+        <div class="col-lg-12 text-right">
+          <button type="button"
+                  class="btn btn-primary"
+                  (click)="submitRequest()"
+                  [disabled]="materialRequestForm.invalid">
+            <i class="fas fa-paper-plane mr-1"></i>
+            Submit Material Request
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>

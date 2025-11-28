@@ -52,7 +52,7 @@ export class TakeoffComponent implements OnInit {
         this.spinner.hide();
 
         if (data.errors) {
-          this.notification.error('Error get orders', 'Atenção');
+          this.notification.error('Error get orders', 'Alert');
         } else {
           this.myOrders = data;
           this.filteredOrders = data;
@@ -60,7 +60,7 @@ export class TakeoffComponent implements OnInit {
       },
       err => {
         this.spinner.hide();
-        this.notification.error('Error get orders. ', 'Erro: ');
+        this.notification.error('Error get orders. ', 'Error: ');
       }
     );
   }
@@ -72,7 +72,7 @@ export class TakeoffComponent implements OnInit {
       data => {
         if (data.errors) {
           this.spinner.hide();
-          this.notification.error('Error generate PDF', 'Atenção');
+          this.notification.error('Error generate PDF', 'Alert');
         } else {
           const link = document.createElement('a');
           link.href = data;
@@ -84,7 +84,7 @@ export class TakeoffComponent implements OnInit {
       },
       err => {
         this.spinner.hide();
-        this.notification.error('Error generate PDF', 'Erro: ');
+        this.notification.error('Error generate PDF', 'Error: ');
       }
     );
   }
