@@ -144,14 +144,10 @@ export class MaterialRequestComponent implements OnInit {
 
     if (requestType === 'DELIVERY') {
       street?.setValidators([Validators.required]);
-      city?.setValidators([Validators.required]);
-      province?.setValidators([Validators.required]);
-      postal?.setValidators([Validators.required]);
+     
     } else {
       street?.clearValidators();
-      city?.clearValidators();
-      province?.clearValidators();
-      postal?.clearValidators();
+      
     }
 
     street?.updateValueAndValidity();
@@ -200,7 +196,6 @@ export class MaterialRequestComponent implements OnInit {
     this.materialRequestService.update(payload, id).subscribe({
       next: () => {
         this.spinner.hide();
-
         this.notification.success('Material Request updated successfully!', 'Success');
         this.router.navigate(['/list-material-request']);
       },

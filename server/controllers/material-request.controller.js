@@ -2,6 +2,8 @@ const User = require('../models/user.model');
 const MaterialRequest = require('../models/material-request.model');
 const fs = require('fs');
 const UserRoles = require('../constants/user-roles');
+const sendgridCtrl = require('./sendgrid.controller');
+const materialRequestEmailTemplate = require('../templates/materialRequestEmailTemplate');
 
 module.exports = {
   createMaterialRequest,
@@ -10,17 +12,48 @@ module.exports = {
   update
 };
 
-async function createMaterialRequest(idUser, body, companyFilter = {}) {
+async function createMaterialRequest(user, body, companyFilter = {}) {
 
-  if (UserRoles.isCarpenter(idUser.roles)) {
-    body.carpentry = idUser._id;
+  if (UserRoles.isCarpenter(user.roles)) {
+    body.carpentry = user._id;
   } else {
-    body.user = idUser._id;
+    body.user = user._id;
   }
   body.status = 1;
-  body.company = idUser.company;
+  body.company = user.company;
 
-  return await new MaterialRequest(body).save();
+  await new MaterialRequest(body).save();
+
+  sendMaterialRequestEmail(user, body);
+
+  return true;
+}
+
+async function sendMaterialRequestEmail(user, materialRequest) {
+
+  const supervisorEmails = await User.find({
+    company: user.company,
+    roles: { $in: ['supervisor'] }
+  }).distinct('email');
+
+  const htmlTemplate = materialRequestEmailTemplate({
+    user: user.fullname,
+    date: new Date().toLocaleDateString("en-US"),
+    customerName: materialRequest.customerName,
+    requestType: materialRequest.requestType,
+    deliveryOrPickupDate: materialRequest.deliveryOrPickupDate,
+    deliveryAddressStreet: materialRequest.deliveryAddressStreet,
+    deliveryAddressCity: materialRequest.deliveryAddressCity,
+    deliveryAddressProvince: materialRequest.deliveryAddressProvince,
+    deliveryAddressPostalCode: materialRequest.deliveryAddressPostalCode,
+    deliveryInstruction: materialRequest.deliveryInstruction,
+    material: materialRequest.material
+  });
+
+  const subject = `New Material Request - ${materialRequest.customerName}`;
+
+  await sendgridCtrl.enviarEmail(supervisorEmails, subject, htmlTemplate);
+
 }
 
 async function getMaterialRequest(user, companyFilter = {}) {
@@ -55,12 +88,12 @@ async function detailMaterialRequest(idUser, id, companyFilter = {}, idCompany, 
   let baseQuery;
 
 
-    baseQuery = {
-      $and: [{ _id: id }],
-      $or: [{ user: idUser }, { carpentry: idUser }],
-      ...companyFilter
-    };
-  
+  baseQuery = {
+    $and: [{ _id: id }],
+    $or: [{ user: idUser }, { carpentry: idUser }],
+    ...companyFilter
+  };
+
   return await MaterialRequest.find(baseQuery)
     .populate('carpentry', 'fullname email');
 }
