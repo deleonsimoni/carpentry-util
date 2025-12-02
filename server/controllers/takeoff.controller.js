@@ -611,7 +611,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[0]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[0]?.height);
           customHeight = takeoff.arches[0]?.height
         } else {
           field.setText("");
@@ -639,7 +639,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[1]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[1]?.height);
           customHeight = takeoff.arches[1]?.height
         } else {
           field.setText("");
@@ -666,7 +666,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[2]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[2]?.height);
           customHeight = takeoff.arches[2]?.height
         } else {
           field.setText("");
@@ -694,7 +694,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[3]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[3]?.height);
           customHeight = takeoff.arches[3]?.height
         } else {
           field.setText("");
@@ -721,7 +721,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[4]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[4]?.height);
           customHeight = takeoff.arches[4]?.height
         } else {
           field.setText("");
@@ -747,7 +747,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[5]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[5]?.height);
           customHeight = takeoff.arches[5]?.height
         } else {
           field.setText("");
@@ -773,7 +773,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[6]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[6]?.height);
           customHeight = takeoff.arches[6]?.height
         } else {
           field.setText("");
@@ -801,7 +801,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[7]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[7]?.height);
           customHeight = takeoff.arches[7]?.height
         } else {
           field.setText("");
@@ -829,7 +829,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[8]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[8]?.height);
           customHeight = takeoff.arches[8]?.height
         } else {
           field.setText("");
@@ -857,7 +857,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[9]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[9]?.height);
           customHeight = takeoff.arches[9]?.height
         } else {
           field.setText("");
@@ -885,7 +885,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[10]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[10]?.height);
           customHeight = takeoff.arches[10]?.height
         } else {
           field.setText("");
@@ -913,7 +913,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[11]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[11]?.height);
           customHeight = takeoff.arches[11]?.height
         } else {
           field.setText("");
@@ -941,7 +941,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[12]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[12]?.height);
           customHeight = takeoff.arches[12]?.height
         } else {
           field.setText("");
@@ -969,7 +969,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
         height = takeoff.arches[13]?.height?.replace(/"/g, '') || "";
 
         if (height !== "80" && height !== "96" && height !== "") {
-          field.setText("X");
+          field.setText(takeoff.arches[13]?.height);
           customHeight = takeoff.arches[13]?.height
         } else {
           field.setText("");

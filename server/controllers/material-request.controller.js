@@ -5,6 +5,7 @@ const UserRoles = require('../constants/user-roles');
 const sendgridCtrl = require('./sendgrid.controller');
 const materialRequestEmailTemplate = require('../templates/materialRequestEmailTemplate');
 const materialRequestPdfTemplatePDF = require("../templates/materialRequestEmailTemplatePDF");
+const { formatDateToDDMMYYYY } = require("../utils/utils");
 
 module.exports = {
   createMaterialRequest,
@@ -62,11 +63,21 @@ async function getMaterialRequest(user, companyFilter = {}) {
   let baseQuery;
 
 
-  // For other users (manager, carpenter), use existing logic
-  baseQuery = {
-    $or: [{ user: user._id }, { carpentry: user._id },],
-    ...companyFilter
-  };
+  if (UserRoles.isSupervisor(user.roles)) {
+
+    baseQuery = {
+      $or: [{ company: user.company }],
+      ...companyFilter // Only company filter for delivery users
+    };
+
+  } else {
+
+    baseQuery = {
+      $or: [{ user: user._id }, { carpentry: user._id },],
+      ...companyFilter
+    };
+
+  }
 
 
   return await MaterialRequest.find(baseQuery)
@@ -89,12 +100,19 @@ async function detailMaterialRequest(idUser, id, companyFilter = {}, idCompany, 
 
   let baseQuery;
 
+  if (UserRoles.isSupervisor(roles)) {
+    baseQuery = {
+      $and: [{ _id: id, company: idCompany }],
+      ...companyFilter // Only company filter for delivery users
+    };
+  } else {
 
-  baseQuery = {
-    $and: [{ _id: id }],
-    $or: [{ user: idUser }, { carpentry: idUser }],
-    ...companyFilter
-  };
+    baseQuery = {
+      $and: [{ _id: id }],
+      $or: [{ user: idUser }, { carpentry: idUser }],
+      ...companyFilter
+    };
+  }
 
   return await MaterialRequest.find(baseQuery)
     .populate('carpentry', 'fullname email');
@@ -102,11 +120,23 @@ async function detailMaterialRequest(idUser, id, companyFilter = {}, idCompany, 
 
 async function update(user, body, id, companyFilter = {}) {
 
-  const baseQuery = {
-    $and: [{ _id: id }],
-    $or: [{ user: user._id }, { carpentry: user._id }],
-    ...companyFilter
-  };
+  let baseQuery;
+
+  if (UserRoles.isSupervisor(user.roles)) {
+    baseQuery = {
+      $and: [{ _id: id }],
+      $or: [{ company: user.company }],
+      ...companyFilter // Only company filter for delivery users
+    };
+  } else {
+    baseQuery = {
+      $and: [{ _id: id }],
+      $or: [{ user: user._id }, { carpentry: user._id }],
+      ...companyFilter
+    };
+
+  }
+
 
   return await MaterialRequest.findOneAndUpdate(baseQuery, body);
 }
@@ -128,10 +158,10 @@ async function generatePDF(user, idMR) {
 
     const pdfDoc = materialRequestPdfTemplatePDF({
       user: mr.carpentry?.fullname ? mr.carpentry?.fullname : mr.user?.fullname,
-      date: new Date(mr.deliveryOrPickupDate).toLocaleDateString("en-US"),
+      date: new Date(mr.deliveryOrPickupDate).toLocaleDateString("pt-BR"),
       customerName: mr.customerName,
       requestType: mr.requestType,
-      deliveryOrPickupDate: mr.deliveryOrPickupDate,
+      deliveryOrPickupDate: formatDateToDDMMYYYY(mr.deliveryOrPickupDate),
       deliveryAddressStreet: mr.deliveryAddressStreet,
       deliveryAddressCity: mr.deliveryAddressCity,
       deliveryAddressProvince: mr.deliveryAddressProvince,

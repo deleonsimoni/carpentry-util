@@ -954,7 +954,7 @@ export class TakeOffComponent implements OnInit {
   }
 
   preFillRoundWindow() {
-    const dadosPrePreenchidos = [{ type: '', qty: '' }];
+    const dadosPrePreenchidos = [{ type: '', qty: '' }, { type: '', qty: '' }, { type: '', qty: '' }];
 
     const arrayForm = this.orderForm.get('roundWindow') as FormArray;
 
@@ -970,8 +970,8 @@ export class TakeOffComponent implements OnInit {
 
   preFillRodSupport() {
     const dadosPrePreenchidos = [
-      { type: 'W - HOOK', desc: '', qty: '' },
-      { type: 'N - HOOK', desc: '', qty: '' },
+      { type: 'W - HOOK', desc: 'W - HOOK', qty: '' },
+      { type: 'N - HOOK', desc: 'N - HOOK', qty: '' },
     ];
 
     const arrayForm = this.orderForm.get('rodSupport') as FormArray;
@@ -980,7 +980,6 @@ export class TakeOffComponent implements OnInit {
       const formGroup = this.builder.group({
         type: [
           { value: dados.type, disabled: this.disableField(dados.type) },
-          [],
         ],
         desc: '',
         qty: '',
