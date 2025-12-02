@@ -1,136 +1,317 @@
+// Metric Cards - Top row
 .metric-card {
   border-radius: 0.75rem;
   padding: 1.25rem;
   box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12);
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   .metric-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-.week-day button.btn-outline-success {
-  border-color: #dc3545;
-  color: #dc3545;
-}
-.week-day button.btn-outline-success:hover {
-  background-color: #dc3545;
-  color: #fff;
-}
-.modal-content.bg-dark {
-  background-color: #1e1e1e;
-}
+
   .metric-value {
-    font-size: 2rem;
+    font-size: 1.75rem;
     display: block;
-    margin: 0.35rem 0;
+    margin: 0.25rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .metric-helper {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-.week-grid {
+// Week View - Responsive Layout
+.week-view {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+
+  @media (max-width: 1400px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-.week-day {
+.week-day-card {
   background: #ffffff;
-  border-radius: 0.75rem;
+  border-radius: 0.5rem;
   border: 1px solid #e9ecef;
-  min-height: 260px;
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: 0 0.75rem 1.5rem rgba(23, 43, 77, 0.1);
-    transform: translateY(-3px);
-  }
-}
-
-.week-day-header {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  .weekday-label {
-    font-weight: 600;
-    color: #5e72e4;
-  }
-
-  .weekday-date {
-    font-size: 1.1rem;
-    font-weight: 700;
-  }
-
-  .weekday-count {
-    font-size: 0.75rem;
-    margin-top: 0.35rem;
-    color: #8898aa;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   &.is-today {
-    border-left: 4px solid #2dce89;
-    padding-left: 0.5rem;
+    border-color: #2dce89;
+    border-width: 2px;
+
+    .week-day-header {
+      background: linear-gradient(135deg, #2dce89 0%, #26af74 100%);
+
+      .weekday-label,
+      .weekday-date {
+        color: #fff;
+      }
+
+      .event-count {
+        background: #fff;
+        color: #2dce89;
+      }
+
+      .btn-add {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.3);
+
+        &:hover {
+          background: #fff;
+          color: #2dce89;
+        }
+      }
+    }
+  }
+
+  .week-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #f8f9fe;
+    border-bottom: 1px solid #e9ecef;
+
+    .day-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .weekday-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #8898aa;
+      letter-spacing: 0.5px;
+    }
+
+    .weekday-date {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #32325d;
+    }
+
+    .day-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .event-count {
+      background: #5e72e4;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .btn-add {
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #e9ecef;
+      color: #2dce89;
+      transition: all 0.2s ease;
+
+      i {
+        font-size: 0.7rem;
+      }
+
+      &:hover {
+        background: #2dce89;
+        border-color: #2dce89;
+        color: #fff;
+      }
+    }
+  }
+
+  .week-day-content {
+    padding: 0.5rem;
+    min-height: 120px;
+    max-height: 250px;
+    overflow-y: auto;
   }
 }
 
-.event-card {
-  background: #f8f9fe;
-  border-radius: 0.75rem;
-  padding: 1rem;
+// Events List
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.event-item {
+  background: #fff;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.6rem;
   border: 1px solid #e9ecef;
-  margin-bottom: 1rem;
-  box-shadow: 0 0.5rem 1rem rgba(94, 114, 228, 0.08);
-  transition: transform 0.2s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
   &:hover {
-    transform: translateY(-3px);
+    background: #f8f9fe;
+    transform: translateX(2px);
   }
 
-  &.event-measurement {
-    border-left: 4px solid #11cdef;
+  &.event-takeoff {
+    border-left: 3px solid #11cdef;
   }
 
-  &.event-production {
-    border-left: 4px solid #2dce89;
+  &.event-shipping {
+    border-left: 3px solid #fb6340;
   }
 
-  &.event-delivery {
-    border-left: 4px solid #fb6340;
+  &.event-trim {
+    border-left: 3px solid #2dce89;
   }
 
-  &.event-follow-up {
-    border-left: 4px solid #5e72e4;
+  .event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
   }
 
-  .text-xs {
+  .event-title {
     font-size: 0.75rem;
+    font-weight: 600;
+    color: #32325d;
+    line-height: 1.3;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .event-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+
+    &.status-scheduled {
+      background: #5e72e4;
+    }
+
+    &.status-in-progress {
+      background: #fb6340;
+    }
+
+    &.status-completed {
+      background: #2dce89;
+    }
+
+    &.status-cancelled {
+      background: #8898aa;
+    }
+  }
+
+  .event-time {
+    font-size: 0.65rem;
+    color: #8898aa;
+    margin-bottom: 0.25rem;
+
+    i {
+      margin-right: 0.25rem;
+      font-size: 0.6rem;
+    }
+  }
+
+  .event-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    color: #8898aa;
+
+    .event-location,
+    .event-assigned {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+
+      i {
+        font-size: 0.55rem;
+        flex-shrink: 0;
+      }
+    }
   }
 }
 
-.empty-state {
-  margin-top: auto;
+// Empty Day State
+.empty-day {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 0;
-  color: #adb5bd;
-  font-size: 0.9rem;
+  height: 100%;
+  min-height: 80px;
+  color: #c0c8d0;
+  font-size: 0.75rem;
 
   i {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    margin-bottom: 0.35rem;
+    opacity: 0.5;
+  }
+
+  span {
+    opacity: 0.7;
   }
 }
 
+// Month Grid
 .month-grid {
   border-radius: 0.75rem;
   border: 1px solid #e9ecef;
@@ -140,18 +321,43 @@
 .month-row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+
+  &.month-header {
+    .month-cell {
+      min-height: auto;
+      padding: 0.5rem;
+      text-align: center;
+    }
+  }
 }
 
 .month-cell {
   border: 1px solid #e9ecef;
-  min-height: 120px;
+  min-height: 100px;
+  height: 100px;
   padding: 0.5rem;
   background: #ffffff;
   position: relative;
+  overflow: hidden;
+
+  &.header {
+    background: #f8f9fe;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: #8898aa;
+    min-height: auto;
+    height: auto;
+  }
 
   &.out-month {
     background: #f8f9fe;
     color: #adb5bd;
+  }
+
+  &.is-today {
+    background: rgba(45, 206, 137, 0.08);
+    border-color: #2dce89;
   }
 }
 
@@ -159,42 +365,75 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
+  margin-bottom: 0.25rem;
+
+  .btn-link {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .month-cell:hover & .btn-link {
+    opacity: 1;
+  }
 }
 
 .month-list {
   list-style: none;
-  margin: 0.75rem 0 0;
+  margin: 0;
   padding: 0;
-  max-height: 90px;
+  max-height: 60px;
   overflow: hidden;
 
   li {
     display: flex;
     align-items: center;
-    font-size: 0.75rem;
-    margin-bottom: 0.35rem;
+    font-size: 0.65rem;
+    margin-bottom: 0.2rem;
     color: #525f7f;
+    padding: 0.1rem 0.2rem;
+    border-radius: 0.2rem;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &.clickable {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(94, 114, 228, 0.1);
+      }
+    }
+
+    .event-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 
 .event-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
+  min-width: 6px;
   border-radius: 50%;
-  margin-right: 0.5rem;
+  margin-right: 0.35rem;
   display: inline-block;
 
-  &.dot-measurement {
+  &.dot-measurement,
+  &.dot-takeoff {
     background: #11cdef;
   }
 
-  &.dot-production {
+  &.dot-production,
+  &.dot-trim {
     background: #2dce89;
   }
 
-  &.dot-delivery {
+  &.dot-delivery,
+  &.dot-shipping {
     background: #fb6340;
   }
 
@@ -203,24 +442,46 @@
   }
 }
 
+// Bottom Section Cards - Equal Height
+.row.mt-5 {
+  .col-lg-6 {
+    display: flex;
+    flex-direction: column;
+
+    .card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 350px;
+
+      .card-body {
+        flex: 1;
+        overflow: auto;
+      }
+    }
+  }
+}
+
+// Team Availability Section
 .team-availability {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .team-member {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
   border: 1px solid #e9ecef;
   background: #f8f9fe;
 }
 
 .avatar-sm {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   border-radius: 50%;
   background: #5e72e4;
   color: #ffffff;
@@ -229,32 +490,79 @@
   justify-content: center;
   margin-right: 0.75rem;
   font-weight: 600;
+  font-size: 0.8rem;
 }
 
-.member-info h6 {
-  font-size: 0.95rem;
+.member-info {
+  flex: 1;
+  min-width: 0;
+
+  h6 {
+    font-size: 0.85rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  small {
+    font-size: 0.7rem;
+  }
 }
 
-.month-header .header {
-  background: #f8f9fe;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
+// Upcoming appointments list
+.list-group-item {
+  padding: 0.75rem 1rem;
+
+  h5 {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+
+  .text-sm {
+    font-size: 0.75rem;
+  }
 }
 
-.dropdown-toggle::after {
-  display: none;
+// Responsive adjustments
+@media (max-width: 1400px) {
+  .week-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .week-day {
+    min-height: 280px;
+  }
 }
 
 @media (max-width: 1200px) {
   .week-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .metric-card {
+    min-height: 100px;
+
+    .metric-value {
+      font-size: 1.5rem;
+    }
+  }
 }
 
 @media (max-width: 992px) {
   .week-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .week-day {
+    min-height: 260px;
+  }
+
+  .row.mt-5 .col-lg-6 .card {
+    min-height: 300px;
   }
 }
 
@@ -266,4 +574,32 @@
   .week-day {
     min-height: auto;
   }
+
+  .month-cell {
+    min-height: 80px;
+    height: 80px;
+    padding: 0.25rem;
+
+    .month-list {
+      max-height: 45px;
+    }
+  }
+
+  .metric-card {
+    min-height: 90px;
+
+    .metric-value {
+      font-size: 1.25rem;
+    }
+
+    .metric-label,
+    .metric-helper {
+      font-size: 0.65rem;
+    }
+  }
+}
+
+// Utility classes
+.dropdown-toggle::after {
+  display: none;
 }

@@ -81,7 +81,7 @@
           </div>
 
           <div class="row align-items-center mb-4">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group mb-0">
                 <label class="form-control-label text-muted">Filter by responsible</label>
                 <select class="form-control" [(ngModel)]="teamFilter">
@@ -89,82 +89,109 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-6 text-md-right mt-3 mt-md-0">
-              <span class="badge badge-dot mr-2"><i class="bg-info"></i> Medição</span>
-              <span class="badge badge-dot mr-2"><i class="bg-success"></i> Produção</span>
-              <span class="badge badge-dot mr-2"><i class="bg-warning"></i> Entrega</span>
-              <span class="badge badge-dot"><i class="bg-primary"></i> Reuniões</span>
+            <div class="col-md-4">
+              <div class="form-group mb-0">
+                <label class="form-control-label text-muted">Filter by type</label>
+                <select class="form-control" [(ngModel)]="typeFilter">
+                  <option *ngFor="let option of getEventTypeOptions()" [ngValue]="option.value">{{ option.label }}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4 text-md-right mt-3 mt-md-0">
+              <span class="badge badge-dot mr-2 text-dark"><i class="bg-info"></i> Takeoff</span>
+              <span class="badge badge-dot mr-2 text-dark"><i class="bg-warning"></i> Shipping</span>
+              <span class="badge badge-dot text-dark"><i class="bg-success"></i> Trim</span>
             </div>
           </div>
 
-          <div *ngIf="activeView === 'week'" class="week-grid">
-            <div class="week-day" *ngFor="let day of weekDays">
-              <div class="week-day-header" [class.is-today]="isToday(day.date)">
-                <span class="weekday-label">{{ day.label | uppercase }}</span>
-                <span class="weekday-date">{{ day.display }}</span>
-                <span class="weekday-count" *ngIf="eventsCountForDay(day) > 0">
-                  {{ eventsCountForDay(day) }} commitment(s)
-                </span>
-              </div>
+          <div *ngIf="eventsLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading events...</span>
+            </div>
+          </div>
 
-              <div class="event-card" *ngFor="let event of eventsForDay(day)" [ngClass]="'event-' + event.type">
-                <div class="d-flex justify-content-between align-items-center">
-                  <h5 class="mb-1">{{ event.title }}</h5>
-                  <span class="badge" [ngClass]="{
-                      'badge-success': event.status === 'completed',
-                      'badge-warning': event.status === 'in-progress',
-                      'badge-danger': event.status === 'delayed',
-                      'badge-primary': event.status === 'scheduled'
-                    }">
-                    {{ event.status | titlecase }}
-                  </span>
+          <div *ngIf="activeView === 'week' && !eventsLoading" class="week-view">
+            <div class="week-day-card" *ngFor="let day of weekDays" [class.is-today]="isToday(day.date)">
+              <div class="week-day-header">
+                <div class="day-info">
+                  <span class="weekday-label">{{ day.label | uppercase }}</span>
+                  <span class="weekday-date">{{ day.display }}</span>
                 </div>
-                <p class="text-sm text-muted mb-1">
-                  <i class="far fa-clock mr-1"></i>
-                  {{ event.start | date:'HH:mm' }} - {{ event.end | date:'HH:mm' }} | {{ event.location }}
-                </p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div class="text-sm text-primary font-weight-bold">
-                    <i class="fas fa-user mr-1"></i>{{ event.assignedTo }}
-                  </div>
-                  <button class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-sticky-note mr-1"></i>Resume
+                <div class="day-actions">
+                  <span class="event-count" *ngIf="eventsCountForDay(day) > 0">
+                    {{ eventsCountForDay(day) }}
+                  </span>
+                  <button class="btn btn-sm btn-add" (click)="openRegisterDialog(day.date)" title="Add event">
+                    <i class="fas fa-plus"></i>
                   </button>
                 </div>
-                <p class="text-xs text-muted mt-2 mb-0" *ngIf="event.notes">{{ event.notes }}</p>
               </div>
 
-              <div class="empty-state" *ngIf="eventsCountForDay(day) === 0">
-                <i class="fas fa-inbox text-muted"></i>
-                <span>No Commitments</span>
-              </div>
+              <div class="week-day-content">
+                <div class="events-list" *ngIf="eventsCountForDay(day) > 0">
+                  <div class="event-item"
+                       *ngFor="let event of eventsForDay(day)"
+                       [ngClass]="'event-' + event.type"
+                       (click)="openEditDialog(event)">
+                    <div class="event-header">
+                      <span class="event-title">{{ event.title }}</span>
+                      <span class="event-status" [ngClass]="{
+                          'status-completed': event.status === 'completed',
+                          'status-in-progress': event.status === 'in-progress',
+                          'status-cancelled': event.status === 'cancelled',
+                          'status-scheduled': event.status === 'scheduled'
+                        }">
+                      </span>
+                    </div>
+                    <div class="event-time">
+                      <i class="far fa-clock"></i>
+                      {{ event.start | date:'HH:mm' }} - {{ event.end | date:'HH:mm' }}
+                    </div>
+                    <div class="event-details" *ngIf="event.location || event.assignedTo">
+                      <span *ngIf="event.location" class="event-location">
+                        <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                      </span>
+                      <span *ngIf="event.assignedTo" class="event-assigned">
+                        <i class="fas fa-user"></i> {{ event.assignedTo }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-              <div class="mb-2 text-center">
-                <button class="btn btn-sm btn-outline-success"
-                        (click)="openRegisterDialog(day.date)">
-                  <i class="fas fa-plus-circle mr-1"></i> Register Event
-                </button>
+                <div class="empty-day" *ngIf="eventsCountForDay(day) === 0">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>No events</span>
+                </div>
               </div>
-
             </div>
           </div>
 
-          <div *ngIf="activeView === 'month'" class="month-grid">
+          <div *ngIf="activeView === 'month' && !eventsLoading" class="month-grid">
             <div class="month-row month-header">
               <div *ngFor="let label of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" class="month-cell header">
                 {{ label }}
               </div>
             </div>
             <div class="month-row" *ngFor="let week of monthMatrix">
-              <div class="month-cell" *ngFor="let day of week" [class.out-month]="day.date.getMonth() !== referenceDate.getMonth()">
+              <div class="month-cell"
+                   *ngFor="let day of week"
+                   [class.out-month]="day.date.getMonth() !== referenceDate.getMonth()"
+                   [class.is-today]="isToday(day.date)">
                 <div class="month-cell-header">
                   <span>{{ day.display }}</span>
                   <span class="badge badge-pill badge-light" *ngIf="eventsCountForDay(day) > 0">
                     {{ eventsCountForDay(day) }}
                   </span>
+                  <button class="btn btn-sm btn-link p-0 ml-auto"
+                          (click)="openRegisterDialog(day.date)"
+                          title="Add event">
+                    <i class="fas fa-plus text-success"></i>
+                  </button>
                 </div>
                 <ul class="month-list">
-                  <li *ngFor="let event of eventsForDay(day)">
+                  <li *ngFor="let event of eventsForDay(day)"
+                      class="clickable"
+                      (click)="openEditDialog(event)">
                     <span class="event-dot" [ngClass]="'dot-' + event.type"></span>
                     <span class="event-title">{{ event.title }}</span>
                   </li>

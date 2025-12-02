@@ -1,4 +1,4 @@
-import { Component, OnInit, input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,19 +6,29 @@ import { take } from 'rxjs/operators';
 import { AuthService } from '@app/shared/services';
 import { UserService, UserProfile } from '../../shared/services/user.service';
 import { UserRoles } from '../../shared/constants/user-roles.constants';
-import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RegisterEventModalComponent } from './register-event-modal.component';
+import { ScheduleService } from '@app/shared/services/schedule.service';
+import {
+  ScheduleEvent,
+  ScheduleEventType,
+  ScheduleEventStatus,
+  SCHEDULE_EVENT_TYPE_CONFIG,
+  SCHEDULE_EVENT_STATUS_CONFIG
+} from '@app/shared/interfaces/schedule.interface';
 
 interface CalendarEvent {
   id: string;
   title: string;
-  type: 'measurement' | 'production' | 'delivery' | 'follow-up';
-  start: string; // ISO string
+  type: ScheduleEventType;
+  start: string;
   end: string;
   location: string;
   assignedTo: string;
-  status: 'scheduled' | 'in-progress' | 'completed' | 'delayed';
+  status: ScheduleEventStatus;
   notes?: string;
+  takeoffId?: string;
+  originalEvent?: ScheduleEvent;
 }
 
 interface TeamMember {
@@ -43,100 +53,38 @@ interface WeekDay {
   styleUrls: ['./calendar.component.scss']
 })
 export class CalendarComponent implements OnInit {
-  activeView: 'week' | 'month' = 'week';
+  activeView: 'week' | 'month' = 'month';
   referenceDate = new Date();
   teamFilter = 'todos';
+  typeFilter = 'all';
   today = new Date();
   hasAccess = false;
   teamMembers: TeamMember[] = [];
   teamLoading = false;
-
+  eventsLoading = false;
 
   weekDays: WeekDay[] = [];
   monthMatrix: WeekDay[][] = [];
-  newEvent: any = {};
-  takeoffs = ['Morning', 'Afternoon', 'Evening']; // exemplo
 
-  events: CalendarEvent[] = [
-    {
-      id: 'evt-001',
-      title: 'Medição Residencial - Alves',
-      type: 'measurement',
-      start: '2024-03-18T09:00:00',
-      end: '2024-03-18T11:00:00',
-      location: 'Rua das Palmeiras, 123',
-      assignedTo: 'João Mendes',
-      status: 'scheduled',
-      notes: 'Confirmar presença com o cliente até 17h do dia anterior.'
-    },
-    {
-      id: 'evt-002',
-      title: 'Instalação de Armário - Costa',
-      type: 'production',
-      start: '2024-03-18T13:30:00',
-      end: '2024-03-18T17:00:00',
-      location: 'Av. Brasil, 890',
-      assignedTo: 'Equipe Trim',
-      status: 'in-progress',
-      notes: 'Levar acabamento extra para gavetas.'
-    },
-    {
-      id: 'evt-003',
-      title: 'Entrega planejada - Lote 45',
-      type: 'delivery',
-      start: '2024-03-19T10:00:00',
-      end: '2024-03-19T12:00:00',
-      location: 'Condomínio Vista Verde',
-      assignedTo: 'Marcos Lima',
-      status: 'scheduled'
-    },
-    {
-      id: 'evt-004',
-      title: 'Reunião de aprovação',
-      type: 'follow-up',
-      start: '2024-03-20T16:00:00',
-      end: '2024-03-20T17:00:00',
-      location: 'Virtual',
-      assignedTo: 'Equipe Gestora',
-      status: 'scheduled',
-      notes: 'Revisar alterações de layout antes da reunião.'
-    },
-    {
-      id: 'evt-005',
-      title: 'Medição Comercial - Silva',
-      type: 'measurement',
-      start: '2024-03-21T08:30:00',
-      end: '2024-03-21T10:30:00',
-      location: 'Rua Xavier, 44',
-      assignedTo: 'Ana Clara',
-      status: 'delayed',
-      notes: 'Cliente pediu reagendamento para o período da tarde.'
-    },
-    {
-      id: 'evt-006',
-      title: 'Entrega Final - Projeto Borges',
-      type: 'delivery',
-      start: '2024-03-22T14:00:00',
-      end: '2024-03-22T18:00:00',
-      location: 'Rua Augusta, 300',
-      assignedTo: 'Equipe Logística',
-      status: 'scheduled'
-    }
-  ];
+  events: CalendarEvent[] = [];
+  eventTypes = Object.values(ScheduleEventType);
+  typeConfig = SCHEDULE_EVENT_TYPE_CONFIG;
+  statusConfig = SCHEDULE_EVENT_STATUS_CONFIG;
 
   productivitySnapshot = {
-    weekUtilization: 78,
-    delayedAppointments: 1,
-    nextOpenSlot: '21/03 às 14h',
-    busiestDay: 'Quarta-feira'
+    weekUtilization: 0,
+    delayedAppointments: 0,
+    nextOpenSlot: '-',
+    busiestDay: '-'
   };
 
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private scheduleService: ScheduleService,
     private router: Router,
     public modalService: NgbModal
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.authService
@@ -165,30 +113,191 @@ export class CalendarComponent implements OnInit {
         this.buildWeekDays();
         this.buildMonthMatrix();
         this.loadTeamMembers();
+        this.loadEvents();
       });
   }
 
-  openRegisterDialog(date: Date) {
+  openRegisterDialog(date: Date): void {
     const modalRef = this.modalService.open(RegisterEventModalComponent, {
       centered: true,
-      backdrop: 'static'
+      backdrop: 'static',
+      size: 'lg'
     });
     modalRef.componentInstance.date = date;
 
     modalRef.result.then(
       result => {
         if (result) {
-          console.log('Evento salvo:', result);
-          this.events.push(result);
-          // aqui você pode atualizar o calendário
+          this.handleEventSave(result);
         }
       },
       () => {
-        // Modal fechado sem salvar
+        // Modal closed without saving
       }
     );
   }
 
+  openEditDialog(event: CalendarEvent): void {
+    if (!event.originalEvent) {
+      return;
+    }
+
+    const modalRef = this.modalService.open(RegisterEventModalComponent, {
+      centered: true,
+      backdrop: 'static',
+      size: 'lg'
+    });
+    modalRef.componentInstance.event = event.originalEvent;
+
+    modalRef.result.then(
+      result => {
+        if (result) {
+          if (result.isDelete) {
+            this.handleEventDelete(result._id);
+          } else {
+            this.handleEventSave(result);
+          }
+        }
+      },
+      () => {
+        // Modal closed without saving
+      }
+    );
+  }
+
+  private handleEventSave(eventData: any): void {
+    if (eventData.isEditMode && eventData._id) {
+      this.scheduleService.updateEvent(eventData._id, eventData)
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.loadEvents();
+          },
+          error: (error) => {
+            console.error('Error updating event:', error);
+          }
+        });
+    } else {
+      this.scheduleService.createEvent(eventData)
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.loadEvents();
+          },
+          error: (error) => {
+            console.error('Error creating event:', error);
+          }
+        });
+    }
+  }
+
+  private handleEventDelete(eventId: string): void {
+    this.scheduleService.deleteEvent(eventId)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.loadEvents();
+        },
+        error: (error) => {
+          console.error('Error deleting event:', error);
+        }
+      });
+  }
+
+  private loadEvents(): void {
+    this.eventsLoading = true;
+    const startDate = this.getStartOfWeek(this.referenceDate);
+    const endDate = this.addDays(startDate, this.activeView === 'week' ? 7 : 42);
+
+    this.scheduleService.getEvents(startDate.toISOString(), endDate.toISOString())
+      .pipe(take(1))
+      .subscribe({
+        next: (response) => {
+          if (response.success && Array.isArray(response.data)) {
+            this.events = response.data.map(event => this.mapScheduleEventToCalendarEvent(event));
+            this.updateProductivitySnapshot();
+          } else {
+            this.events = [];
+          }
+          this.eventsLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading events:', error);
+          this.events = [];
+          this.eventsLoading = false;
+        }
+      });
+  }
+
+  private mapScheduleEventToCalendarEvent(event: ScheduleEvent): CalendarEvent {
+    return {
+      id: event._id || '',
+      title: event.title,
+      type: event.type,
+      start: event.scheduledDate,
+      end: event.endDate || event.scheduledDate,
+      location: event.location || '',
+      assignedTo: event.assignedToName || '',
+      status: event.status,
+      notes: event.notes,
+      takeoffId: event.takeoffId,
+      originalEvent: event
+    };
+  }
+
+  private updateProductivitySnapshot(): void {
+    const now = new Date();
+    const weekStart = this.getStartOfWeek(now);
+    const weekEnd = this.addDays(weekStart, 7);
+
+    const weekEvents = this.events.filter(event => {
+      const eventDate = new Date(event.start);
+      return eventDate >= weekStart && eventDate < weekEnd;
+    });
+
+    const totalSlots = 7 * 8;
+    const usedSlots = weekEvents.length;
+    this.productivitySnapshot.weekUtilization = Math.round((usedSlots / totalSlots) * 100);
+
+    this.productivitySnapshot.delayedAppointments = this.events.filter(
+      event => event.status === ScheduleEventStatus.IN_PROGRESS && new Date(event.end) < now
+    ).length;
+
+    const dayCounts: Record<string, number> = {};
+    weekEvents.forEach(event => {
+      const day = new Date(event.start).toLocaleDateString('en-US', { weekday: 'long' });
+      dayCounts[day] = (dayCounts[day] || 0) + 1;
+    });
+
+    let busiestDay = '-';
+    let maxCount = 0;
+    Object.entries(dayCounts).forEach(([day, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        busiestDay = day;
+      }
+    });
+    this.productivitySnapshot.busiestDay = busiestDay;
+
+    this.productivitySnapshot.nextOpenSlot = this.findNextOpenSlot();
+  }
+
+  private findNextOpenSlot(): string {
+    const now = new Date();
+    for (let i = 0; i < 14; i++) {
+      const checkDate = this.addDays(now, i);
+      const dayEvents = this.events.filter(event => {
+        const eventDate = new Date(event.start);
+        return eventDate.toDateString() === checkDate.toDateString();
+      });
+
+      if (dayEvents.length < 8) {
+        const formatter = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit' });
+        return `${formatter.format(checkDate)} at 9am`;
+      }
+    }
+    return 'No availability';
+  }
 
   private loadTeamMembers(): void {
     this.teamLoading = true;
@@ -199,18 +308,11 @@ export class CalendarComponent implements OnInit {
         next: response => {
           if (response.success && Array.isArray(response.data)) {
             this.teamMembers = response.data.map(user => this.mapUserToTeamMember(user));
-
-            if (this.teamMembers.length > 0) {
-              this.events = this.events.map((event, index) => ({
-                ...event,
-                assignedTo: this.teamMembers[index % this.teamMembers.length].name
-              }));
-            }
           }
           this.teamLoading = false;
         },
         error: error => {
-          console.error('Erro ao carregar equipe:', error);
+          console.error('Error loading team:', error);
           this.teamLoading = false;
         }
       });
@@ -223,6 +325,7 @@ export class CalendarComponent implements OnInit {
     } else {
       this.buildMonthMatrix();
     }
+    this.loadEvents();
   }
 
   previousPeriod(): void {
@@ -233,6 +336,7 @@ export class CalendarComponent implements OnInit {
       this.referenceDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth() - 1, 1);
       this.buildMonthMatrix();
     }
+    this.loadEvents();
   }
 
   nextPeriod(): void {
@@ -243,6 +347,7 @@ export class CalendarComponent implements OnInit {
       this.referenceDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth() + 1, 1);
       this.buildMonthMatrix();
     }
+    this.loadEvents();
   }
 
   resetToToday(): void {
@@ -253,13 +358,21 @@ export class CalendarComponent implements OnInit {
     } else {
       this.buildMonthMatrix();
     }
+    this.loadEvents();
   }
 
   filteredEvents(): CalendarEvent[] {
-    if (this.teamFilter === 'todos') {
-      return this.events;
+    let filtered = this.events;
+
+    if (this.teamFilter !== 'todos') {
+      filtered = filtered.filter(event => event.assignedTo === this.teamFilter);
     }
-    return this.events.filter(event => event.assignedTo === this.teamFilter);
+
+    if (this.typeFilter !== 'all') {
+      filtered = filtered.filter(event => event.type === this.typeFilter);
+    }
+
+    return filtered;
   }
 
   eventsForDay(day: WeekDay): CalendarEvent[] {
@@ -279,9 +392,23 @@ export class CalendarComponent implements OnInit {
   }
 
   getUniqueAssignees(): string[] {
-    const names = new Set(this.events.map(event => event.assignedTo));
+    const names = new Set(this.events.map(event => event.assignedTo).filter(Boolean));
     this.teamMembers.forEach(member => names.add(member.name));
     return ['todos', ...Array.from(names)];
+  }
+
+  getEventTypeOptions(): { value: string; label: string }[] {
+    return [
+      { value: 'all', label: 'All Types' },
+      ...this.eventTypes.map(type => ({
+        value: type,
+        label: this.typeConfig[type]?.label || type
+      }))
+    ];
+  }
+
+  getEventTypeColor(type: ScheduleEventType): string {
+    return this.typeConfig[type]?.color || 'secondary';
   }
 
   getInitials(name: string): string {
@@ -299,9 +426,9 @@ export class CalendarComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    if (status === 'active') return 'Ativo';
-    if (status === 'inactive') return 'Inativo';
-    return status || 'Desconhecido';
+    if (status === 'active') return 'Active';
+    if (status === 'inactive') return 'Inactive';
+    return status || 'Unknown';
   }
 
   private mapUserToTeamMember(user: UserProfile): TeamMember {
@@ -355,7 +482,7 @@ export class CalendarComponent implements OnInit {
   private getStartOfWeek(date: Date): Date {
     const start = new Date(date);
     const day = start.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // Segunda como início
+    const diff = day === 0 ? -6 : 1 - day;
     start.setDate(start.getDate() + diff);
     start.setHours(0, 0, 0, 0);
     return start;

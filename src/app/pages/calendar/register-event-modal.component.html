@@ -1,46 +1,182 @@
-<div class="modal-header">
-  <h5 class="modal-title">Register New Event</h5>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('cancel')"></button>
+<div class="modal-header border-bottom-0 pb-0">
+  <div class="d-flex align-items-center">
+    <div class="icon-circle bg-primary mr-3">
+      <i class="fas fa-calendar-plus text-white"></i>
+    </div>
+    <div>
+      <h4 class="modal-title mb-0">{{ isEditMode ? 'Edit Event' : 'Register New Event' }}</h4>
+      <p class="text-muted mb-0 text-sm">{{ isEditMode ? 'Update event information' : 'Fill in the event details' }}</p>
+    </div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" (click)="cancel()">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>
 
-<div class="modal-body">
-  <form>
-    <div class="mb-3">
-      <label for="takeoff" class="form-label">Select Takeoff</label>
+<div class="modal-body px-4 py-4">
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <form *ngIf="!isLoading">
+    <!-- Event Type -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Event Type <span class="text-danger">*</span>
+      </label>
+      <div class="event-type-selector">
+        <div
+          *ngFor="let type of eventTypes"
+          class="event-type-option"
+          [class.selected]="formData.type === type"
+          [ngClass]="'type-' + type"
+          (click)="selectEventType(type)"
+        >
+          <i [class]="typeConfig[type]?.icon"></i>
+          <span>{{ getTypeLabel(type) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Takeoff Selection -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Select Takeoff <span class="text-danger">*</span>
+      </label>
       <select
-        id="takeoff"
-        class="form-select"
-        [(ngModel)]="eventData.takeoff"
+        class="form-control form-control-alternative"
+        [(ngModel)]="formData.takeoffId"
         name="takeoff"
+        (change)="onTakeoffChange()"
       >
-        <option *ngFor="let takeoff of takeoffs" [value]="takeoff.id">
-          {{ takeoff.name }}
+        <option value="">-- Select a Takeoff --</option>
+        <option *ngFor="let takeoff of takeoffs" [value]="takeoff._id">
+          {{ getTakeoffDisplayName(takeoff) }}
+        </option>
+      </select>
+      <small *ngIf="takeoffs.length === 0" class="text-muted d-block mt-1">
+        <i class="fas fa-info-circle"></i> No takeoffs available
+      </small>
+      <div *ngIf="selectedTakeoff" class="takeoff-preview mt-2">
+        <small class="text-muted d-block">
+          <i class="fas fa-user"></i> {{ selectedTakeoff.custumerName }}
+        </small>
+        <small class="text-muted d-block" *ngIf="selectedTakeoff.streetName">
+          <i class="fas fa-map-marker-alt"></i> {{ selectedTakeoff.streetName }}
+        </small>
+        <small class="text-muted d-block" *ngIf="selectedTakeoff.lot">
+          <i class="fas fa-home"></i> Lot {{ selectedTakeoff.lot }}
+        </small>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Title <span class="text-danger">*</span>
+      </label>
+      <input
+        type="text"
+        class="form-control form-control-alternative"
+        [(ngModel)]="formData.title"
+        name="title"
+        placeholder="Event title"
+      />
+    </div>
+
+    <!-- Date/Time Row -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            Start Date/Time <span class="text-danger">*</span>
+          </label>
+          <input
+            type="datetime-local"
+            class="form-control form-control-alternative"
+            [(ngModel)]="formData.scheduledDate"
+            name="scheduledDate"
+            (change)="onStartDateChange()"
+          />
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label fw-bold text-dark mb-2">
+            End Date/Time
+          </label>
+          <input
+            type="datetime-local"
+            class="form-control form-control-alternative"
+            [(ngModel)]="formData.endDate"
+            name="endDate"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned To -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Assigned To
+      </label>
+      <select
+        class="form-control form-control-alternative"
+        [(ngModel)]="formData.assignedTo"
+        name="assignedTo"
+      >
+        <option value="">-- Select Team Member --</option>
+        <option *ngFor="let member of teamMembers" [value]="member._id">
+          {{ member.fullname }} ({{ member.profile | titlecase }})
         </option>
       </select>
     </div>
 
-    <div class="mb-3">
-      <label for="status" class="form-label">Status</label>
-      <select
-        id="status"
-        class="form-select"
-        [(ngModel)]="eventData.status"
-        name="status"
-      >
-        <option value="scheduled">Scheduled</option>
-        <option value="in-progress">In Progress</option>
-        <option value="completed">Completed</option>
-        <option value="delayed">Delayed</option>
-      </select>
+    <!-- Location -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Location
+      </label>
+      <input
+        type="text"
+        class="form-control form-control-alternative"
+        [(ngModel)]="formData.location"
+        name="location"
+        placeholder="Event location"
+      />
     </div>
 
-    <div class="mb-3">
-      <label for="notes" class="form-label">Notes</label>
+    <!-- Status -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Status
+      </label>
+      <div class="status-selector">
+        <div
+          *ngFor="let status of eventStatuses"
+          class="status-option"
+          [class.selected]="formData.status === status"
+          [ngClass]="'status-' + status"
+          (click)="formData.status = status"
+        >
+          <i [class]="getStatusIcon(status)"></i>
+          <span>{{ getStatusLabel(status) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Notes
+      </label>
       <textarea
-        id="notes"
-        class="form-control"
+        class="form-control form-control-alternative"
         rows="3"
-        [(ngModel)]="eventData.notes"
+        [(ngModel)]="formData.notes"
         name="notes"
         placeholder="Enter any additional information..."
       ></textarea>
@@ -48,11 +184,30 @@
   </form>
 </div>
 
-<div class="modal-footer">
-  <button type="button" class="btn btn-outline-secondary" (click)="activeModal.dismiss('cancel')">
-    Cancel
-  </button>
-  <button type="button" class="btn btn-primary" (click)="save()">
-    Save Event
-  </button>
+<div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+  <div class="d-flex justify-content-between w-100">
+    <div>
+      <button
+        *ngIf="isEditMode"
+        type="button"
+        class="btn btn-outline-danger"
+        (click)="delete()"
+      >
+        <i class="fas fa-trash-alt mr-2"></i>Delete
+      </button>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-secondary mr-2" (click)="cancel()">
+        <i class="fas fa-times mr-2"></i>Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="save()"
+        [disabled]="!isFormValid()"
+      >
+        <i class="fas fa-save mr-2"></i>{{ isEditMode ? 'Update Event' : 'Save Event' }}
+      </button>
+    </div>
+  </div>
 </div>
