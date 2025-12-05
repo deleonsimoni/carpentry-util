@@ -7,14 +7,14 @@ const ScheduleEventSchema = new mongoose.Schema(
       ref: 'Company',
       required: true
     },
-    takeoff: {
+    takeoffs: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Takeoff',
       required: true
-    },
+    }],
     type: {
       type: String,
-      enum: ['takeoff', 'shipping', 'trim'],
+      enum: ['first_trim', 'backtrim', 'delivery'],
       required: true
     },
     title: {
@@ -25,23 +25,9 @@ const ScheduleEventSchema = new mongoose.Schema(
       type: Date,
       required: true
     },
-    endDate: {
-      type: Date
-    },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
-    },
-    status: {
-      type: String,
-      enum: ['scheduled', 'in-progress', 'completed', 'cancelled'],
-      default: 'scheduled'
-    },
-    notes: {
-      type: String
-    },
-    location: {
-      type: String
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -56,8 +42,8 @@ const ScheduleEventSchema = new mongoose.Schema(
 );
 
 ScheduleEventSchema.index({ company: 1, scheduledDate: 1 });
-ScheduleEventSchema.index({ company: 1, takeoff: 1 });
+ScheduleEventSchema.index({ company: 1, takeoffs: 1 });
 ScheduleEventSchema.index({ company: 1, assignedTo: 1 });
-ScheduleEventSchema.index({ company: 1, status: 1 });
+ScheduleEventSchema.index({ company: 1, type: 1 });
 
 module.exports = mongoose.model('ScheduleEvent', ScheduleEventSchema);

@@ -15,10 +15,12 @@ module.exports = {
 async function createEvent(user, body, companyFilter = {}) {
   const eventData = {
     ...body,
-    takeoff: body.takeoffId,
+    takeoffs: body.takeoffIds || [],
     company: user.company,
     createdBy: user._id
   };
+
+  delete eventData.takeoffIds;
 
   const event = await new ScheduleEvent(eventData).save();
 
@@ -48,27 +50,12 @@ async function getEvents(user, query = {}, companyFilter = {}) {
   }
 
   const events = await ScheduleEvent.find(filter)
-    .populate('takeoff', 'custumerName lot streetName shipTo status')
+    .populate('takeoffs', 'custumerName lot streetName shipTo status')
     .populate('assignedTo', 'fullname email')
     .populate('createdBy', 'fullname')
     .sort({ scheduledDate: 1 });
 
-  const mappedEvents = events.map(event => ({
-    _id: event._id,
-    takeoffId: event.takeoff?._id,
-    type: event.type,
-    title: event.title,
-    scheduledDate: event.scheduledDate,
-    endDate: event.endDate,
-    assignedTo: event.assignedTo?._id,
-    assignedToName: event.assignedTo?.fullname,
-    status: event.status,
-    notes: event.notes,
-    location: event.location,
-    takeoff: event.takeoff,
-    createdAt: event.createdAt,
-    updatedAt: event.updatedAt
-  }));
+  const mappedEvents = events.map(event => mapEventResponse(event));
 
   return {
     success: true,
@@ -83,7 +70,7 @@ async function getEventById(user, eventId, companyFilter = {}) {
   };
 
   const event = await ScheduleEvent.findOne(filter)
-    .populate('takeoff', 'custumerName lot streetName shipTo status')
+    .populate('takeoffs', 'custumerName lot streetName shipTo status')
     .populate('assignedTo', 'fullname email')
     .populate('createdBy', 'fullname');
 
@@ -102,12 +89,12 @@ async function getEventById(user, eventId, companyFilter = {}) {
 
 async function getEventsByTakeoff(user, takeoffId, companyFilter = {}) {
   const filter = {
-    takeoff: takeoffId,
+    takeoffs: takeoffId,
     ...companyFilter
   };
 
   const events = await ScheduleEvent.find(filter)
-    .populate('takeoff', 'custumerName lot streetName shipTo status')
+    .populate('takeoffs', 'custumerName lot streetName shipTo status')
     .populate('assignedTo', 'fullname email')
     .populate('createdBy', 'fullname')
     .sort({ scheduledDate: 1 });
@@ -125,9 +112,9 @@ async function updateEvent(user, eventId, body, companyFilter = {}) {
   };
 
   const updateData = { ...body };
-  if (body.takeoffId) {
-    updateData.takeoff = body.takeoffId;
-    delete updateData.takeoffId;
+  if (body.takeoffIds) {
+    updateData.takeoffs = body.takeoffIds;
+    delete updateData.takeoffIds;
   }
 
   const event = await ScheduleEvent.findOneAndUpdate(
@@ -172,7 +159,7 @@ async function deleteEvent(user, eventId, companyFilter = {}) {
 
 async function populateEvent(eventId) {
   const event = await ScheduleEvent.findById(eventId)
-    .populate('takeoff', 'custumerName lot streetName shipTo status')
+    .populate('takeoffs', 'custumerName lot streetName shipTo status')
     .populate('assignedTo', 'fullname email')
     .populate('createdBy', 'fullname');
 
@@ -184,17 +171,13 @@ function mapEventResponse(event) {
 
   return {
     _id: event._id,
-    takeoffId: event.takeoff?._id,
+    takeoffIds: event.takeoffs?.map(t => t._id || t) || [],
     type: event.type,
     title: event.title,
     scheduledDate: event.scheduledDate,
-    endDate: event.endDate,
     assignedTo: event.assignedTo?._id,
     assignedToName: event.assignedTo?.fullname,
-    status: event.status,
-    notes: event.notes,
-    location: event.location,
-    takeoff: event.takeoff,
+    takeoffs: event.takeoffs,
     createdAt: event.createdAt,
     updatedAt: event.updatedAt
   };

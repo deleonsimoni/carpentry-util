@@ -5,7 +5,7 @@
       <div class="row align-items-center py-4">
         <div class="col-lg-7 col-7">
           <h6 class="h2 text-white d-inline-block mb-0">Operations Schedule</h6>
-          <p class="text-white mt-0 mb-0">Visualize measurements, production, and deliveries all in one place.</p>
+          <p class="text-white mt-0 mb-0">Visualize first trim, backtrim, and deliveries all in one place.</p>
         </div>
         <div class="col-lg-5 col-5 text-right">
           <button class="btn btn-sm btn-neutral mr-2" (click)="resetToToday()">
@@ -35,7 +35,23 @@
               <h3 class="mb-0">Schedules</h3>
               <small class="text-muted">Reference: {{ referenceDate | date:'MMMM yyyy':undefined:'pt-BR' }}</small>
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex align-items-center">
+              <div class="dropdown mr-3">
+                <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" (click)="toggleReportDropdown()">
+                  <i class="fas fa-file-alt mr-1"></i>Reports
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" [class.show]="reportDropdownOpen">
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="generateReport(ScheduleEventType.FIRST_TRIM)">
+                    <i class="fas fa-home mr-2 text-info"></i>First Trim Report (Month)
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="generateReport(ScheduleEventType.BACKTRIM)">
+                    <i class="fas fa-clipboard-check mr-2 text-success"></i>Backtrim Report (Month)
+                  </a>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="generateReport(ScheduleEventType.DELIVERY)">
+                    <i class="fas fa-truck mr-2 text-warning"></i>Delivery Report (Week)
+                  </a>
+                </div>
+              </div>
               <div class="btn-group btn-group-toggle" data-toggle="buttons">
                 <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'week'">
                   <input type="radio" autocomplete="off" (click)="changeView('week')"> Week
@@ -52,21 +68,21 @@
           <div class="row mb-4">
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-info text-white">
-                <span class="metric-label">Your Week</span>
-                <strong class="metric-value">{{ productivitySnapshot.weekUtilization }}%</strong>
-                <span class="metric-helper">Occupied capacity</span>
+                <span class="metric-label">This Week</span>
+                <strong class="metric-value">{{ productivitySnapshot.weekEvents }}</strong>
+                <span class="metric-helper">Scheduled events</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-warning text-white">
-                <span class="metric-label">Overdue Commitments</span>
-                <strong class="metric-value">{{ productivitySnapshot.delayedAppointments }}</strong>
-                <span class="metric-helper">Reschedule as soon as possible</span>
+                <span class="metric-label">Pending Events</span>
+                <strong class="metric-value">{{ productivitySnapshot.pendingEvents }}</strong>
+                <span class="metric-helper">Upcoming scheduled</span>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 mb-3">
               <div class="metric-card bg-gradient-success text-white">
-                <span class="metric-label">Next Free Time</span>
+                <span class="metric-label">Next Free Day</span>
                 <strong class="metric-value">{{ productivitySnapshot.nextOpenSlot }}</strong>
                 <span class="metric-helper">Ideal for new deals</span>
               </div>
@@ -98,9 +114,9 @@
               </div>
             </div>
             <div class="col-md-4 text-md-right mt-3 mt-md-0">
-              <span class="badge badge-dot mr-2 text-dark"><i class="bg-info"></i> Takeoff</span>
-              <span class="badge badge-dot mr-2 text-dark"><i class="bg-warning"></i> Shipping</span>
-              <span class="badge badge-dot text-dark"><i class="bg-success"></i> Trim</span>
+              <span class="badge badge-dot mr-2 text-dark"><i class="bg-info"></i> First Trim</span>
+              <span class="badge badge-dot mr-2 text-dark"><i class="bg-success"></i> Backtrim</span>
+              <span class="badge badge-dot text-dark"><i class="bg-warning"></i> Delivery</span>
             </div>
           </div>
 
@@ -135,23 +151,9 @@
                        (click)="openEditDialog(event)">
                     <div class="event-header">
                       <span class="event-title">{{ event.title }}</span>
-                      <span class="event-status" [ngClass]="{
-                          'status-completed': event.status === 'completed',
-                          'status-in-progress': event.status === 'in-progress',
-                          'status-cancelled': event.status === 'cancelled',
-                          'status-scheduled': event.status === 'scheduled'
-                        }">
-                      </span>
                     </div>
-                    <div class="event-time">
-                      <i class="far fa-clock"></i>
-                      {{ event.start | date:'HH:mm' }} - {{ event.end | date:'HH:mm' }}
-                    </div>
-                    <div class="event-details" *ngIf="event.location || event.assignedTo">
-                      <span *ngIf="event.location" class="event-location">
-                        <i class="fas fa-map-marker-alt"></i> {{ event.location }}
-                      </span>
-                      <span *ngIf="event.assignedTo" class="event-assigned">
+                    <div class="event-details" *ngIf="event.assignedTo">
+                      <span class="event-assigned">
                         <i class="fas fa-user"></i> {{ event.assignedTo }}
                       </span>
                     </div>
@@ -205,8 +207,8 @@
               <div class="card shadow-sm">
                 <div class="card-header border-0 d-flex justify-content-between align-items-center">
                   <div>
-                    <h5 class="mb-0">Upcoming appointments</h5>
-                    <small class="text-muted">Get organized before heading out to meet a client</small>
+                    <h5 class="mb-0">Upcoming events</h5>
+                    <small class="text-muted">Get organized for upcoming activities</small>
                   </div>
                   <span class="badge badge-primary">{{ getUpcomingEvents().length }}</span>
                 </div>
@@ -218,24 +220,19 @@
                           <h5 class="mb-1">{{ event.title }}</h5>
                           <p class="text-sm text-muted mb-1">
                             <i class="far fa-calendar mr-1"></i>
-                            {{ event.start | date:'EEEE, dd/MM HH:mm':undefined:'pt-BR' }}
+                            {{ event.start | date:'EEEE, dd/MM':undefined:'pt-BR' }}
                           </p>
-                          <span class="badge badge-light text-primary">
-                            <i class="fas fa-map-marker-alt mr-1"></i>{{ event.location }}
+                          <span class="badge" [ngClass]="'badge-' + getEventTypeColor(event.type)">
+                            {{ typeConfig[event.type]?.label }}
                           </span>
                         </div>
-                        <div class="text-right">
-                          <span class="badge badge-secondary mb-2">{{ event.assignedTo }}</span>
-                          <div>
-                            <button class="btn btn-sm btn-outline-secondary">
-                              <i class="fas fa-share mr-1"></i>Share
-                            </button>
-                          </div>
+                        <div class="text-right" *ngIf="event.assignedTo">
+                          <span class="badge badge-secondary">{{ event.assignedTo }}</span>
                         </div>
                       </div>
                     </li>
                     <li class="list-group-item text-center text-muted" *ngIf="getUpcomingEvents().length === 0">
-                        No future commitments after the current filter.
+                        No upcoming events.
                     </li>
                   </ul>
                 </div>
@@ -286,4 +283,3 @@
   </div>
 </div>
 </ng-container>
-

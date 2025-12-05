@@ -1,0 +1,754 @@
+// Report Modal Styles
+
+.report-header {
+  border-bottom: none;
+
+  &.bg-info {
+    background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+  }
+
+  &.bg-success {
+    background: linear-gradient(87deg, #2dce89 0, #2dcecc 100%) !important;
+  }
+
+  &.bg-warning {
+    background: linear-gradient(87deg, #fb6340 0, #fbb140 100%) !important;
+  }
+
+  &.bg-primary {
+    background: linear-gradient(87deg, #5e72e4 0, #825ee4 100%) !important;
+  }
+
+  .icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+
+  .btn-close {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+    opacity: 1;
+    cursor: pointer;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.report-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #f8f9fe;
+  padding: 1.5rem;
+}
+
+.report-info {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e9ecef;
+}
+
+// Summary Cards
+.summary-card {
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .summary-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.25rem;
+    }
+  }
+
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .summary-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+
+  .summary-value {
+    font-size: 1.75rem;
+    line-height: 1;
+  }
+}
+
+// Large Summary Card for Single Type Reports
+.summary-card-large {
+  border-radius: 0.75rem;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  color: #fff;
+
+  &.bg-info {
+    background: linear-gradient(87deg, #11cdef 0, #1171ef 100%) !important;
+  }
+
+  &.bg-success {
+    background: linear-gradient(87deg, #2dce89 0, #2dcecc 100%) !important;
+  }
+
+  &.bg-warning {
+    background: linear-gradient(87deg, #fb6340 0, #fbb140 100%) !important;
+  }
+
+  .summary-icon-large {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 2.5rem;
+    }
+  }
+
+  .summary-content-large {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .summary-label-large {
+    font-size: 1rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+  }
+
+  .summary-value-large {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+
+  .summary-helper {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+}
+
+// Section Cards
+.section-card {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid #e9ecef;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #32325d;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e9ecef;
+
+  i {
+    color: #5e72e4;
+  }
+}
+
+// Progress Bar
+.progress-stacked {
+  display: flex;
+  height: 24px;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background: #e9ecef;
+}
+
+.progress-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.25rem;
+}
+
+// Day Section
+.day-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: #f8f9fe;
+  border-radius: 0.25rem;
+}
+
+.day-date {
+  font-size: 0.95rem;
+}
+
+.day-badges {
+  display: flex;
+  gap: 0.25rem;
+}
+
+// Table Styles
+.table {
+  font-size: 0.85rem;
+
+  th {
+    font-weight: 600;
+    color: #8898aa;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+    border-top: none;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Report Calendar Grid
+.report-calendar {
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.calendar-header-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background: #f8f9fe;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.calendar-header-cell {
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #8898aa;
+  letter-spacing: 0.5px;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid #e9ecef;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.calendar-day {
+  min-height: 100px;
+  padding: 0.35rem;
+  border-right: 1px solid #e9ecef;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &.out-month {
+    background: #f8f9fe;
+    opacity: 0.5;
+  }
+
+  &.has-events {
+    background: #fff;
+  }
+}
+
+.calendar-day-number {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #32325d;
+  margin-bottom: 0.25rem;
+}
+
+.calendar-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: calc(100% - 20px);
+  overflow-y: auto;
+}
+
+.event-group {
+  background: #f8f9fe;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.35rem;
+  border-left: 2px solid #5e72e4;
+  margin-bottom: 0.25rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.event-assignee {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #5e72e4;
+  margin-bottom: 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  i {
+    font-size: 0.55rem;
+    flex-shrink: 0;
+  }
+}
+
+.event-title-small {
+  font-size: 0.55rem;
+  color: #525f7f;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.event-takeoff {
+  font-size: 0.5rem;
+  color: #525f7f;
+  line-height: 1.2;
+  padding-left: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  &::before {
+    content: '•';
+    margin-right: 0.15rem;
+    color: #8898aa;
+  }
+}
+
+.builder-group {
+  margin-top: 0.2rem;
+}
+
+.builder-name {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: #32325d;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lot-item {
+  font-size: 0.55rem;
+  color: #8898aa;
+  line-height: 1.3;
+  padding-left: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &::before {
+    content: '•';
+    margin-right: 0.15rem;
+    color: #adb5bd;
+  }
+}
+
+// Keep old classes for backwards compatibility
+.assignee-group {
+  background: #f8f9fe;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.35rem;
+  border-left: 2px solid #5e72e4;
+}
+
+.assignee-name {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #5e72e4;
+  margin-bottom: 0.15rem;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  i {
+    font-size: 0.5rem;
+    flex-shrink: 0;
+  }
+}
+
+.event-item-small {
+  font-size: 0.55rem;
+  color: #525f7f;
+  padding-left: 0.5rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+
+  &::before {
+    content: '•';
+    margin-right: 0.2rem;
+    color: #8898aa;
+  }
+}
+
+// Week View for Delivery Reports
+.week-view-report {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.week-day-card-report {
+  background: #fff;
+  border-radius: 0.5rem;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+}
+
+.week-day-header-report {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  background: #f8f9fe;
+  border-bottom: 1px solid #e9ecef;
+
+  .day-info-report {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .weekday-label-report {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: #8898aa;
+    letter-spacing: 0.5px;
+  }
+
+  .weekday-date-report {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #32325d;
+  }
+
+  .event-count-report {
+    background: #5e72e4;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+  }
+}
+
+.week-day-content-report {
+  padding: 0.5rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.events-list-report {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.event-item-report {
+  background: #fff;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #e9ecef;
+  border-left: 3px solid #fb6340;
+
+  .event-title-report {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #32325d;
+    line-height: 1.3;
+    margin-bottom: 0.25rem;
+  }
+
+  .event-assigned-report {
+    font-size: 0.65rem;
+    color: #8898aa;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    i {
+      font-size: 0.55rem;
+    }
+  }
+}
+
+.empty-day-report {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 100px;
+  color: #c0c8d0;
+  font-size: 0.75rem;
+
+  i {
+    font-size: 1.25rem;
+    margin-bottom: 0.35rem;
+    opacity: 0.5;
+  }
+
+  span {
+    opacity: 0.7;
+  }
+}
+
+.builder-group-report {
+  margin-bottom: 0.35rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.builder-name-report {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #32325d;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lot-item-report {
+  font-size: 0.7rem;
+  color: #8898aa;
+  line-height: 1.3;
+  padding-left: 0.6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &::before {
+    content: '•';
+    margin-right: 0.2rem;
+    color: #adb5bd;
+  }
+}
+
+// Footer
+.report-footer {
+  background: #fff;
+  border-top: 1px solid #e9ecef;
+}
+
+// Print Styles
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.5cm;
+  }
+
+  .modal-header,
+  .modal-footer {
+    display: none !important;
+  }
+
+  .report-body {
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0.5rem !important;
+    background: #fff !important;
+  }
+
+  .modal-dialog {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .modal-content {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  // Hide everything except week view for delivery reports
+  .report-info,
+  .summary-card-large,
+  .week-selector {
+    display: none !important;
+  }
+
+  .section-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .section-title {
+    display: none !important;
+  }
+
+  .day-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .summary-card {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .badge {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .progress-stacked {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .report-calendar {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .calendar-day {
+    min-height: 80px;
+  }
+
+  .assignee-group {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  // Week view print optimizations
+  .week-view-report {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    gap: 0.25rem;
+  }
+
+  .week-day-header-report {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    padding: 0.4rem 0.5rem;
+    background: #f0f0f0 !important;
+
+    .weekday-label-report {
+      font-size: 0.55rem;
+    }
+
+    .weekday-date-report {
+      font-size: 0.75rem;
+    }
+
+    .event-count-report {
+      print-color-adjust: exact;
+      -webkit-print-color-adjust: exact;
+    }
+  }
+
+  .week-day-card-report {
+    min-height: auto;
+    border: 1px solid #ccc !important;
+  }
+
+  .week-day-content-report {
+    padding: 0.25rem;
+  }
+
+  .event-item-report {
+    padding: 0.3rem 0.4rem;
+    margin-bottom: 0.2rem;
+    border-left: 2px solid #fb6340 !important;
+
+    .event-title-report {
+      font-size: 0.65rem;
+    }
+
+    .event-assigned-report {
+      font-size: 0.55rem;
+    }
+  }
+
+  .empty-day-report {
+    min-height: 60px;
+    font-size: 0.6rem;
+
+    i {
+      font-size: 1rem;
+    }
+  }
+}

@@ -8,13 +8,12 @@ import { UserService, UserProfile } from '../../shared/services/user.service';
 import { UserRoles } from '../../shared/constants/user-roles.constants';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { RegisterEventModalComponent } from './register-event-modal.component';
+import { ScheduleReportModalComponent } from './schedule-report-modal.component';
 import { ScheduleService } from '@app/shared/services/schedule.service';
 import {
   ScheduleEvent,
   ScheduleEventType,
-  ScheduleEventStatus,
-  SCHEDULE_EVENT_TYPE_CONFIG,
-  SCHEDULE_EVENT_STATUS_CONFIG
+  SCHEDULE_EVENT_TYPE_CONFIG
 } from '@app/shared/interfaces/schedule.interface';
 
 interface CalendarEvent {
@@ -22,12 +21,8 @@ interface CalendarEvent {
   title: string;
   type: ScheduleEventType;
   start: string;
-  end: string;
-  location: string;
   assignedTo: string;
-  status: ScheduleEventStatus;
-  notes?: string;
-  takeoffId?: string;
+  takeoffIds?: string[];
   originalEvent?: ScheduleEvent;
 }
 
@@ -69,14 +64,16 @@ export class CalendarComponent implements OnInit {
   events: CalendarEvent[] = [];
   eventTypes = Object.values(ScheduleEventType);
   typeConfig = SCHEDULE_EVENT_TYPE_CONFIG;
-  statusConfig = SCHEDULE_EVENT_STATUS_CONFIG;
+  ScheduleEventType = ScheduleEventType;
 
   productivitySnapshot = {
-    weekUtilization: 0,
-    delayedAppointments: 0,
+    weekEvents: 0,
+    pendingEvents: 0,
     nextOpenSlot: '-',
     busiestDay: '-'
   };
+
+  reportDropdownOpen = false;
 
   constructor(
     private authService: AuthService,
@@ -131,9 +128,7 @@ export class CalendarComponent implements OnInit {
           this.handleEventSave(result);
         }
       },
-      () => {
-        // Modal closed without saving
-      }
+      () => {}
     );
   }
 
@@ -159,9 +154,7 @@ export class CalendarComponent implements OnInit {
           }
         }
       },
-      () => {
-        // Modal closed without saving
-      }
+      () => {}
     );
   }
 
@@ -235,12 +228,8 @@ export class CalendarComponent implements OnInit {
       title: event.title,
       type: event.type,
       start: event.scheduledDate,
-      end: event.endDate || event.scheduledDate,
-      location: event.location || '',
       assignedTo: event.assignedToName || '',
-      status: event.status,
-      notes: event.notes,
-      takeoffId: event.takeoffId,
+      takeoffIds: event.takeoffIds,
       originalEvent: event
     };
   }
@@ -255,12 +244,10 @@ export class CalendarComponent implements OnInit {
       return eventDate >= weekStart && eventDate < weekEnd;
     });
 
-    const totalSlots = 7 * 8;
-    const usedSlots = weekEvents.length;
-    this.productivitySnapshot.weekUtilization = Math.round((usedSlots / totalSlots) * 100);
+    this.productivitySnapshot.weekEvents = weekEvents.length;
 
-    this.productivitySnapshot.delayedAppointments = this.events.filter(
-      event => event.status === ScheduleEventStatus.IN_PROGRESS && new Date(event.end) < now
+    this.productivitySnapshot.pendingEvents = this.events.filter(
+      event => new Date(event.start) >= now
     ).length;
 
     const dayCounts: Record<string, number> = {};
@@ -293,7 +280,7 @@ export class CalendarComponent implements OnInit {
 
       if (dayEvents.length < 8) {
         const formatter = new Intl.DateTimeFormat('en-US', { day: '2-digit', month: '2-digit' });
-        return `${formatter.format(checkDate)} at 9am`;
+        return formatter.format(checkDate);
       }
     }
     return 'No availability';
@@ -386,7 +373,7 @@ export class CalendarComponent implements OnInit {
 
   getUpcomingEvents(limit = 4): CalendarEvent[] {
     return this.filteredEvents()
-      .filter(event => new Date(event.end) >= new Date())
+      .filter(event => new Date(event.start) >= new Date())
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
       .slice(0, limit);
   }
@@ -500,5 +487,55 @@ export class CalendarComponent implements OnInit {
 
   isToday(date: Date): boolean {
     return date.toDateString() === this.today.toDateString();
+  }
+
+  toggleReportDropdown(): void {
+    this.reportDropdownOpen = !this.reportDropdownOpen;
+  }
+
+  generateReport(eventType: ScheduleEventType): void {
+    this.reportDropdownOpen = false;
+
+    let startDate: Date;
+    let endDate: Date;
+    let reportPeriod: 'week' | 'month';
+
+    if (eventType === ScheduleEventType.DELIVERY) {
+      // Delivery: weekly report
+      startDate = this.getStartOfWeek(this.referenceDate);
+      endDate = this.addDays(startDate, 6);
+      reportPeriod = 'week';
+    } else {
+      // First Trim and Backtrim: monthly report
+      startDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth(), 1);
+      endDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth() + 1, 0);
+      reportPeriod = 'month';
+    }
+
+    // Filter events by type
+    const filteredByType = this.events.filter(event => event.type === eventType);
+
+    const modalRef = this.modalService.open(ScheduleReportModalComponent, {
+      centered: true,
+      size: 'xl',
+      scrollable: true
+    });
+
+    modalRef.componentInstance.events = filteredByType.map(event => ({
+      id: event.id,
+      title: event.title,
+      type: event.type,
+      start: event.start,
+      assignedTo: event.assignedTo,
+      takeoffs: (event.originalEvent?.takeoffs || []).map(t => ({
+        id: t._id || '',
+        name: t.custumerName || '',
+        lot: t.lot
+      }))
+    }));
+    modalRef.componentInstance.reportType = reportPeriod;
+    modalRef.componentInstance.eventTypeFilter = eventType;
+    modalRef.componentInstance.startDate = startDate;
+    modalRef.componentInstance.endDate = endDate;
   }
 }

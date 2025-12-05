@@ -21,6 +21,17 @@
   </div>
 
   <form *ngIf="!isLoading">
+    <!-- Scheduled Date (Read-only display) -->
+    <div class="form-group">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Scheduled Date
+      </label>
+      <div class="date-display">
+        <i class="fas fa-calendar-day mr-2"></i>
+        <span>{{ getFormattedDate() }}</span>
+      </div>
+    </div>
+
     <!-- Event Type -->
     <div class="form-group">
       <label class="form-control-label fw-bold text-dark mb-2">
@@ -34,92 +45,64 @@
           [ngClass]="'type-' + type"
           (click)="selectEventType(type)"
         >
-          <i [class]="typeConfig[type]?.icon"></i>
+          <i [class]="getTypeIcon(type)"></i>
           <span>{{ getTypeLabel(type) }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Takeoff Selection -->
+    <!-- Takeoff Selection (Multiple) -->
     <div class="form-group">
       <label class="form-control-label fw-bold text-dark mb-2">
-        Select Takeoff <span class="text-danger">*</span>
+        Select Takeoffs <span class="text-danger">*</span>
       </label>
       <select
         class="form-control form-control-alternative"
-        [(ngModel)]="formData.takeoffId"
-        name="takeoff"
-        (change)="onTakeoffChange()"
+        (change)="onTakeoffSelect($event)"
       >
-        <option value="">-- Select a Takeoff --</option>
-        <option *ngFor="let takeoff of takeoffs" [value]="takeoff._id">
+        <option value="">-- Add a Takeoff --</option>
+        <option *ngFor="let takeoff of getAvailableTakeoffs()" [value]="takeoff._id">
           {{ getTakeoffDisplayName(takeoff) }}
         </option>
       </select>
       <small *ngIf="takeoffs.length === 0" class="text-muted d-block mt-1">
         <i class="fas fa-info-circle"></i> No takeoffs available
       </small>
-      <div *ngIf="selectedTakeoff" class="takeoff-preview mt-2">
-        <small class="text-muted d-block">
-          <i class="fas fa-user"></i> {{ selectedTakeoff.custumerName }}
-        </small>
-        <small class="text-muted d-block" *ngIf="selectedTakeoff.streetName">
-          <i class="fas fa-map-marker-alt"></i> {{ selectedTakeoff.streetName }}
-        </small>
-        <small class="text-muted d-block" *ngIf="selectedTakeoff.lot">
-          <i class="fas fa-home"></i> Lot {{ selectedTakeoff.lot }}
-        </small>
+
+      <!-- Selected Takeoffs List -->
+      <div *ngIf="selectedTakeoffs.length > 0" class="selected-takeoffs mt-2">
+        <div *ngFor="let takeoff of selectedTakeoffs" class="selected-takeoff-item">
+          <div class="takeoff-info">
+            <strong>{{ takeoff.custumerName }}</strong>
+            <span *ngIf="takeoff.lot" class="text-muted ml-1">- Lot {{ takeoff.lot }}</span>
+            <small *ngIf="takeoff.streetName" class="d-block text-muted">
+              <i class="fas fa-map-marker-alt"></i> {{ takeoff.streetName }}
+            </small>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeTakeoff(takeoff._id)">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Title -->
+    <!-- Title (Auto-generated, read-only) -->
     <div class="form-group">
       <label class="form-control-label fw-bold text-dark mb-2">
-        Title <span class="text-danger">*</span>
+        Title
       </label>
       <input
         type="text"
         class="form-control form-control-alternative"
-        [(ngModel)]="formData.title"
-        name="title"
-        placeholder="Event title"
+        [value]="formData.title"
+        readonly
+        placeholder="Select takeoffs to generate title"
       />
+      <small class="text-muted">Auto-generated from selected takeoffs</small>
     </div>
 
-    <!-- Date/Time Row -->
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label class="form-control-label fw-bold text-dark mb-2">
-            Start Date/Time <span class="text-danger">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            class="form-control form-control-alternative"
-            [(ngModel)]="formData.scheduledDate"
-            name="scheduledDate"
-            (change)="onStartDateChange()"
-          />
-        </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="form-group">
-          <label class="form-control-label fw-bold text-dark mb-2">
-            End Date/Time
-          </label>
-          <input
-            type="datetime-local"
-            class="form-control form-control-alternative"
-            [(ngModel)]="formData.endDate"
-            name="endDate"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Assigned To -->
-    <div class="form-group">
+    <!-- Assigned To (Hidden for Delivery) -->
+    <div class="form-group" *ngIf="!isDelivery()">
       <label class="form-control-label fw-bold text-dark mb-2">
         Assigned To
       </label>
@@ -133,53 +116,6 @@
           {{ member.fullname }} ({{ member.profile | titlecase }})
         </option>
       </select>
-    </div>
-
-    <!-- Location -->
-    <div class="form-group">
-      <label class="form-control-label fw-bold text-dark mb-2">
-        Location
-      </label>
-      <input
-        type="text"
-        class="form-control form-control-alternative"
-        [(ngModel)]="formData.location"
-        name="location"
-        placeholder="Event location"
-      />
-    </div>
-
-    <!-- Status -->
-    <div class="form-group">
-      <label class="form-control-label fw-bold text-dark mb-2">
-        Status
-      </label>
-      <div class="status-selector">
-        <div
-          *ngFor="let status of eventStatuses"
-          class="status-option"
-          [class.selected]="formData.status === status"
-          [ngClass]="'status-' + status"
-          (click)="formData.status = status"
-        >
-          <i [class]="getStatusIcon(status)"></i>
-          <span>{{ getStatusLabel(status) }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Notes -->
-    <div class="form-group">
-      <label class="form-control-label fw-bold text-dark mb-2">
-        Notes
-      </label>
-      <textarea
-        class="form-control form-control-alternative"
-        rows="3"
-        [(ngModel)]="formData.notes"
-        name="notes"
-        placeholder="Enter any additional information..."
-      ></textarea>
     </div>
   </form>
 </div>

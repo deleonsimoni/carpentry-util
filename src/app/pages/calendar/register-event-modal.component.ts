@@ -9,10 +9,8 @@ import { TakeoffOrder } from '@app/shared/interfaces/takeoff.interface';
 import {
   ScheduleEvent,
   ScheduleEventType,
-  ScheduleEventStatus,
   ScheduleEventFormData,
-  SCHEDULE_EVENT_TYPE_CONFIG,
-  SCHEDULE_EVENT_STATUS_CONFIG
+  SCHEDULE_EVENT_TYPE_CONFIG
 } from '@app/shared/interfaces/schedule.interface';
 
 @Component({
@@ -28,25 +26,19 @@ export class RegisterEventModalComponent implements OnInit {
 
   takeoffs: TakeoffOrder[] = [];
   teamMembers: UserProfile[] = [];
-  selectedTakeoff: TakeoffOrder | null = null;
+  selectedTakeoffs: TakeoffOrder[] = [];
   isLoading = false;
   isEditMode = false;
 
   eventTypes = Object.values(ScheduleEventType);
-  eventStatuses = Object.values(ScheduleEventStatus);
   typeConfig = SCHEDULE_EVENT_TYPE_CONFIG;
-  statusConfig = SCHEDULE_EVENT_STATUS_CONFIG;
 
   formData: ScheduleEventFormData = {
-    takeoffId: '',
-    type: ScheduleEventType.TAKEOFF,
+    takeoffIds: [],
+    type: ScheduleEventType.FIRST_TRIM,
     title: '',
     scheduledDate: '',
-    endDate: '',
-    assignedTo: '',
-    status: ScheduleEventStatus.SCHEDULED,
-    notes: '',
-    location: ''
+    assignedTo: ''
   };
 
   constructor(
@@ -65,47 +57,36 @@ export class RegisterEventModalComponent implements OnInit {
   private initializeForm(): void {
     if (this.isEditMode && this.event) {
       this.formData = {
-        takeoffId: this.event.takeoffId,
+        takeoffIds: this.event.takeoffIds || [],
         type: this.event.type,
         title: this.event.title,
-        scheduledDate: this.formatDateTimeForInput(this.event.scheduledDate),
-        endDate: this.event.endDate ? this.formatDateTimeForInput(this.event.endDate) : '',
-        assignedTo: this.event.assignedTo || '',
-        status: this.event.status,
-        notes: this.event.notes || '',
-        location: this.event.location || ''
+        scheduledDate: this.formatDateForInput(this.event.scheduledDate),
+        assignedTo: this.event.assignedTo || ''
       };
     } else {
-      this.formData.title = this.getTypeLabel(this.formData.type);
       if (this.date) {
-        const startDate = new Date(this.date);
-        startDate.setHours(9, 0, 0, 0);
-        this.formData.scheduledDate = this.formatDateTimeForInput(startDate.toISOString());
-        this.formData.endDate = this.calculateEndDate(this.formData.scheduledDate);
+        this.formData.scheduledDate = this.formatDateForInput(this.date.toISOString());
       }
     }
   }
 
-  private formatDateTimeForInput(isoString: string): string {
+  private formatDateForInput(isoString: string): string {
     const date = new Date(isoString);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${year}-${month}-${day}`;
   }
 
-  private calculateEndDate(startDateStr: string): string {
-    const startDate = new Date(startDateStr);
-    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-    return this.formatDateTimeForInput(endDate.toISOString());
-  }
-
-  onStartDateChange(): void {
-    if (this.formData.scheduledDate) {
-      this.formData.endDate = this.calculateEndDate(this.formData.scheduledDate);
-    }
+  getFormattedDate(): string {
+    if (!this.formData.scheduledDate) return '';
+    const date = new Date(this.formData.scheduledDate + 'T00:00:00');
+    return new Intl.DateTimeFormat('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(date);
   }
 
   private loadTakeoffs(): void {
@@ -119,6 +100,14 @@ export class RegisterEventModalComponent implements OnInit {
           } else if (response?.data && Array.isArray(response.data)) {
             this.takeoffs = response.data;
           }
+
+          if (this.isEditMode && this.formData.takeoffIds.length > 0) {
+            this.selectedTakeoffs = this.takeoffs.filter(t =>
+              t._id && this.formData.takeoffIds.includes(t._id)
+            );
+            this.updateTitle();
+          }
+
           this.isLoading = false;
         },
         error: (error) => {
@@ -143,50 +132,57 @@ export class RegisterEventModalComponent implements OnInit {
       });
   }
 
-  onTakeoffChange(): void {
-    this.selectedTakeoff = this.takeoffs.find(t => t._id === this.formData.takeoffId) || null;
-    if (this.selectedTakeoff) {
-      this.formData.location = this.selectedTakeoff.shipTo || this.selectedTakeoff.streetName || '';
-      if (!this.formData.title) {
-        this.formData.title = this.generateTitle(this.selectedTakeoff);
-      }
+  onTakeoffSelect(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const selectedId = selectElement.value;
+
+    if (!selectedId) return;
+
+    const takeoff = this.takeoffs.find(t => t._id === selectedId);
+    if (takeoff && !this.selectedTakeoffs.find(t => t._id === selectedId)) {
+      this.selectedTakeoffs.push(takeoff);
+      this.formData.takeoffIds.push(selectedId);
+      this.updateTitle();
     }
+
+    selectElement.value = '';
   }
 
-  private generateTitle(takeoff: TakeoffOrder): string {
-    const typeLabel = this.typeConfig[this.formData.type]?.label || this.formData.type;
-    return `${typeLabel} - ${takeoff.custumerName}`;
+  removeTakeoff(takeoffId: string): void {
+    this.selectedTakeoffs = this.selectedTakeoffs.filter(t => t._id !== takeoffId);
+    this.formData.takeoffIds = this.formData.takeoffIds.filter(id => id !== takeoffId);
+    this.updateTitle();
   }
 
   selectEventType(type: ScheduleEventType): void {
     this.formData.type = type;
-    this.onTypeChange();
+    this.updateTitle();
+
+    if (type === ScheduleEventType.DELIVERY) {
+      this.formData.assignedTo = '';
+    }
   }
 
-  onTypeChange(): void {
-    if (this.selectedTakeoff) {
-      this.formData.title = this.generateTitle(this.selectedTakeoff);
-    } else {
-      this.formData.title = this.getTypeLabel(this.formData.type);
+  private updateTitle(): void {
+    if (this.selectedTakeoffs.length === 0) {
+      this.formData.title = '';
+      return;
     }
+
+    const takeoffNames = this.selectedTakeoffs.map(t => {
+      const lot = t.lot ? ` - Lot ${t.lot}` : '';
+      return `${t.custumerName}${lot}`;
+    });
+
+    this.formData.title = takeoffNames.join(', ');
   }
 
   getTypeLabel(type: ScheduleEventType): string {
     return this.typeConfig[type]?.label || type;
   }
 
-  getStatusLabel(status: ScheduleEventStatus): string {
-    return this.statusConfig[status]?.label || status;
-  }
-
-  getStatusIcon(status: ScheduleEventStatus): string {
-    const icons: Record<ScheduleEventStatus, string> = {
-      [ScheduleEventStatus.SCHEDULED]: 'fas fa-clock',
-      [ScheduleEventStatus.IN_PROGRESS]: 'fas fa-spinner',
-      [ScheduleEventStatus.COMPLETED]: 'fas fa-check-circle',
-      [ScheduleEventStatus.CANCELLED]: 'fas fa-times-circle'
-    };
-    return icons[status] || 'fas fa-circle';
+  getTypeIcon(type: ScheduleEventType): string {
+    return this.typeConfig[type]?.icon || 'fas fa-calendar';
   }
 
   getTakeoffDisplayName(takeoff: TakeoffOrder): string {
@@ -200,9 +196,17 @@ export class RegisterEventModalComponent implements OnInit {
     return parts.join(' - ');
   }
 
+  getAvailableTakeoffs(): TakeoffOrder[] {
+    return this.takeoffs.filter(t => t._id && !this.formData.takeoffIds.includes(t._id));
+  }
+
+  isDelivery(): boolean {
+    return this.formData.type === ScheduleEventType.DELIVERY;
+  }
+
   isFormValid(): boolean {
     return !!(
-      this.formData.takeoffId &&
+      this.formData.takeoffIds.length > 0 &&
       this.formData.type &&
       this.formData.title &&
       this.formData.scheduledDate
@@ -216,9 +220,12 @@ export class RegisterEventModalComponent implements OnInit {
 
     const eventData: ScheduleEventFormData = {
       ...this.formData,
-      scheduledDate: new Date(this.formData.scheduledDate).toISOString(),
-      endDate: this.formData.endDate ? new Date(this.formData.endDate).toISOString() : undefined
+      scheduledDate: new Date(this.formData.scheduledDate + 'T00:00:00').toISOString()
     };
+
+    if (this.isDelivery()) {
+      delete eventData.assignedTo;
+    }
 
     const result = {
       ...eventData,

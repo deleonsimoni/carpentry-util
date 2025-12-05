@@ -196,16 +196,16 @@
     transform: translateX(2px);
   }
 
-  &.event-takeoff {
+  &.event-first_trim {
     border-left: 3px solid #11cdef;
   }
 
-  &.event-shipping {
-    border-left: 3px solid #fb6340;
+  &.event-backtrim {
+    border-left: 3px solid #2dce89;
   }
 
-  &.event-trim {
-    border-left: 3px solid #2dce89;
+  &.event-delivery {
+    border-left: 3px solid #fb6340;
   }
 
   .event-header {
@@ -227,41 +227,6 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
-  }
-
-  .event-status {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: 3px;
-
-    &.status-scheduled {
-      background: #5e72e4;
-    }
-
-    &.status-in-progress {
-      background: #fb6340;
-    }
-
-    &.status-completed {
-      background: #2dce89;
-    }
-
-    &.status-cancelled {
-      background: #8898aa;
-    }
-  }
-
-  .event-time {
-    font-size: 0.65rem;
-    color: #8898aa;
-    margin-bottom: 0.25rem;
-
-    i {
-      margin-right: 0.25rem;
-      font-size: 0.6rem;
-    }
   }
 
   .event-details {
@@ -422,23 +387,16 @@
   margin-right: 0.35rem;
   display: inline-block;
 
-  &.dot-measurement,
-  &.dot-takeoff {
+  &.dot-first_trim {
     background: #11cdef;
   }
 
-  &.dot-production,
-  &.dot-trim {
+  &.dot-backtrim {
     background: #2dce89;
   }
 
-  &.dot-delivery,
-  &.dot-shipping {
+  &.dot-delivery {
     background: #fb6340;
-  }
-
-  &.dot-follow-up {
-    background: #5e72e4;
   }
 }
 

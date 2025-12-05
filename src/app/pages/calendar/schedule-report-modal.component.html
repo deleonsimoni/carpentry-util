@@ -1,0 +1,155 @@
+<div class="modal-header report-header" [ngClass]="'bg-' + (eventTypeColor || 'primary')">
+  <div class="d-flex align-items-center">
+    <div class="icon-circle bg-white mr-3">
+      <i [class]="eventTypeIcon || 'fas fa-file-alt'" [ngClass]="'text-' + (eventTypeColor || 'primary')"></i>
+    </div>
+    <div>
+      <h4 class="modal-title mb-0 text-white">{{ reportTitle }}</h4>
+      <p class="mb-0 text-white-50 text-sm">{{ periodLabel }}</p>
+    </div>
+  </div>
+  <button type="button" class="btn-close" aria-label="Close" (click)="close()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body report-body">
+  <!-- Report Header Info -->
+  <div class="report-info mb-4">
+    <div class="row">
+      <div class="col-md-6">
+        <p class="mb-1"><strong>Report Period:</strong> {{ periodLabel }}</p>
+        <p class="mb-0"><strong>Generated:</strong> {{ generatedAt }}</p>
+      </div>
+      <div class="col-md-6 text-md-right">
+        <p class="mb-1"><strong>Total Events:</strong> {{ totalEvents }}</p>
+        <p class="mb-0"><strong>Days with Events:</strong> {{ daySummaries.length }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Card for Single Type -->
+  <div class="row mb-4" *ngIf="eventTypeFilter">
+    <div class="col-12">
+      <div class="summary-card-large" [ngClass]="'bg-' + eventTypeColor">
+        <div class="summary-icon-large">
+          <i [class]="eventTypeIcon || 'fas fa-calendar'"></i>
+        </div>
+        <div class="summary-content-large">
+          <span class="summary-label-large">{{ eventTypeLabel }}</span>
+          <strong class="summary-value-large">{{ totalEvents }}</strong>
+          <span class="summary-helper">events scheduled</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monthly Calendar Grid for Trim Reports -->
+  <div class="section-card" *ngIf="isTrimReport()">
+    <h5 class="section-title">
+      <i class="fas fa-calendar-alt mr-2"></i>Monthly Calendar
+    </h5>
+
+    <div class="report-calendar">
+      <div class="calendar-header-row">
+        <div class="calendar-header-cell" *ngFor="let day of weekDayHeaders">{{ day }}</div>
+      </div>
+      <div class="calendar-week" *ngFor="let week of calendarWeeks">
+        <div class="calendar-day"
+             *ngFor="let day of week"
+             [class.out-month]="!day.isCurrentMonth"
+             [class.has-events]="day.events.length > 0">
+          <div class="calendar-day-number">{{ day.dayNumber }}</div>
+          <div class="calendar-day-events" *ngIf="day.events.length > 0 && day.isCurrentMonth">
+            <div class="event-group" *ngFor="let event of day.events">
+              <div class="event-assignee">
+                <i class="fas fa-user"></i> {{ event.assignedTo || 'Unassigned' }}
+              </div>
+              <ng-container *ngIf="event.takeoffs && event.takeoffs.length > 0">
+                <div class="builder-group" *ngFor="let builder of getTakeoffsByBuilder(event.takeoffs) | keyvalue">
+                  <div class="builder-name">{{ builder.key }}</div>
+                  <div class="lot-item" *ngFor="let takeoff of builder.value">
+                    Lot {{ takeoff.lot || 'N/A' }}
+                  </div>
+                </div>
+              </ng-container>
+              <div class="event-takeoff" *ngIf="!event.takeoffs || event.takeoffs.length === 0">
+                {{ event.title }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="totalEvents === 0" class="text-center text-muted py-4">
+      <i class="fas fa-calendar-times fa-3x mb-3"></i>
+      <p>No {{ eventTypeLabel }} scheduled for this period.</p>
+    </div>
+  </div>
+
+  <!-- Weekly View for Delivery Reports -->
+  <div class="section-card" *ngIf="isDeliveryReport()">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="section-title mb-0 border-0 pb-0">
+        <i class="fas fa-calendar-week mr-2"></i>Weekly Schedule
+      </h5>
+      <div class="week-selector" *ngIf="availableWeeks.length > 0">
+        <select class="form-control form-control-sm" [(ngModel)]="selectedWeekIndex" (change)="onWeekChange(selectedWeekIndex)">
+          <option *ngFor="let week of availableWeeks; let i = index" [ngValue]="i">{{ week.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="totalEvents === 0" class="text-center text-muted py-4">
+      <i class="fas fa-calendar-times fa-3x mb-3"></i>
+      <p>No {{ eventTypeLabel }} scheduled for this week.</p>
+    </div>
+
+    <div class="week-view-report" *ngIf="totalEvents > 0">
+      <div class="week-day-card-report" *ngFor="let day of weekDaysReport">
+        <div class="week-day-header-report">
+          <div class="day-info-report">
+            <span class="weekday-label-report">{{ day.weekdayShort }}</span>
+            <span class="weekday-date-report">{{ day.dateFormatted }}</span>
+          </div>
+          <span class="event-count-report" *ngIf="day.events.length > 0">
+            {{ day.events.length }}
+          </span>
+        </div>
+
+        <div class="week-day-content-report">
+          <div class="events-list-report" *ngIf="day.events.length > 0">
+            <div class="event-item-report" *ngFor="let event of day.events">
+              <ng-container *ngIf="event.takeoffs && event.takeoffs.length > 0">
+                <div class="builder-group-report" *ngFor="let builder of getTakeoffsByBuilder(event.takeoffs) | keyvalue">
+                  <div class="builder-name-report">{{ builder.key }}</div>
+                  <div class="lot-item-report" *ngFor="let takeoff of builder.value">
+                    Lot {{ takeoff.lot || 'N/A' }}
+                  </div>
+                </div>
+              </ng-container>
+              <div class="event-title-report" *ngIf="!event.takeoffs || event.takeoffs.length === 0">
+                {{ event.title }}
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-day-report" *ngIf="day.events.length === 0">
+            <i class="fas fa-calendar-day"></i>
+            <span>No deliveries</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer report-footer">
+  <button type="button" class="btn btn-outline-secondary" (click)="close()">
+    <i class="fas fa-times mr-2"></i>Close
+  </button>
+  <button type="button" class="btn btn-primary" (click)="print()">
+    <i class="fas fa-print mr-2"></i>Print Report
+  </button>
+</div>
