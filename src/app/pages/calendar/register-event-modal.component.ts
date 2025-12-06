@@ -23,6 +23,7 @@ import {
 export class RegisterEventModalComponent implements OnInit {
   @Input() date!: Date;
   @Input() event: ScheduleEvent | null = null;
+  @Input() fixedEventType: ScheduleEventType | null = null;
 
   takeoffs: TakeoffOrder[] = [];
   teamMembers: UserProfile[] = [];
@@ -67,7 +68,19 @@ export class RegisterEventModalComponent implements OnInit {
       if (this.date) {
         this.formData.scheduledDate = this.formatDateForInput(this.date.toISOString());
       }
+      // Set fixed event type if provided
+      if (this.fixedEventType) {
+        this.formData.type = this.fixedEventType;
+      }
     }
+  }
+
+  hasFixedEventType(): boolean {
+    return this.fixedEventType !== null;
+  }
+
+  requiresAssignee(): boolean {
+    return this.formData.type !== ScheduleEventType.DELIVERY;
   }
 
   private formatDateForInput(isoString: string): string {
@@ -170,8 +183,9 @@ export class RegisterEventModalComponent implements OnInit {
     }
 
     const takeoffNames = this.selectedTakeoffs.map(t => {
+      const jobsite = t.shipTo || t.streetName || 'No Jobsite';
       const lot = t.lot ? ` - Lot ${t.lot}` : '';
-      return `${t.custumerName}${lot}`;
+      return `${jobsite}${lot}`;
     });
 
     this.formData.title = takeoffNames.join(', ');
@@ -186,14 +200,9 @@ export class RegisterEventModalComponent implements OnInit {
   }
 
   getTakeoffDisplayName(takeoff: TakeoffOrder): string {
-    const parts = [takeoff.custumerName];
-    if (takeoff.lot) {
-      parts.push(`Lot ${takeoff.lot}`);
-    }
-    if (takeoff.streetName) {
-      parts.push(takeoff.streetName);
-    }
-    return parts.join(' - ');
+    const jobsite = takeoff.shipTo || takeoff.streetName || 'No Jobsite';
+    const lot = takeoff.lot ? `Lot ${takeoff.lot}` : '';
+    return lot ? `${jobsite} - ${lot}` : jobsite;
   }
 
   getAvailableTakeoffs(): TakeoffOrder[] {
@@ -205,12 +214,19 @@ export class RegisterEventModalComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    return !!(
+    const baseValid = !!(
       this.formData.takeoffIds.length > 0 &&
       this.formData.type &&
       this.formData.title &&
       this.formData.scheduledDate
     );
+
+    // For Trim types (First Trim and Backtrim), assignee is required
+    if (this.requiresAssignee()) {
+      return baseValid && !!this.formData.assignedTo;
+    }
+
+    return baseValid;
   }
 
   save(): void {

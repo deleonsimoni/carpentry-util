@@ -92,12 +92,36 @@
       </form>-->
       <!-- Navigation -->
       <ul class="navbar-nav">
-        <li *ngFor="let menuItem of menuItems" class="{{menuItem.class}} nav-item">
-          <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
-            <i class="ni {{menuItem.icon}}"></i>
-            {{menuItem.title}}
-          </a>
-        </li>
+        <ng-container *ngFor="let menuItem of menuItems">
+          <!-- Menu item without children -->
+          <li *ngIf="!menuItem.children" class="{{menuItem.class}} nav-item">
+            <a routerLinkActive="active" [routerLink]="[menuItem.path]" class="nav-link">
+              <i class="ni {{menuItem.icon}}"></i>
+              {{menuItem.title}}
+            </a>
+          </li>
+
+          <!-- Menu item with children (submenu) -->
+          <li *ngIf="menuItem.children" class="{{menuItem.class}} nav-item">
+            <a class="nav-link nav-link-submenu"
+               [class.active]="isChildActive(menuItem)"
+               (click)="toggleSubmenu(menuItem.path)"
+               style="cursor: pointer;">
+              <i class="ni {{menuItem.icon}}"></i>
+              {{menuItem.title}}
+              <i class="fas fa-chevron-down ml-auto submenu-arrow"
+                 [class.rotated]="isSubmenuExpanded(menuItem.path)"></i>
+            </a>
+            <ul class="nav nav-submenu" [class.show]="isSubmenuExpanded(menuItem.path) || isChildActive(menuItem)">
+              <li *ngFor="let child of menuItem.children" class="nav-item">
+                <a routerLinkActive="active" [routerLink]="[child.path]" class="nav-link nav-link-child">
+                  <i class="ni {{child.icon}}"></i>
+                  {{child.title}}
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ng-container>
       </ul>
       <!-- Divider -->
       <hr class="my-3">

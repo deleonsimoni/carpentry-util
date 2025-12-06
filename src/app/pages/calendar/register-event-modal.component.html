@@ -33,7 +33,7 @@
     </div>
 
     <!-- Event Type -->
-    <div class="form-group">
+    <div class="form-group" *ngIf="!hasFixedEventType()">
       <label class="form-control-label fw-bold text-dark mb-2">
         Event Type <span class="text-danger">*</span>
       </label>
@@ -48,6 +48,19 @@
           <i [class]="getTypeIcon(type)"></i>
           <span>{{ getTypeLabel(type) }}</span>
         </div>
+      </div>
+    </div>
+
+    <!-- Fixed Event Type Display -->
+    <div class="form-group" *ngIf="hasFixedEventType()">
+      <label class="form-control-label fw-bold text-dark mb-2">
+        Event Type
+      </label>
+      <div class="event-type-display">
+        <span class="badge badge-lg" [ngClass]="'badge-' + typeConfig[formData.type]?.color">
+          <i [class]="getTypeIcon(formData.type) + ' mr-2'"></i>
+          {{ getTypeLabel(formData.type) }}
+        </span>
       </div>
     </div>
 
@@ -73,11 +86,8 @@
       <div *ngIf="selectedTakeoffs.length > 0" class="selected-takeoffs mt-2">
         <div *ngFor="let takeoff of selectedTakeoffs" class="selected-takeoff-item">
           <div class="takeoff-info">
-            <strong>{{ takeoff.custumerName }}</strong>
+            <strong>{{ takeoff.shipTo || takeoff.streetName || 'No Jobsite' }}</strong>
             <span *ngIf="takeoff.lot" class="text-muted ml-1">- Lot {{ takeoff.lot }}</span>
-            <small *ngIf="takeoff.streetName" class="d-block text-muted">
-              <i class="fas fa-map-marker-alt"></i> {{ takeoff.streetName }}
-            </small>
           </div>
           <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeTakeoff(takeoff._id)">
             <i class="fas fa-times"></i>
@@ -101,21 +111,23 @@
       <small class="text-muted">Auto-generated from selected takeoffs</small>
     </div>
 
-    <!-- Assigned To (Hidden for Delivery) -->
+    <!-- Assigned To (Hidden for Delivery, Required for Trim) -->
     <div class="form-group" *ngIf="!isDelivery()">
       <label class="form-control-label fw-bold text-dark mb-2">
-        Assigned To
+        Assigned To <span class="text-danger">*</span>
       </label>
       <select
         class="form-control form-control-alternative"
         [(ngModel)]="formData.assignedTo"
         name="assignedTo"
+        [class.is-invalid]="!formData.assignedTo"
       >
         <option value="">-- Select Team Member --</option>
         <option *ngFor="let member of teamMembers" [value]="member._id">
           {{ member.fullname }} ({{ member.profile | titlecase }})
         </option>
       </select>
+      <small class="text-muted">Required for trim installations</small>
     </div>
   </form>
 </div>

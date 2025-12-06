@@ -1,0 +1,223 @@
+<ng-container *ngIf="hasAccess">
+<div class="header pb-8 pt-5 pt-md-8" [ngClass]="'bg-gradient-' + scheduleColor">
+  <div class="container-fluid">
+    <div class="header-body">
+      <div class="row align-items-center py-4">
+        <div class="col-lg-7 col-7">
+          <h6 class="h2 text-white d-inline-block mb-0">
+            <i [class]="scheduleIcon + ' mr-2'"></i>{{ scheduleTitle }}
+          </h6>
+          <p class="text-white mt-0 mb-0">{{ scheduleDescription }}</p>
+        </div>
+        <div class="col-lg-5 col-5 text-right">
+          <button class="btn btn-sm btn-neutral mr-2" (click)="resetToToday()">
+            <i class="fas fa-dot-circle mr-1"></i>Today
+          </button>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-neutral" (click)="previousPeriod()">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="btn btn-neutral" (click)="nextPeriod()">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt--7">
+  <div class="row">
+    <div class="col">
+      <div class="card shadow">
+        <div class="card-header border-0">
+          <div class="row align-items-center">
+            <div class="col">
+              <h3 class="mb-0">{{ scheduleTitle }}</h3>
+              <small class="text-muted">Reference: {{ referenceDate | date:'MMMM yyyy':undefined:'pt-BR' }}</small>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+              <button class="btn btn-sm mr-3" [ngClass]="'btn-' + scheduleColor" (click)="generateReport()">
+                <i class="fas fa-file-alt mr-1"></i>Report
+              </button>
+              <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'week'">
+                  <input type="radio" autocomplete="off" (click)="changeView('week')"> Week
+                </label>
+                <label class="btn btn-sm btn-outline-primary" [class.active]="activeView === 'month'">
+                  <input type="radio" autocomplete="off" (click)="changeView('month')"> Month
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card text-white" [ngClass]="'bg-gradient-' + scheduleColor">
+                <span class="metric-label">This Week</span>
+                <strong class="metric-value">{{ productivitySnapshot.weekEvents }}</strong>
+                <span class="metric-helper">Scheduled events</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-warning text-white">
+                <span class="metric-label">Pending Events</span>
+                <strong class="metric-value">{{ productivitySnapshot.pendingEvents }}</strong>
+                <span class="metric-helper">Upcoming scheduled</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-success text-white">
+                <span class="metric-label">Next Free Day</span>
+                <strong class="metric-value">{{ productivitySnapshot.nextOpenSlot }}</strong>
+                <span class="metric-helper">Ideal for new deals</span>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="metric-card bg-gradient-primary text-white">
+                <span class="metric-label">Busiest Day</span>
+                <strong class="metric-value">{{ productivitySnapshot.busiestDay }}</strong>
+                <span class="metric-helper">Plan extra resources</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row align-items-center mb-4" *ngIf="requiresAssignee">
+            <div class="col-md-4">
+              <div class="form-group mb-0">
+                <label class="form-control-label text-muted">Filter by responsible</label>
+                <select class="form-control" [(ngModel)]="teamFilter">
+                  <option *ngFor="let member of getUniqueAssignees()" [ngValue]="member">{{ member | titlecase }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="eventsLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading events...</span>
+            </div>
+          </div>
+
+          <div *ngIf="activeView === 'week' && !eventsLoading" class="week-view">
+            <div class="week-day-card" *ngFor="let day of weekDays" [class.is-today]="isToday(day.date)">
+              <div class="week-day-header">
+                <div class="day-info">
+                  <span class="weekday-label">{{ day.label | uppercase }}</span>
+                  <span class="weekday-date">{{ day.display }}</span>
+                </div>
+                <div class="day-actions">
+                  <span class="event-count" *ngIf="eventsCountForDay(day) > 0">
+                    {{ eventsCountForDay(day) }}
+                  </span>
+                  <button class="btn btn-sm btn-add" (click)="openRegisterDialog(day.date)" title="Add event">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="week-day-content">
+                <div class="events-list" *ngIf="eventsCountForDay(day) > 0">
+                  <div class="event-item"
+                       *ngFor="let event of eventsForDay(day)"
+                       [ngClass]="'event-' + event.type"
+                       (click)="openEditDialog(event)">
+                    <div class="event-header">
+                      <span class="event-title">{{ event.title }}</span>
+                    </div>
+                    <div class="event-details" *ngIf="event.assignedTo">
+                      <span class="event-assigned">
+                        <i class="fas fa-user"></i> {{ event.assignedTo }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="empty-day" *ngIf="eventsCountForDay(day) === 0">
+                  <i class="fas fa-calendar-day"></i>
+                  <span>No events</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="activeView === 'month' && !eventsLoading" class="month-grid">
+            <div class="month-row month-header">
+              <div *ngFor="let label of ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" class="month-cell header">
+                {{ label }}
+              </div>
+            </div>
+            <div class="month-row" *ngFor="let week of monthMatrix">
+              <div class="month-cell"
+                   *ngFor="let day of week"
+                   [class.out-month]="day.date.getMonth() !== referenceDate.getMonth()"
+                   [class.is-today]="isToday(day.date)">
+                <div class="month-cell-header">
+                  <span>{{ day.display }}</span>
+                  <span class="badge badge-pill badge-light" *ngIf="eventsCountForDay(day) > 0">
+                    {{ eventsCountForDay(day) }}
+                  </span>
+                  <button class="btn btn-sm btn-link p-0 ml-auto"
+                          (click)="openRegisterDialog(day.date)"
+                          title="Add event">
+                    <i class="fas fa-plus text-success"></i>
+                  </button>
+                </div>
+                <ul class="month-list">
+                  <li *ngFor="let event of eventsForDay(day)"
+                      class="clickable"
+                      (click)="openEditDialog(event)">
+                    <span class="event-dot" [ngClass]="'dot-' + event.type"></span>
+                    <span class="event-title">{{ event.title }}</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-5">
+            <div class="col-lg-12 mb-4">
+              <div class="card shadow-sm">
+                <div class="card-header border-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5 class="mb-0">Upcoming events</h5>
+                    <small class="text-muted">Get organized for upcoming activities</small>
+                  </div>
+                  <span class="badge" [ngClass]="'badge-' + scheduleColor">{{ getUpcomingEvents().length }}</span>
+                </div>
+                <div class="card-body p-0">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item" *ngFor="let event of getUpcomingEvents()">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <h5 class="mb-1">{{ event.title }}</h5>
+                          <p class="text-sm text-muted mb-1">
+                            <i class="far fa-calendar mr-1"></i>
+                            {{ event.start | date:'EEEE, dd/MM':undefined:'pt-BR' }}
+                          </p>
+                          <span class="badge" [ngClass]="'badge-' + getEventTypeColor(event.type)">
+                            {{ typeConfig[event.type]?.label }}
+                          </span>
+                        </div>
+                        <div class="text-right" *ngIf="event.assignedTo">
+                          <span class="badge badge-secondary">{{ event.assignedTo }}</span>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="list-group-item text-center text-muted" *ngIf="getUpcomingEvents().length === 0">
+                        No upcoming events.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</ng-container>

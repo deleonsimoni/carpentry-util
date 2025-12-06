@@ -5,6 +5,12 @@ import { CompanyService } from '@app/shared/services/company.service';
 import { Company } from '@app/shared/interfaces/company.interface';
 import { UserRoles } from '@app/shared/constants/user-roles.constants';
 
+declare interface SubRouteInfo {
+  path: string;
+  title: string;
+  icon: string;
+}
+
 declare interface RouteInfo {
   path: string;
   title: string;
@@ -14,7 +20,9 @@ declare interface RouteInfo {
   carpenterOnly?: boolean;
   managerOnly?: boolean;
   managementOnly?: boolean;
+  children?: SubRouteInfo[];
 }
+
 export const ROUTES: RouteInfo[] = [
   { path: '/home', title: 'Dashboard', icon: 'ni-tv-2 text-primary', class: '' },
   { path: '/takeoff', title: 'Takeoff', icon: 'ni-building text-red', class: '' },
@@ -25,11 +33,16 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
-    path: '/calendar',
-    title: 'Schedules',
+    path: '/schedule',
+    title: 'Schedule',
     icon: 'ni-calendar-grid-58 text-info',
     class: '',
     managementOnly: true,
+    children: [
+      { path: '/schedule/first-trim', title: 'First Trim', icon: 'ni-shop text-info' },
+      { path: '/schedule/backtrim', title: 'Backtrim', icon: 'ni-check-bold text-success' },
+      { path: '/schedule/delivery', title: 'Delivery', icon: 'ni-send text-warning' },
+    ]
   },
   {
     path: '/invoice',
@@ -58,16 +71,6 @@ export const ROUTES: RouteInfo[] = [
     class: '',
     superAdminOnly: true,
   },
-  // {
-  //   path: '/user-profile',
-  //   title: 'Your Profile',
-  //   icon: 'ni-single-02 text-yellow',
-  //   class: '',
-  // },
-
-  //{ path: '/user-profile/new', title: 'New Order', icon: 'ni-single-02 text-yellow', class: '' }
-  // { path: '/login', title: 'Login', icon: 'ni-key-25 text-info', class: '' },
-  // { path: '/register', title: 'Register', icon: 'ni-circle-08 text-pink', class: '' }
 ];
 
 
@@ -79,10 +82,24 @@ export const ROUTES: RouteInfo[] = [
 export class SidebarComponent implements OnInit {
   public menuItems: any[] = []; // Initialize as empty array
   public isCollapsed = true;
+  public expandedMenus: { [key: string]: boolean } = {};
   user;
   currentCompany: Company | null = null;
 
   constructor(private router: Router, private authService: AuthService, private companyService: CompanyService) {}
+
+  toggleSubmenu(menuPath: string): void {
+    this.expandedMenus[menuPath] = !this.expandedMenus[menuPath];
+  }
+
+  isSubmenuExpanded(menuPath: string): boolean {
+    return this.expandedMenus[menuPath] || false;
+  }
+
+  isChildActive(menuItem: RouteInfo): boolean {
+    if (!menuItem.children) return false;
+    return menuItem.children.some(child => this.router.url === child.path);
+  }
 
   ngOnInit() {
     this.authService.getUser().subscribe(user => {

@@ -1,3 +1,59 @@
+// Submenu Styling
+.nav-link-submenu {
+  display: flex;
+  align-items: center;
+
+  .submenu-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.nav-submenu {
+  display: none;
+  flex-direction: column;
+  padding-left: 0;
+  margin-left: 1rem;
+  border-left: 2px solid #e9ecef;
+
+  &.show {
+    display: flex;
+  }
+
+  .nav-item {
+    margin: 0;
+  }
+
+  .nav-link-child {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #525f7f;
+
+    &:hover {
+      color: #5e72e4;
+      background-color: rgba(94, 114, 228, 0.05);
+    }
+
+    &.active {
+      color: #5e72e4;
+      font-weight: 600;
+      background-color: rgba(94, 114, 228, 0.1);
+      border-radius: 0.375rem;
+    }
+
+    i {
+      font-size: 0.75rem;
+      width: 1.25rem;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
 // User Role Badge Styling
 .user-role-section {
   .badge {

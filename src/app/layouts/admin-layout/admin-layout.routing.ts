@@ -47,8 +47,18 @@ export const AdminLayoutRoutes: Routes = [
     canActivate: [PasswordChangeGuard]
   },
   {
-    path: 'calendar',
-    loadComponent: () => import('../../pages/calendar/calendar.component').then(c => c.CalendarComponent),
+    path: 'schedule/first-trim',
+    loadComponent: () => import('../../pages/calendar/first-trim-schedule.component').then(c => c.FirstTrimScheduleComponent),
+    canActivate: [PasswordChangeGuard]
+  },
+  {
+    path: 'schedule/backtrim',
+    loadComponent: () => import('../../pages/calendar/backtrim-schedule.component').then(c => c.BacktrimScheduleComponent),
+    canActivate: [PasswordChangeGuard]
+  },
+  {
+    path: 'schedule/delivery',
+    loadComponent: () => import('../../pages/calendar/delivery-schedule.component').then(c => c.DeliveryScheduleComponent),
     canActivate: [PasswordChangeGuard]
   },
   { path: 'takeoff', component: TakeoffComponent, canActivate: [PasswordChangeGuard] },
