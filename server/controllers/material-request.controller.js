@@ -41,7 +41,7 @@ async function sendMaterialRequestEmail(user, materialRequest) {
 
   const htmlTemplate = materialRequestEmailTemplate({
     user: user.fullname,
-    date: new Date().toLocaleDateString("en-US"),
+    date: new Date().toLocaleDateString("pt-BR"),
     customerName: materialRequest.customerName,
     requestType: materialRequest.requestType,
     deliveryOrPickupDate: materialRequest.deliveryOrPickupDate,

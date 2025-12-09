@@ -128,7 +128,7 @@ async function updateUserById(req, res) {
     res.json({
       success: true,
       data: user,
-      message: 'Usuário atualizado com sucesso'
+      message: 'User updated successfully'
     });
   } catch (error) {
     res.status(400).json({
@@ -145,7 +145,7 @@ async function deleteUserById(req, res) {
     res.json({
       success: true,
       data: user,
-      message: 'Usuário inativado com sucesso'
+      message: 'User successfully deactivated'
     });
   } catch (error) {
     res.status(404).json({

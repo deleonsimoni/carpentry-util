@@ -194,11 +194,11 @@ export class StatusManagementComponent implements OnInit {
         next: (response) => {
           if (response.success) {
             this.loadStatusConfigs();
-            console.log(`Status "${status.name}" excluído com sucesso. IDs foram automaticamente reordenados.`);
+            console.log(`Status "${status.name}" successfully deleted. IDs have been automatically reordered.`);
           }
         },
         error: (error) => {
-          console.error('Erro ao excluir status:', error);
+          console.error('Error deleting status:', error);
         }
       });
     }

@@ -247,7 +247,7 @@ async function createUser(userData, companyFilter = {}, currentUser = null) {
   return {
     user: userResponse,
     temporaryPassword: temporaryPassword,
-    message: `Usuário criado com sucesso. Senha temporária: ${temporaryPassword}`
+    message: `User created successfully. Temporary password: ${temporaryPassword}`
   };
 }
 

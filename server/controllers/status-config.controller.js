@@ -146,12 +146,12 @@ async function createStatusConfig(req, res) {
     res.status(201).json({
       success: true,
       data: config,
-      message: 'Status criado com sucesso'
+      message: 'Status created successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erro ao criar status',
+      message: 'Error creating status',
       error: error.message
     });
   }
@@ -186,12 +186,12 @@ async function updateStatusConfig(req, res) {
     res.json({
       success: true,
       data: config,
-      message: 'Status atualizado com sucesso'
+      message: 'Status updated successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erro ao atualizar status',
+      message: 'Error updating status',
       error: error.message
     });
   }
@@ -261,12 +261,12 @@ async function deleteStatusConfig(req, res) {
 
     res.json({
       success: true,
-      message: 'Status excluído com sucesso e IDs reordenados'
+      message: 'Status successfully deleted and IDs reordered'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Erro ao excluir status',
+      message: 'Error deleting status',
       error: error.message
     });
   }

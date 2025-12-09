@@ -257,7 +257,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
       //frenchDoors
       case 'frenchSize1':
         field.setText(
-          takeoff.frenchDoors[0].size + ' ' + takeoff.frenchDoors[0].swing
+          takeoff.frenchDoors[0].size + ' ' + (takeoff.frenchDoors[0].swing == 'DOUBLE' ? 'DD' : takeoff.frenchDoors[0].swing)
         );
         break;
       case 'frenchHeight1':
@@ -273,7 +273,7 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
 
       case 'frenchSize2':
         field.setText(
-          takeoff.frenchDoors[1].size + ' ' + takeoff.frenchDoors[1].swing
+          takeoff.frenchDoors[1].size + ' ' + (takeoff.frenchDoors[1].swing == 'DOUBLE' ? 'DD' : takeoff.frenchDoors[1].swing)
         );
         break;
       case 'frenchHeight2':

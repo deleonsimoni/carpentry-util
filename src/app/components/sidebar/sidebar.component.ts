@@ -51,12 +51,12 @@ export const ROUTES: RouteInfo[] = [
     class: '',
     carpenterOnly: true,
   },
-  {
+ /* {
     path: '/user-management',
     title: 'Users Management',
     icon: 'ni-single-02 text-green',
     class: '',
-  },
+  },*/
   {
     path: '/status-management',
     title: 'Status Management',

@@ -11,7 +11,7 @@ import { InvoiceCalculationResponse } from '../interfaces/invoice-calculation.in
 export class InvoiceService {
   private apiUrl = `/api/invoices`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Get takeoffs ready for invoice (status >= 3 - UNDER_REVIEW or higher)
   getTakeoffsForInvoice(): Observable<any> {
@@ -191,7 +191,7 @@ export class InvoiceService {
     return of({
       success: true,
       data: newInvoice,
-      message: 'Invoice gerada com sucesso!'
+      Message: 'Invoice generated successfully!'
     });
   }
 
@@ -202,12 +202,12 @@ export class InvoiceService {
 
   // Update invoice status
   updateInvoiceStatus(id: string, status: string): Observable<any> {
-    return of({ success: true, message: 'Status atualizado com sucesso!' });
+    return of({ success: true, message: 'Status updated successfully!' });
   }
 
   // Delete draft invoice
   deleteInvoice(id: string): Observable<any> {
-    return of({ success: true, message: 'Invoice excluída com sucesso!' });
+    return of({ success: true, message: 'Invoice successfully deleted!' });
   }
 
   // Calculate invoice preview for a takeoff
