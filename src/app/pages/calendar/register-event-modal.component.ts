@@ -80,7 +80,7 @@ export class RegisterEventModalComponent implements OnInit {
   }
 
   requiresAssignee(): boolean {
-    return this.formData.type !== ScheduleEventType.DELIVERY;
+    return this.formData.type !== ScheduleEventType.SHIPPING && this.formData.type !== ScheduleEventType.PRODUCTION;
   }
 
   private formatDateForInput(isoString: string): string {
@@ -104,21 +104,36 @@ export class RegisterEventModalComponent implements OnInit {
 
   private loadTakeoffs(): void {
     this.isLoading = true;
-    this.takeoffService.getOrdersFromUser()
+
+    // Use the new endpoint that filters already scheduled takeoffs
+    const scheduleType = this.fixedEventType || this.formData.type;
+
+    this.takeoffService.getTakeoffsForScheduling(scheduleType)
       .pipe(take(1))
       .subscribe({
         next: (response) => {
-          if (Array.isArray(response)) {
+          if (response?.success && Array.isArray(response.data)) {
+            this.takeoffs = response.data;
+          } else if (Array.isArray(response)) {
             this.takeoffs = response;
           } else if (response?.data && Array.isArray(response.data)) {
             this.takeoffs = response.data;
           }
 
           if (this.isEditMode && this.formData.takeoffIds.length > 0) {
-            this.selectedTakeoffs = this.takeoffs.filter(t =>
-              t._id && this.formData.takeoffIds.includes(t._id)
-            );
-            this.updateTitle();
+            // In edit mode, also load the currently selected takeoffs
+            this.takeoffService.getOrdersFromUser()
+              .pipe(take(1))
+              .subscribe({
+                next: (allResponse) => {
+                  const allTakeoffs = Array.isArray(allResponse) ? allResponse :
+                    (allResponse?.data || []);
+                  this.selectedTakeoffs = allTakeoffs.filter((t: any) =>
+                    t._id && this.formData.takeoffIds.includes(t._id)
+                  );
+                  this.updateTitle();
+                }
+              });
           }
 
           this.isLoading = false;
@@ -168,11 +183,19 @@ export class RegisterEventModalComponent implements OnInit {
   }
 
   selectEventType(type: ScheduleEventType): void {
+    const previousType = this.formData.type;
     this.formData.type = type;
     this.updateTitle();
 
-    if (type === ScheduleEventType.DELIVERY) {
+    if (type === ScheduleEventType.SHIPPING) {
       this.formData.assignedTo = '';
+    }
+
+    // Reload takeoffs when type changes to filter by new type
+    if (previousType !== type && !this.fixedEventType) {
+      this.selectedTakeoffs = [];
+      this.formData.takeoffIds = [];
+      this.loadTakeoffs();
     }
   }
 
@@ -209,8 +232,8 @@ export class RegisterEventModalComponent implements OnInit {
     return this.takeoffs.filter(t => t._id && !this.formData.takeoffIds.includes(t._id));
   }
 
-  isDelivery(): boolean {
-    return this.formData.type === ScheduleEventType.DELIVERY;
+  isShippingOrProduction(): boolean {
+    return this.formData.type === ScheduleEventType.SHIPPING || this.formData.type === ScheduleEventType.PRODUCTION;
   }
 
   isFormValid(): boolean {
@@ -239,7 +262,7 @@ export class RegisterEventModalComponent implements OnInit {
       scheduledDate: new Date(this.formData.scheduledDate + 'T00:00:00').toISOString()
     };
 
-    if (this.isDelivery()) {
+    if (this.isShippingOrProduction()) {
       delete eventData.assignedTo;
     }
 

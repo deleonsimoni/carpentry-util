@@ -32,20 +32,20 @@ interface WeekDay {
 }
 
 @Component({
-  selector: 'app-backtrim-schedule',
+  selector: 'app-shipping-schedule',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './schedule-type.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class BacktrimScheduleComponent implements OnInit {
+export class ShippingScheduleComponent implements OnInit {
   // Schedule type configuration
-  scheduleType = ScheduleEventType.BACKTRIM;
-  scheduleTitle = 'Backtrim Schedule';
-  scheduleDescription = 'Manage backtrim installations';
-  scheduleColor = 'success';
-  scheduleIcon = 'fas fa-clipboard-check';
-  requiresAssignee = true;
+  scheduleType = ScheduleEventType.SHIPPING;
+  scheduleTitle = 'Shipping Schedule';
+  scheduleDescription = 'Manage material shipping';
+  scheduleColor = 'warning';
+  scheduleIcon = 'fas fa-truck';
+  requiresAssignee = false;
 
   activeView: 'week' | 'month' = 'week';
   referenceDate = new Date();
@@ -422,8 +422,8 @@ export class BacktrimScheduleComponent implements OnInit {
   }
 
   generateReport(): void {
-    const startDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth(), 1);
-    const endDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth() + 1, 0);
+    const startDate = this.getStartOfWeek(this.referenceDate);
+    const endDate = this.addDays(startDate, 6);
 
     const modalRef = this.modalService.open(ScheduleReportModalComponent, {
       centered: true,
@@ -443,7 +443,7 @@ export class BacktrimScheduleComponent implements OnInit {
         lot: t.lot
       }))
     }));
-    modalRef.componentInstance.reportType = 'month';
+    modalRef.componentInstance.reportType = 'week';
     modalRef.componentInstance.eventTypeFilter = this.scheduleType;
     modalRef.componentInstance.startDate = startDate;
     modalRef.componentInstance.endDate = endDate;

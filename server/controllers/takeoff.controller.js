@@ -18,6 +18,7 @@ module.exports = {
   updateTrimCarpenter,
   removeTrimCarpenter,
   getTakeoffsForInvoice,
+  getTakeoffsForScheduling,
 };
 
 async function insert(idUser, body, companyFilter = {}) {
@@ -1760,4 +1761,45 @@ async function getTakeoffsForInvoice(user, companyFilter = {}) {
   }
 
   return formattedTakeoffs;
+}
+
+/**
+ * Get takeoffs available for scheduling (not already scheduled for the specified type)
+ * @param {Object} user - The user making the request
+ * @param {string} scheduleType - The schedule type to filter (production, shipping, first_trim, second_trim)
+ * @param {Object} companyFilter - Company filter for multi-tenancy
+ */
+async function getTakeoffsForScheduling(user, scheduleType, companyFilter = {}) {
+  const ScheduleEvent = require('../models/schedule.model');
+
+  const validTypes = ['production', 'shipping', 'first_trim', 'second_trim'];
+  if (!validTypes.includes(scheduleType)) {
+    throw new Error('Invalid schedule type');
+  }
+
+  // Get all takeoff IDs that are already scheduled for this type
+  const existingSchedules = await ScheduleEvent.find({
+    type: scheduleType,
+    ...companyFilter
+  }).select('takeoffs');
+
+  const scheduledTakeoffIds = existingSchedules.flatMap(schedule =>
+    schedule.takeoffs.map(t => t.toString())
+  );
+
+  let baseQuery = { ...companyFilter };
+
+  // Exclude takeoffs that are already scheduled for this type
+  if (scheduledTakeoffIds.length > 0) {
+    baseQuery._id = { $nin: scheduledTakeoffIds };
+  }
+
+  const takeoffs = await Takeoff.find(baseQuery)
+    .populate('carpentry', 'fullname email')
+    .populate('trimCarpentry', 'fullname email')
+    .populate('user', 'fullname email')
+    .select('custumerName shipTo lot streetName status carpentry trimCarpentry user createdAt')
+    .sort({ createdAt: -1 });
+
+  return takeoffs;
 }

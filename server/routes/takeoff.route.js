@@ -38,6 +38,7 @@ router.use(companyHeaderMiddleware);
 
 router.route('/').get(asyncHandler(getTakeoffs));
 router.route('/for-invoice').get(asyncHandler(getTakeoffsForInvoice));
+router.route('/for-scheduling').get(asyncHandler(getTakeoffsForScheduling));
 router.route('/:idTakeoff').get(asyncHandler(detailTakeoff));
 router.route('/:idTakeoff/generatePDF').get(asyncHandler(generatePDF));
 router.route('/:idTakeoff/update').post(asyncHandler(updateTakeoff));
@@ -204,6 +205,29 @@ async function removeTrimCarpenter(req, res) {
 async function getTakeoffsForInvoice(req, res) {
   try {
     let response = await takeoffCtrl.getTakeoffsForInvoice(req.user, req.companyFilter);
+    res.json({
+      success: true,
+      data: response
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+async function getTakeoffsForScheduling(req, res) {
+  try {
+    const scheduleType = req.query.type;
+    if (!scheduleType) {
+      return res.status(400).json({
+        success: false,
+        error: 'Schedule type is required'
+      });
+    }
+
+    let response = await takeoffCtrl.getTakeoffsForScheduling(req.user, scheduleType, req.companyFilter);
     res.json({
       success: true,
       data: response

@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { take } from 'rxjs/operators';
+import { UserRoles } from '@app/shared/constants/user-roles.constants';
 
 @Component({
   selector: 'app-login',
@@ -49,7 +50,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.getUser().pipe(take(1)).subscribe(
       user => {
         if (user && user._id) {
-          this.router.navigate(['/home']);
+          // Redirect super admin to superadmin dashboard
+          if (UserRoles.isSuperAdmin(user.roles)) {
+            this.router.navigate(['/superadmin/dashboard']);
+          } else {
+            this.router.navigate(['/home']);
+          }
           this.notification.info('You are already logged in', 'Redirected');
         }
       }
@@ -102,6 +108,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   private proceedAfterLogin(user: any): void {
+    // Super admin goes directly to superadmin dashboard
+    if (UserRoles.isSuperAdmin(user?.roles)) {
+      this.navigateToSuperAdmin();
+      return;
+    }
+
     this.userService.checkPasswordStatus().subscribe({
       next: (response) => {
         // Managers skip password change requirement
@@ -123,6 +135,12 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.navigateToHome();
       }
     });
+  }
+
+  private navigateToSuperAdmin(): void {
+    this.notification.success('Welcome, Super Admin', 'System Access');
+    this.router.navigate(['/superadmin/dashboard']);
+    this.spinner.hide();
   }
 
   private navigateToHome(): void {

@@ -57,4 +57,8 @@ export class TakeoffService {
   removeTrimCarpenter(takeoffId: string) {
     return this.http.delete<any>(`/api/takeoff/${takeoffId}/trim-carpenter`);
   }
+
+  getTakeoffsForScheduling(scheduleType: string) {
+    return this.http.get<any>(`/api/takeoff/for-scheduling?type=${scheduleType}`);
+  }
 }

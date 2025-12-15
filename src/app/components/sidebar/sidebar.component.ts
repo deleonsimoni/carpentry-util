@@ -37,9 +37,10 @@ export const ROUTES: RouteInfo[] = [
     class: '',
     managementOnly: true,
     children: [
+      { path: '/schedule/production', title: 'Production', icon: 'ni-settings text-primary' },
+      { path: '/schedule/shipping', title: 'Shipping', icon: 'ni-send text-warning' },
       { path: '/schedule/first-trim', title: 'First Trim', icon: 'ni-shop text-info' },
-      { path: '/schedule/backtrim', title: 'Backtrim', icon: 'ni-check-bold text-success' },
-      { path: '/schedule/delivery', title: 'Delivery', icon: 'ni-send text-warning' },
+      { path: '/schedule/second-trim', title: 'Second Trim', icon: 'ni-check-bold text-success' },
     ]
   },
   { path: '/invoice', title: 'Invoice', icon: 'ni-money-coins text-success', class: '', carpenterOnly: true },

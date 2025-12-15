@@ -32,20 +32,20 @@ interface WeekDay {
 }
 
 @Component({
-  selector: 'app-delivery-schedule',
+  selector: 'app-second-trim-schedule',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './schedule-type.component.html',
   styleUrls: ['./calendar.component.scss']
 })
-export class DeliveryScheduleComponent implements OnInit {
+export class SecondTrimScheduleComponent implements OnInit {
   // Schedule type configuration
-  scheduleType = ScheduleEventType.DELIVERY;
-  scheduleTitle = 'Delivery Schedule';
-  scheduleDescription = 'Manage material deliveries';
-  scheduleColor = 'warning';
-  scheduleIcon = 'fas fa-truck';
-  requiresAssignee = false;
+  scheduleType = ScheduleEventType.SECOND_TRIM;
+  scheduleTitle = 'Second Trim Schedule';
+  scheduleDescription = 'Manage second trim installations';
+  scheduleColor = 'success';
+  scheduleIcon = 'fas fa-clipboard-check';
+  requiresAssignee = true;
 
   activeView: 'week' | 'month' = 'week';
   referenceDate = new Date();
@@ -422,8 +422,8 @@ export class DeliveryScheduleComponent implements OnInit {
   }
 
   generateReport(): void {
-    const startDate = this.getStartOfWeek(this.referenceDate);
-    const endDate = this.addDays(startDate, 6);
+    const startDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth(), 1);
+    const endDate = new Date(this.referenceDate.getFullYear(), this.referenceDate.getMonth() + 1, 0);
 
     const modalRef = this.modalService.open(ScheduleReportModalComponent, {
       centered: true,
@@ -443,7 +443,7 @@ export class DeliveryScheduleComponent implements OnInit {
         lot: t.lot
       }))
     }));
-    modalRef.componentInstance.reportType = 'week';
+    modalRef.componentInstance.reportType = 'month';
     modalRef.componentInstance.eventTypeFilter = this.scheduleType;
     modalRef.componentInstance.startDate = startDate;
     modalRef.componentInstance.endDate = endDate;

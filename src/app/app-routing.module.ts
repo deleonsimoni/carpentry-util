@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
-import { AuthGuard } from './shared/guards';
+import { AuthGuard, SuperAdminGuard } from './shared/guards';
 
 const routes: Routes = [
   {
@@ -38,6 +38,17 @@ const routes: Routes = [
           ),
       },
     ],
+  },
+  {
+    path: 'superadmin',
+    loadComponent: () => import('./layouts/superadmin-layout/superadmin-layout.component').then(c => c.SuperAdminLayoutComponent),
+    canActivate: [AuthGuard, SuperAdminGuard],
+    children: [
+      {
+        path: '',
+        loadChildren: () => import('./layouts/superadmin-layout/superadmin-layout.routing').then(m => m.SuperAdminLayoutRoutes)
+      }
+    ]
   },
   {
     path: 'auth',

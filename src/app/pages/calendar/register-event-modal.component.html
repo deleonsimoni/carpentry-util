@@ -111,8 +111,8 @@
       <small class="text-muted">Auto-generated from selected takeoffs</small>
     </div>
 
-    <!-- Assigned To (Hidden for Delivery, Required for Trim) -->
-    <div class="form-group" *ngIf="!isDelivery()">
+    <!-- Assigned To (Hidden for Shipping/Production, Required for Trim) -->
+    <div class="form-group" *ngIf="!isShippingOrProduction()">
       <label class="form-control-label fw-bold text-dark mb-2">
         Assigned To <span class="text-danger">*</span>
       </label>

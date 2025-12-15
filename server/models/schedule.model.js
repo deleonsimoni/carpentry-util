@@ -14,7 +14,7 @@ const ScheduleEventSchema = new mongoose.Schema(
     }],
     type: {
       type: String,
-      enum: ['first_trim', 'backtrim', 'delivery'],
+      enum: ['production', 'shipping', 'first_trim', 'second_trim'],
       required: true
     },
     title: {

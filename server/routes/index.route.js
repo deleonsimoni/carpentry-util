@@ -10,6 +10,7 @@ const statusConfigRoutes = require('./status-config.routes');
 const invoiceRoutes = require('./invoice.route');
 const installCostRoutes = require('./install-cost.route');
 const scheduleRoutes = require('./schedule.route');
+const superadminRoutes = require('./superadmin.route');
 
 const router = express.Router(); // eslint-disable-line new-cap
 
@@ -27,5 +28,6 @@ router.use('/status-config', statusConfigRoutes);
 router.use('/invoice', invoiceRoutes);
 router.use('/install-cost', installCostRoutes);
 router.use('/schedule', scheduleRoutes);
+router.use('/superadmin', superadminRoutes);
 
 module.exports = router;

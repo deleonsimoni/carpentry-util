@@ -27,9 +27,10 @@ interface DaySummary {
   dateFormatted: string;
   weekday: string;
   events: ReportEvent[];
+  productionCount: number;
+  shippingCount: number;
   firstTrimCount: number;
-  backtrimCount: number;
-  deliveryCount: number;
+  secondTrimCount: number;
 }
 
 interface CalendarDay {
@@ -57,9 +58,10 @@ interface WeekDayReport {
 interface AssigneeSummary {
   name: string;
   eventCount: number;
+  productionCount: number;
+  shippingCount: number;
   firstTrimCount: number;
-  backtrimCount: number;
-  deliveryCount: number;
+  secondTrimCount: number;
 }
 
 @Component({
@@ -100,11 +102,15 @@ export class ScheduleReportModalComponent implements OnInit {
 
   isTrimReport(): boolean {
     return this.eventTypeFilter === ScheduleEventType.FIRST_TRIM ||
-           this.eventTypeFilter === ScheduleEventType.BACKTRIM;
+           this.eventTypeFilter === ScheduleEventType.SECOND_TRIM;
   }
 
-  isDeliveryReport(): boolean {
-    return this.eventTypeFilter === ScheduleEventType.DELIVERY;
+  isShippingReport(): boolean {
+    return this.eventTypeFilter === ScheduleEventType.SHIPPING;
+  }
+
+  isProductionReport(): boolean {
+    return this.eventTypeFilter === ScheduleEventType.PRODUCTION;
   }
 
   constructor(public activeModal: NgbActiveModal) {}
@@ -144,8 +150,8 @@ export class ScheduleReportModalComponent implements OnInit {
       }).format(this.startDate);
     }
 
-    // For delivery reports, generate week options and week view
-    if (this.isDeliveryReport()) {
+    // For shipping reports, generate week options and week view
+    if (this.isShippingReport()) {
       this.allDeliveryEvents = [...this.events];
       this.generateWeekOptions();
       this.generateWeekDaysReport();
@@ -267,9 +273,10 @@ export class ScheduleReportModalComponent implements OnInit {
         }).format(currentDate),
         weekday: new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(currentDate),
         events: [],
+        productionCount: 0,
+        shippingCount: 0,
         firstTrimCount: 0,
-        backtrimCount: 0,
-        deliveryCount: 0
+        secondTrimCount: 0
       });
       currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -281,9 +288,10 @@ export class ScheduleReportModalComponent implements OnInit {
 
       if (daySummary) {
         daySummary.events.push(event);
+        if (event.type === ScheduleEventType.PRODUCTION) daySummary.productionCount++;
+        if (event.type === ScheduleEventType.SHIPPING) daySummary.shippingCount++;
         if (event.type === ScheduleEventType.FIRST_TRIM) daySummary.firstTrimCount++;
-        if (event.type === ScheduleEventType.BACKTRIM) daySummary.backtrimCount++;
-        if (event.type === ScheduleEventType.DELIVERY) daySummary.deliveryCount++;
+        if (event.type === ScheduleEventType.SECOND_TRIM) daySummary.secondTrimCount++;
       }
     });
 
@@ -319,17 +327,19 @@ export class ScheduleReportModalComponent implements OnInit {
         assigneeMap.set(name, {
           name,
           eventCount: 0,
+          productionCount: 0,
+          shippingCount: 0,
           firstTrimCount: 0,
-          backtrimCount: 0,
-          deliveryCount: 0
+          secondTrimCount: 0
         });
       }
 
       const summary = assigneeMap.get(name)!;
       summary.eventCount++;
+      if (event.type === ScheduleEventType.PRODUCTION) summary.productionCount++;
+      if (event.type === ScheduleEventType.SHIPPING) summary.shippingCount++;
       if (event.type === ScheduleEventType.FIRST_TRIM) summary.firstTrimCount++;
-      if (event.type === ScheduleEventType.BACKTRIM) summary.backtrimCount++;
-      if (event.type === ScheduleEventType.DELIVERY) summary.deliveryCount++;
+      if (event.type === ScheduleEventType.SECOND_TRIM) summary.secondTrimCount++;
     });
 
     this.assigneeSummaries = Array.from(assigneeMap.values())
@@ -338,9 +348,10 @@ export class ScheduleReportModalComponent implements OnInit {
 
   getTypeBadgeClass(type: ScheduleEventType): string {
     const classes: Record<ScheduleEventType, string> = {
+      [ScheduleEventType.PRODUCTION]: 'badge-primary',
+      [ScheduleEventType.SHIPPING]: 'badge-warning',
       [ScheduleEventType.FIRST_TRIM]: 'badge-info',
-      [ScheduleEventType.BACKTRIM]: 'badge-success',
-      [ScheduleEventType.DELIVERY]: 'badge-warning'
+      [ScheduleEventType.SECOND_TRIM]: 'badge-success'
     };
     return classes[type] || 'badge-secondary';
   }
