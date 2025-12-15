@@ -34,6 +34,7 @@ export class ProfileUserComponent implements OnInit {
 
   ngOnInit() {
     this.authService.me().subscribe(user => {
+      if (!user) return;
       this.user = user;
 
       this.urlImage = this.sanitizer.bypassSecurityTrustStyle(

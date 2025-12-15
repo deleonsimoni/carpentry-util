@@ -92,3 +92,123 @@
     padding: 0.6rem 1.2rem;
   }
 }
+
+// Company Switcher Dropdown (Multi-tenancy)
+.company-switcher {
+  position: relative;
+
+  .company-dropdown-toggle {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .company-name-text {
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .fa-chevron-down {
+      transition: transform 0.2s ease;
+      font-size: 0.6rem;
+    }
+
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+
+    &:hover {
+      background-color: rgba(94, 114, 228, 0.1);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
+
+  .company-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 0.5rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 1000;
+    animation: fadeInDown 0.2s ease;
+
+    .dropdown-header {
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .company-dropdown-item {
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.15s ease;
+      font-size: 0.85rem;
+      color: #525f7f;
+
+      &:hover {
+        background-color: rgba(94, 114, 228, 0.1);
+        color: #5e72e4;
+      }
+
+      &:last-child {
+        border-radius: 0 0 0.5rem 0.5rem;
+      }
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  .company-switching-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    z-index: 1001;
+
+    i {
+      color: #5e72e4;
+      margin-bottom: 0.25rem;
+    }
+
+    small {
+      color: #525f7f;
+      font-size: 0.7rem;
+    }
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

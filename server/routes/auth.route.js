@@ -5,6 +5,7 @@ const userCtrl = require('../controllers/user.controller');
 const authCtrl = require('../controllers/auth.controller');
 const sendgridCtrl = require('../controllers/sendgrid.controller');
 const User = require('../models/user.model');
+const Company = require('../models/company.model');
 
 const config = require('../config/config');
 const crypto = require("crypto");
@@ -18,9 +19,9 @@ router.get('/verify-email', asyncHandler(verifyEmail));
 router.post(
   '/login',
   passport.authenticate('local', { session: false }),
-  login
+  asyncHandler(login)
 );
-router.get('/me', passport.authenticate('jwt', { session: false }), login);
+router.get('/me', passport.authenticate('jwt', { session: false }), asyncHandler(getMe));
 router.post(
   '/me',
   passport.authenticate('jwt', { session: false }),
@@ -30,6 +31,20 @@ router.post(
   '/first-password-change',
   passport.authenticate('jwt', { session: false }),
   asyncHandler(firstPasswordChange)
+);
+
+// Multi-tenancy: Select/switch company
+router.post(
+  '/select-company',
+  passport.authenticate('jwt', { session: false }),
+  asyncHandler(selectCompany)
+);
+
+// Multi-tenancy: Get user's companies
+router.get(
+  '/my-companies',
+  passport.authenticate('jwt', { session: false }),
+  asyncHandler(getMyCompanies)
 );
 
 async function verifyEmail(req, res) {
@@ -123,15 +138,126 @@ async function login(req, res) {
   // Atualizar último login
   await authCtrl.updateLastLogin(user._id);
 
-  let token = authCtrl.generateToken(user);
+  // Get fresh user data with companies populated
+  const freshUser = await User.findById(user._id)
+    .populate('companies', 'name status')
+    .lean();
 
-  // Incluir informação sobre necessidade de trocar senha
+  // Filter active companies
+  const activeCompanies = (freshUser.companies || []).filter(
+    c => c && c.status === 'active'
+  );
+
+  // Ensure user object has companies data
+  const userToSend = { ...freshUser };
+  delete userToSend.hashedPassword;
+  userToSend.companies = activeCompanies.map(c => c._id);
+
+  // Check if user needs to select a company (has multiple)
+  if (activeCompanies.length > 1 && !freshUser.activeCompany) {
+    // User has multiple companies and no active one selected
+    // Return companies list for selection
+    return res.json({
+      needsCompanySelection: true,
+      companies: activeCompanies,
+      user: userToSend,
+      token: authCtrl.generateToken(userToSend),
+      requirePasswordChange: user.requirePasswordChange || false,
+      temporaryPassword: user.temporaryPassword || false
+    });
+  }
+
+  // Single company or already has active company selected
+  // Ensure activeCompany is set
+  if (!freshUser.activeCompany && activeCompanies.length === 1) {
+    // Auto-select the only company
+    await User.findByIdAndUpdate(user._id, {
+      activeCompany: activeCompanies[0]._id,
+      company: activeCompanies[0]._id
+    });
+    userToSend.activeCompany = activeCompanies[0]._id;
+    userToSend.company = activeCompanies[0]._id;
+  }
+
+  let token = authCtrl.generateToken(userToSend);
+
+  // Normal login response
   res.json({
-    user,
+    user: userToSend,
     token,
     requirePasswordChange: user.requirePasswordChange || false,
     temporaryPassword: user.temporaryPassword || false
   });
+}
+
+// Get current user info (for /me endpoint)
+async function getMe(req, res) {
+  let user = req.user;
+
+  // Get fresh user data with companies populated
+  const freshUser = await User.findById(user._id)
+    .populate('companies', 'name status')
+    .lean();
+
+  // Filter active companies
+  const activeCompanies = (freshUser.companies || []).filter(
+    c => c && c.status === 'active'
+  );
+
+  const userToSend = { ...freshUser };
+  delete userToSend.hashedPassword;
+  userToSend.companies = activeCompanies.map(c => c._id);
+
+  let token = authCtrl.generateToken(userToSend);
+
+  res.json({
+    user: userToSend,
+    token,
+    requirePasswordChange: freshUser.requirePasswordChange || false,
+    temporaryPassword: freshUser.temporaryPassword || false
+  });
+}
+
+// Select/switch company for multi-tenancy
+async function selectCompany(req, res) {
+  const { companyId } = req.body;
+  const userId = req.user._id;
+
+  if (!companyId) {
+    return res.status(400).json({ message: 'Company ID is required' });
+  }
+
+  try {
+    const result = await authCtrl.selectCompany(userId, companyId);
+    res.json({
+      success: true,
+      user: result.user,
+      token: result.token,
+      message: 'Company switched successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+// Get all companies user belongs to
+async function getMyCompanies(req, res) {
+  try {
+    const companies = await authCtrl.getUserCompanies(req.user._id);
+    res.json({
+      success: true,
+      companies,
+      activeCompany: req.user.activeCompany || req.user.company
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
 }
 
 function updateUser(req, res) {

@@ -12,12 +12,37 @@
 
     <!-- User Section -->
     <div class="user-section d-none d-md-block text-center my-3" *ngIf="user">
-      <!-- Company Name (Above Role) -->
+      <!-- Company Name with Dropdown (Multi-tenancy) -->
       <div class="company-name-section mb-2" *ngIf="currentCompany && !isSuperAdmin">
-        <small class="text-muted d-block">
-          <i class="ni ni-building text-primary"></i>
-          {{currentCompany.name}}
-        </small>
+        <!-- Always show dropdown -->
+        <div class="company-switcher">
+          <button class="btn btn-sm btn-outline-primary company-dropdown-toggle"
+                  (click)="toggleCompanyDropdown()"
+                  [disabled]="isSwitchingCompany">
+            <i class="ni ni-building mr-1"></i>
+            <span class="company-name-text">{{currentCompany.name}}</span>
+            <i class="fas fa-chevron-down ml-2" [class.rotate-180]="showCompanyDropdown" *ngIf="hasMultipleCompanies"></i>
+          </button>
+
+          <!-- Dropdown menu -->
+          <div class="company-dropdown-menu" *ngIf="showCompanyDropdown && hasMultipleCompanies">
+            <div class="dropdown-header">
+              <small class="text-muted">Switch Company</small>
+            </div>
+            <div class="company-dropdown-item"
+                 *ngFor="let company of otherCompanies"
+                 (click)="switchCompany(company._id)">
+              <i class="ni ni-building text-muted mr-2"></i>
+              {{company.name}}
+            </div>
+          </div>
+
+          <!-- Loading overlay -->
+          <div class="company-switching-overlay" *ngIf="isSwitchingCompany">
+            <i class="fas fa-spinner fa-spin"></i>
+            <small>Switching...</small>
+          </div>
+        </div>
       </div>
 
       <!-- User Role Badge -->
@@ -50,7 +75,7 @@
         </a>
         <div class="dropdown-menu-arrow dropdown-menu-right" ngbDropdownMenu>
           <div class=" dropdown-header noti-title">
-            <h6 class="text-overflow m-0">Welcome {{user.fullname}}!</h6>
+            <h6 class="text-overflow m-0">Welcome {{user?.fullname}}!</h6>
           </div>
           <div class="dropdown-divider"></div>
           <a (click)="logout()" class="dropdown-item">

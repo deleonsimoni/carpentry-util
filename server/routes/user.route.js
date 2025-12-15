@@ -35,6 +35,18 @@ router.route('/change-password')
 router.route('/reset-password/:id')
   .post(requireAuth, requireAdmin, asyncHandler(resetUserPassword));
 
+// Multi-tenancy: Search user by email to add to company
+router.route('/search-by-email')
+  .post(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(searchUserByEmail));
+
+// Multi-tenancy: Add existing user to company
+router.route('/add-to-company')
+  .post(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(addUserToCompany));
+
+// Multi-tenancy: Remove user from company
+router.route('/remove-from-company')
+  .post(requireAuth, requireAdmin, companyHeaderMiddleware, asyncHandler(removeUserFromCompany));
+
 // Rota para upload de foto de perfil (mantida a existente)
 router.put(
   '/updateProfilePic',
@@ -213,6 +225,127 @@ async function resetUserPassword(req, res) {
     res.status(400).json({
       success: false,
       errors: true,
+      message: error.message
+    });
+  }
+}
+
+// Multi-tenancy: Search user by email
+async function searchUserByEmail(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      });
+    }
+
+    const companyId = req.companyFilter?.company || req.user.company;
+    const result = await userCtrl.searchUserByEmail(email, companyId);
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+// Multi-tenancy: Add existing user to company
+async function addUserToCompany(req, res) {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const companyId = req.companyFilter?.company || req.user.company;
+    const result = await userCtrl.addUserToCompany(userId, companyId, req.user._id);
+
+    res.json({
+      success: true,
+      data: result.user,
+      message: result.message
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+// Multi-tenancy: Remove user from company
+async function removeUserFromCompany(req, res) {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const companyId = req.companyFilter?.company || req.user.company;
+    // Import the function (need to add to exports in controller)
+    const User = require('../models/user.model');
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Check if user belongs to this company
+    const belongsToCompany = user.companies && user.companies.some(
+      c => c.toString() === companyId.toString()
+    );
+
+    if (!belongsToCompany) {
+      return res.status(400).json({
+        success: false,
+        message: 'User does not belong to this company'
+      });
+    }
+
+    // Ensure user has at least one company remaining
+    if (user.companies.length <= 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot remove user from their only company'
+      });
+    }
+
+    // Remove company from user's companies array
+    user.companies = user.companies.filter(
+      c => c.toString() !== companyId.toString()
+    );
+
+    // If active company was the removed one, switch to another
+    if (user.activeCompany && user.activeCompany.toString() === companyId.toString()) {
+      user.activeCompany = user.companies[0];
+      user.company = user.companies[0];
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'User removed from company successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
       message: error.message
     });
   }

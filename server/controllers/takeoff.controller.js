@@ -1522,8 +1522,6 @@ async function generatePDF(user, idTakeoff, companyFilter = {}) {
     field.enableReadOnly();
   });
 
-  console.log('Custom heights for arches:', customHeight);
-
   form.getField("archesSize3").setText(customHeight);
 
   return await pdfDoc.saveAsBase64({ dataUri: true });

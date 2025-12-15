@@ -58,14 +58,8 @@ async function insert(user, verificationCode) {
   // Para usuários com role manager, garantir que profile está correto
   if (UserRoles.isManager(user.roles)) {
     user.profile = UserRoles.MANAGER;
-    // Managers não precisam trocar senha após registro
     user.requirePasswordChange = false;
     user.temporaryPassword = false;
-    console.log('✅ DEBUG - Profile definido como:', user.profile);
-    console.log('✅ DEBUG - requirePasswordChange:', user.requirePasswordChange);
-    console.log('✅ DEBUG - temporaryPassword:', user.temporaryPassword);
-  } else {
-    console.log('❌ DEBUG - NÃO é manager');
   }
 
   // Se há dados da empresa (registro de manager), criar a empresa primeiro
@@ -456,5 +450,146 @@ module.exports = {
   deleteUser,
   checkPasswordStatus,
   changePassword,
-  resetUserPassword
+  resetUserPassword,
+  addUserToCompany,
+  searchUserByEmail
 };
+
+/**
+ * Search for a user by email (for adding to company)
+ * Returns basic user info if found in another company
+ */
+async function searchUserByEmail(email, currentCompanyId) {
+  const user = await User.findOne({
+    email: email.toLowerCase()
+  }).select('_id fullname email profile companies company');
+
+  if (!user) {
+    return { found: false };
+  }
+
+  // Check if user already belongs to the current company
+  const alreadyInCompany = user.companies && user.companies.some(
+    c => c.toString() === currentCompanyId.toString()
+  );
+
+  if (alreadyInCompany) {
+    return {
+      found: true,
+      alreadyMember: true,
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        profile: user.profile
+      }
+    };
+  }
+
+  return {
+    found: true,
+    alreadyMember: false,
+    user: {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      profile: user.profile
+    }
+  };
+}
+
+/**
+ * Add an existing user to a company (multi-tenancy)
+ * Only managers can add users to their company
+ */
+async function addUserToCompany(userId, companyId, addedBy) {
+  // Verify user exists
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Verify company exists and is active
+  const company = await Company.findById(companyId);
+  if (!company) {
+    throw new Error('Company not found');
+  }
+  if (company.status !== 'active') {
+    throw new Error('Company is not active');
+  }
+
+  // Check if user already belongs to this company
+  const alreadyInCompany = user.companies && user.companies.some(
+    c => c.toString() === companyId.toString()
+  );
+
+  if (alreadyInCompany) {
+    throw new Error('User already belongs to this company');
+  }
+
+  // Initialize companies array if needed
+  if (!user.companies || user.companies.length === 0) {
+    user.companies = user.company ? [user.company] : [];
+  }
+
+  // Add the new company to user's companies array
+  user.companies.push(companyId);
+
+  // Save user
+  await user.save();
+
+  // Return updated user without password
+  const updatedUser = user.toObject();
+  delete updatedUser.hashedPassword;
+
+  return {
+    user: updatedUser,
+    message: `User ${user.fullname} added to company ${company.name} successfully`
+  };
+}
+
+/**
+ * Remove a user from a company (multi-tenancy)
+ * User must have at least one company remaining
+ */
+async function removeUserFromCompany(userId, companyId) {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  // Check if user belongs to this company
+  const belongsToCompany = user.companies && user.companies.some(
+    c => c.toString() === companyId.toString()
+  );
+
+  if (!belongsToCompany) {
+    throw new Error('User does not belong to this company');
+  }
+
+  // Ensure user has at least one company remaining
+  if (user.companies.length <= 1) {
+    throw new Error('Cannot remove user from their only company');
+  }
+
+  // Remove company from user's companies array
+  user.companies = user.companies.filter(
+    c => c.toString() !== companyId.toString()
+  );
+
+  // If active company was the removed one, switch to another
+  if (user.activeCompany && user.activeCompany.toString() === companyId.toString()) {
+    user.activeCompany = user.companies[0];
+    user.company = user.companies[0];
+  }
+
+  await user.save();
+
+  const updatedUser = user.toObject();
+  delete updatedUser.hashedPassword;
+
+  return {
+    user: updatedUser,
+    message: 'User removed from company successfully'
+  };
+}

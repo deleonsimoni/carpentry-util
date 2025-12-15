@@ -1,99 +1,91 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { switchMap, take, catchError } from 'rxjs/operators';
 import { AuthService } from '../services/auth/auth.service';
 
 interface StoredUserData {
   company?: string;
+  activeCompany?: string;
   roles?: string[];
   timestamp: number;
 }
 
 @Injectable()
 export class CompanyHeaderInterceptor implements HttpInterceptor {
+  private static readonly STORAGE_KEY = 'user_company_data';
+  private static readonly MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
   constructor(private authService: AuthService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Skip adding company header for auth endpoints
-    if (req.url.includes('/api/auth') || req.url.includes('/api/user/password-status')) {
+    if (this.shouldSkipHeader(req.url)) {
       return next.handle(req);
     }
 
-    // Try to get company data from localStorage first
     const storedData = this.getStoredUserData();
-    if (storedData && storedData.company && !this.isSuperAdmin(storedData.roles)) {
-      const modifiedReq = req.clone({
-        setHeaders: {
-          'x-company-id': storedData.company
-        }
-      });
-      return next.handle(modifiedReq);
+    const companyId = storedData?.activeCompany || storedData?.company;
+
+    if (storedData && companyId && !this.isSuperAdmin(storedData.roles)) {
+      return next.handle(this.addCompanyHeader(req, companyId));
     }
 
-    // Fallback to AuthService if no stored data
     return this.authService.getUser().pipe(
       take(1),
       switchMap(user => {
         if (user) {
-          // Store user data for future requests
           this.storeUserData(user);
+          const userCompanyId = user.activeCompany || user.company;
 
-          if (user.company && !user.roles?.includes('super_admin')) {
-            const modifiedReq = req.clone({
-              setHeaders: {
-                'x-company-id': user.company
-              }
-            });
-            return next.handle(modifiedReq);
+          if (userCompanyId && !user.roles?.includes('super_admin')) {
+            return next.handle(this.addCompanyHeader(req, userCompanyId));
           }
         }
-
-        // For super_admin or users without company, proceed without header
         return next.handle(req);
       }),
-      catchError(() => {
-        // If AuthService fails, proceed without header
-        return next.handle(req);
-      })
+      catchError(() => next.handle(req))
     );
+  }
+
+  private shouldSkipHeader(url: string): boolean {
+    return url.includes('/api/auth') || url.includes('/api/user/password-status');
+  }
+
+  private addCompanyHeader(req: HttpRequest<any>, companyId: string): HttpRequest<any> {
+    return req.clone({ setHeaders: { 'x-company-id': companyId } });
   }
 
   private storeUserData(user: any): void {
     if (!user) return;
 
-    const userData: StoredUserData = {
-      company: user.company,
-      roles: user.roles,
-      timestamp: Date.now()
-    };
-
     try {
-      localStorage.setItem('user_company_data', JSON.stringify(userData));
-    } catch (error) {
-      console.warn('Failed to store user data in localStorage:', error);
+      const userData: StoredUserData = {
+        company: user.company,
+        activeCompany: user.activeCompany,
+        roles: user.roles,
+        timestamp: Date.now()
+      };
+      localStorage.setItem(CompanyHeaderInterceptor.STORAGE_KEY, JSON.stringify(userData));
+    } catch {
+      // Silently fail if localStorage is not available
     }
   }
 
   private getStoredUserData(): StoredUserData | null {
     try {
-      const stored = localStorage.getItem('user_company_data');
+      const stored = localStorage.getItem(CompanyHeaderInterceptor.STORAGE_KEY);
       if (!stored) return null;
 
       const data: StoredUserData = JSON.parse(stored);
 
-      // Check if data is not older than 24 hours
-      const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-      if (Date.now() - data.timestamp > maxAge) {
-        localStorage.removeItem('user_company_data');
+      if (Date.now() - data.timestamp > CompanyHeaderInterceptor.MAX_AGE_MS) {
+        localStorage.removeItem(CompanyHeaderInterceptor.STORAGE_KEY);
         return null;
       }
 
       return data;
-    } catch (error) {
-      console.warn('Failed to retrieve user data from localStorage:', error);
-      localStorage.removeItem('user_company_data');
+    } catch {
+      localStorage.removeItem(CompanyHeaderInterceptor.STORAGE_KEY);
       return null;
     }
   }
@@ -102,12 +94,11 @@ export class CompanyHeaderInterceptor implements HttpInterceptor {
     return roles?.includes('super_admin') || false;
   }
 
-  // Method to clear stored data (useful for logout)
   static clearStoredUserData(): void {
     try {
-      localStorage.removeItem('user_company_data');
-    } catch (error) {
-      console.warn('Failed to clear user data from localStorage:', error);
+      localStorage.removeItem(CompanyHeaderInterceptor.STORAGE_KEY);
+    } catch {
+      // Silently fail
     }
   }
 }

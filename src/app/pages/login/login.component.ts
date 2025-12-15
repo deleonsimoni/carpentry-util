@@ -5,6 +5,7 @@ import { UserService } from '@app/shared/services/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationService } from '@app/shared/services/notification.service';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -15,9 +16,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   public loginForm: FormGroup;
 
-  mensagem: string | null = null;
-
-
   constructor(
     private router: Router,
     private authService: AuthService,
@@ -27,15 +25,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     private spinner: NgxSpinnerService,
     private route: ActivatedRoute
   ) {
-
     this.route.queryParams.subscribe(params => {
       if (params['verified']) {
-        this.notification.success('✅ Your account has been successfully verified. Please log in.', 'Welcome :)');
+        this.notification.success('Your account has been successfully verified. Please log in.', 'Welcome');
       }
     });
 
     this.loginForm = this.builder.group({
-      // tslint:disable-next-line: max-line-length
       email: [
         null,
         [
@@ -50,81 +46,89 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Check if user is already logged in
-    this.authService.getUser().subscribe(
+    this.authService.getUser().pipe(take(1)).subscribe(
       user => {
         if (user && user._id) {
-          // User is already logged in, redirect to home
           this.router.navigate(['/home']);
           this.notification.info('You are already logged in', 'Redirected');
         }
-      },
-      err => {
-        // User not logged in, stay on login page
       }
     );
   }
 
   login(): void {
-    if (this.loginForm.valid) {
-      this.spinner.show();
-      console.log('🔍 LOGIN - Iniciando processo de login');
-
-      this.authService.login(this.loginForm.value).subscribe(
-        (res: any) => {
-          console.log('✅ LOGIN - Login realizado com sucesso:', res);
-
-          // Check if user needs to change password (except managers)
-          this.userService.checkPasswordStatus().subscribe({
-            next: (response) => {
-              console.log('✅ LOGIN - Status da senha obtido:', response);
-
-              // Managers are not required to change password
-              if (res.roles && res.roles.includes('manager')) {
-                console.log('✅ LOGIN - Usuário é manager, redirecionando para /takeoff');
-                this.notification.success('Nice to see you', 'Welcome :)');
-                this.router.navigate(['/home']);
-                this.spinner.hide();
-                return;
-              }
-
-              if (response.data.requirePasswordChange) {
-                console.log('⚠️ LOGIN - Usuário precisa trocar senha, redirecionando para /change-password-required');
-                // Redirect to password change page
-                this.notification.info('You must change your temporary password', 'Password Change Required');
-                this.router.navigate(['/change-password-required']);
-              } else {
-                console.log('✅ LOGIN - Login normal, redirecionando para /takeoff');
-                // Normal login flow - redirect to takeoff list
-                this.notification.success('Nice to see you', 'Welcome :)');
-                this.router.navigate(['/home']);
-              }
-              this.spinner.hide();
-            },
-            error: (error) => {
-              console.error('❌ LOGIN - Erro ao verificar status da senha:', error);
-              // In case of error, proceed with normal flow
-              this.notification.success('Nice to see you', 'Welcome :)');
-              this.router.navigate(['/home']);
-              this.spinner.hide();
-            }
-          });
-        },
-        err => {
-          console.error('❌ LOGIN - Erro no login:', err);
-          this.spinner.hide();
-
-          if (err.status === 401) {
-            this.notification.error('Invalid email or password', 'Error: ');
-          } else {
-            this.notification.error('Login error: ' + (err.message || 'Unknown error'), 'Error: ');
-          }
-        }
-      );
-    } else {
-      console.log('⚠️ LOGIN - Formulário inválido');
+    if (!this.loginForm.valid) {
       this.notification.error('Please fill in all required fields', 'Form Invalid');
+      return;
     }
+
+    this.spinner.show();
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res: any) => {
+        // Multi-company user: auto-select first active company
+        if (res.needsCompanySelection && res.companies?.length > 0) {
+          const activeCompany = res.companies.find((c: any) => c.status === 'active') || res.companies[0];
+          this.selectCompanyAndProceed(activeCompany._id);
+          return;
+        }
+
+        // Single company or no selection needed
+        this.proceedAfterLogin(res.user);
+      },
+      error: (err) => {
+        this.spinner.hide();
+        if (err.status === 401) {
+          this.notification.error('Invalid email or password', 'Error');
+        } else if (err.status === 403) {
+          this.notification.error('Account is inactive or blocked', 'Error');
+        } else {
+          this.notification.error(err.error?.message || 'Login error', 'Error');
+        }
+      }
+    });
+  }
+
+  private selectCompanyAndProceed(companyId: string): void {
+    this.authService.selectCompany(companyId).subscribe({
+      next: (res: any) => {
+        this.proceedAfterLogin(res.user);
+      },
+      error: (err) => {
+        this.spinner.hide();
+        this.notification.error(err.error?.message || 'Error selecting company', 'Error');
+      }
+    });
+  }
+
+  private proceedAfterLogin(user: any): void {
+    this.userService.checkPasswordStatus().subscribe({
+      next: (response) => {
+        // Managers skip password change requirement
+        if (user.roles?.includes('manager')) {
+          this.navigateToHome();
+          return;
+        }
+
+        if (response.data?.requirePasswordChange) {
+          this.notification.info('You must change your temporary password', 'Password Change Required');
+          this.router.navigate(['/change-password-required']);
+          this.spinner.hide();
+        } else {
+          this.navigateToHome();
+        }
+      },
+      error: () => {
+        // On error, proceed to home
+        this.navigateToHome();
+      }
+    });
+  }
+
+  private navigateToHome(): void {
+    this.notification.success('Nice to see you', 'Welcome');
+    this.router.navigate(['/home']);
+    this.spinner.hide();
   }
 
   ngOnDestroy() {}

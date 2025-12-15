@@ -17,7 +17,11 @@ export interface User {
   lastLogin?: string;
   mobilePhone?: string;
   homePhone?: string;
+  image?: string;
   company?: string;
+  // Multi-tenancy fields
+  companies?: string[];
+  activeCompany?: string;
 }
 
 export interface UserProfile {
@@ -35,4 +39,24 @@ export interface UserProfile {
   roles: string[];
   isAdmin: boolean;
   company?: string;
+  // Multi-tenancy fields
+  companies?: string[];
+  activeCompany?: string;
+}
+
+// Interface for company selection during login
+export interface CompanyOption {
+  _id: string;
+  name: string;
+  status?: string;
+}
+
+// Login response with multi-company support
+export interface LoginResponse {
+  user: User;
+  token: string;
+  requirePasswordChange?: boolean;
+  temporaryPassword?: boolean;
+  needsCompanySelection?: boolean;
+  companies?: CompanyOption[];
 }

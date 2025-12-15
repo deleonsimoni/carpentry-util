@@ -4,12 +4,25 @@ const UserRoles = require('../constants/user-roles');
 const UserSchema = new mongoose.Schema(
   {
     // Company relationship (MULTI-TENANCY KEY)
+    // DEPRECATED: Use activeCompany instead. Kept for backwards compatibility.
     company: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Company',
       required: function() {
         return !UserRoles.isSuperAdmin(this.roles);
       }
+    },
+
+    // Multi-tenancy: List of all companies the user belongs to
+    companies: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company'
+    }],
+
+    // Currently active/selected company for this user session
+    activeCompany: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Company'
     },
 
     fullname: {
@@ -123,5 +136,32 @@ const UserSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+// Pre-save middleware to sync company fields for backwards compatibility
+UserSchema.pre('save', function(next) {
+  // If company is set but companies array is empty, initialize it
+  if (this.company && (!this.companies || this.companies.length === 0)) {
+    this.companies = [this.company];
+  }
+
+  // If activeCompany is not set, use company
+  if (!this.activeCompany && this.company) {
+    this.activeCompany = this.company;
+  }
+
+  // Keep company field in sync with activeCompany for backwards compatibility
+  if (this.activeCompany) {
+    this.company = this.activeCompany;
+  }
+
+  next();
+});
+
+// Virtual to get all populated companies
+UserSchema.virtual('companiesPopulated', {
+  ref: 'Company',
+  localField: 'companies',
+  foreignField: '_id'
+});
 
 module.exports = mongoose.model('User', UserSchema);
