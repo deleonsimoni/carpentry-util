@@ -498,6 +498,16 @@ export class TakeOffComponent implements OnInit {
     }
   }
 
+  checkDoorsStyleValueFromCombobox(value: string | null) {
+    // custom combobox emits 'custom' when user selects the Custom option
+    if (value === 'custom') {
+      this.orderForm?.get('doorsStyle')?.setValue(null);
+      this.doorsStyleValueIsOther = true;
+    } else {
+      this.doorsStyleValueIsOther = false;
+    }
+  }
+
   saveOrder() {
     this.spinner.show();
 
@@ -1387,6 +1397,26 @@ export class TakeOffComponent implements OnInit {
       this.isCustomHeight[index] = true;
       control?.setValue(''); // limpa para digitação
     } else {
+      this.isCustomHeight[index] = false;
+      control?.setValue(value);
+      this.updateSingleDoorSize(index);
+    }
+  }
+
+  onHeightComboboxChange(value: string | null, index: number) {
+    const singleDoorsArray = this.orderForm.get('singleDoors') as FormArray;
+    const control = singleDoorsArray.at(index).get('height');
+
+    if (value === 'custom') {
+      // user selected the custom token — show input
+      this.isCustomHeight[index] = true;
+      control?.setValue('');
+    } else if (value === null) {
+      // user cleared or reverted — hide custom
+      this.isCustomHeight[index] = false;
+      control?.setValue(null);
+    } else {
+      // regular value
       this.isCustomHeight[index] = false;
       control?.setValue(value);
       this.updateSingleDoorSize(index);

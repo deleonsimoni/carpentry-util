@@ -1,0 +1,9 @@
+<div>
+  <select *ngIf="!isCustom" class="form-control form-control-alternative" (change)="onSelectChange($any($event.target).value)">
+    <option *ngIf="emptyOption" value=""></option>
+    <option *ngFor="let opt of options" [value]="opt">{{ opt }}</option>
+    <option value="custom">{{ customLabel }}</option>
+  </select>
+
+  <input *ngIf="isCustom" type="text" class="form-control form-control-alternative" [(ngModel)]="internalValue" (blur)="onInputBlur()" [placeholder]="placeholder" />
+</div>

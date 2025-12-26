@@ -25,9 +25,13 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { NumberInputComponent } from './components/number-input/number-input.component';
 import { TakeoffStatusComponent } from './components/takeoff-status/takeoff-status.component';
 import { TakeoffActionsComponent } from './components/takeoff-actions/takeoff-actions.component';
+import { CustomComboboxComponent } from './components/custom-combobox/custom-combobox.component';
 
 @NgModule({
   imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     NumberInputComponent,
     TakeoffStatusComponent,
     TakeoffActionsComponent,
@@ -59,8 +63,9 @@ import { TakeoffActionsComponent } from './components/takeoff-actions/takeoff-ac
     NumberInputComponent,
     TakeoffStatusComponent,
     TakeoffActionsComponent,
+    CustomComboboxComponent,
   ],
   providers: [ImagePathUrlPipe],
-  declarations: [ImagePathUrlPipe],
+  declarations: [ImagePathUrlPipe, CustomComboboxComponent],
 })
 export class SharedModule {}

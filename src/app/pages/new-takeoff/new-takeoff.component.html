@@ -301,13 +301,7 @@
                       placeholder="Enter specific doors style" class="form-control form-control-alternative"
                       formControlName="doorsStyle" />
 
-                    <select *ngIf="!doorsStyleValueIsOther" (change)="checkDoorsStyleValueIsOther()"
-                      class="form-control form-control-alternative" formControlName="doorsStyle">
-                      <option value=""></option>
-                      <option *ngFor="let doorsStyleValue of doorsStyleValues" [ngValue]="doorsStyleValue">
-                        {{ doorsStyleValue }}
-                      </option>
-                    </select>
+                    <app-custom-combobox *ngIf="!doorsStyleValueIsOther" [options]="doorsStyleValues" formControlName="doorsStyle" (valueChange)="checkDoorsStyleValueFromCombobox($event)" placeholder="Select doors style" customLabel="Other" [emptyOption]="true"></app-custom-combobox>
                   </div>
                 </div>
               </div>
@@ -346,21 +340,13 @@
                         <div class="col-4">
                           <div class="form-group">
                             <label class="form-control-label">SWING</label>
-                            <select class="form-control form-control-alternative" formControlName="swing">
-                              <option value=""></option>
-                              <option value="RH">RH</option>
-                              <option value="LH">LH</option>
-                            </select>
+                            <app-custom-combobox [options]="['RH','LH']" formControlName="swing" placeholder="Select swing" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-4" *ngIf="cantinaDoorsForm.get('name')?.value != 'STEEL STD'">
                           <div class="form-group">
                             <label class="form-control-label">JAMB</label>
-                            <select class="form-control form-control-alternative" formControlName="jamb">
-                              <option value=""></option>
-                              <option value="475">475</option>
-                              <option value="675">675</option>
-                            </select>
+                            <app-custom-combobox [options]="['475','675']" formControlName="jamb" placeholder="Select jamb" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-4">
@@ -403,28 +389,13 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label class="form-control-label">SIZE</label>
-                            <select class="form-control form-control-alternative" formControlName="size">
-                              <option value=""></option>
-                              <option value="26">26"</option>
-                              <option value="28">28"</option>
-                              <option value="30">30"</option>
-                              <option value="32">32"</option>
-                              <option value="52">52"</option>
-                              <option value="56">56"</option>
-                              <option value="60">60"</option>
-                              <option value="64">64"</option>
-                            </select>
+                            <app-custom-combobox [options]="['26','28','30','32','52','56','60','64']" formControlName="size" placeholder="Select size" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-6">
                           <div class="form-group">
                             <label class="form-control-label">SWING</label>
-                            <select class="form-control form-control-alternative" formControlName="swing">
-                              <option value=""></option>
-                              <option value="RH">RH</option>
-                              <option value="LH">LH</option>
-                              <option value="DOUBLE">DOUBLE</option>
-                            </select>
+                            <app-custom-combobox [options]="['RH','LH','DOUBLE']" formControlName="swing" placeholder="Select swing" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                       </div>
@@ -433,22 +404,15 @@
                         <div class="col-4">
                           <div class="form-group">
                             <label class="form-control-label">HEIGHT</label>
-                            <select class="form-control form-control-alternative" formControlName="height">
-                              <option value=""></option>
-                              <option value="80">80"</option>
-                              <option value="84">84"</option>
-                              <option value="96">96"</option>
-                            </select>
+
+                            <app-custom-combobox [options]="['80','84','96']" formControlName="height" placeholder="Enter custom height (inches)" customLabel="Custom"></app-custom-combobox>
+
                           </div>
                         </div>
                         <div class="col-4">
                           <div class="form-group">
                             <label class="form-control-label">JAMB</label>
-                            <select class="form-control form-control-alternative" formControlName="jamb">
-                              <option value=""></option>
-                              <option value="475">475</option>
-                              <option value="675">675</option>
-                            </select>
+                            <app-custom-combobox [options]="['475','675']" formControlName="jamb" placeholder="Select jamb" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-4">
@@ -489,41 +453,21 @@
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
 
-                          <select class="form-control form-control-alternative" formControlName="size">
-                            <option value=""></option>
-
-                            <option value="32">32"</option>
-                            <option value="36">36"</option>
-                            <option value="40">40"</option>
-                            <option value="44">44"</option>
-                            <option value="48">48"</option>
-                            <option value="52">52"</option>
-                            <option value="56">56"</option>
-                            <option value="60">60"</option>
-                            <option value="64">64"</option>
-                          </select>
+                          <app-custom-combobox [options]="['32','36','40','44','48','52','56','60','64']" formControlName="size" placeholder="Select size" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">HEIGHT</label>
 
-                          <select class="form-control form-control-alternative" formControlName="height">
-                            <option value="80">80"</option>
-                            <option value="84">84"</option>
-                            <option value="96">96"</option>
-                          </select>
+                          <app-custom-combobox [options]="['80','84','96']" formControlName="height" placeholder="Enter custom height (inches)" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                         </div>
                       </div>
                       <div class="col-3">
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">JAMB</label>
 
-                          <select class="form-control form-control-alternative" formControlName="jamb">
-                            <option value=""></option>
-                            <option value="475">475</option>
-                            <option value="675">675</option>
-                          </select>
+                          <app-custom-combobox [options]="['475','675']" formControlName="jamb" placeholder="Select jamb" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                         </div>
                       </div>
                       <div class="col-6">
@@ -566,36 +510,13 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label class="form-control-label">SIZE</label>
-                            <select class="form-control form-control-alternative" formControlName="size"
-                              (change)="updateSingleDoorSize(i)">
-                              <option value='16"'>16"</option>
-                              <option value='18"'>18"</option>
-                              <option value='20"'>20"</option>
-                              <option value='22"'>22"</option>
-                              <option value='24"'>24"</option>
-                              <option value='26"'>26"</option>
-                              <option value='28"'>28"</option>
-                              <option value='30"'>30"</option>
-                              <option value='32"'>32"</option>
-                              <option value='34"'>34"</option>
-                              <option value='36"'>36"</option>
-                              <option value='38"'>38"</option>
-
-                            </select>
+                            <app-custom-combobox [options]="['16&quot;','18&quot;','20&quot;','22&quot;','24&quot;','26&quot;','28&quot;','30&quot;','32&quot;','34&quot;','36&quot;','38&quot;']" formControlName="size" (valueChange)="updateSingleDoorSize(i)" placeholder="Select size" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-6">
                           <div class="form-group">
                             <label class="form-control-label">HEIGHT</label>
-                            <select *ngIf="!isCustomHeight[i]" class="form-control form-control-alternative"
-                              formControlName="height" (change)="onHeightChange($event, i)">
-                              <option value=""></option>
-                              <option value='80"'>80"</option>
-                              <option value='84"'>84"</option>
-                              <option value='96"'>96"</option>
-                              <option value="custom">Custom</option>
-
-                            </select>
+                            <app-custom-combobox *ngIf="!isCustomHeight[i]" [options]="['80&quot;','84&quot;','96&quot;']" formControlName="height" (valueChange)="onHeightComboboxChange($event, i)" placeholder="Enter custom height (inches)" customLabel="Custom"></app-custom-combobox>
 
                             <input *ngIf="isCustomHeight[i]" type="text" class="form-control form-control-alternative"
                               formControlName="height" (blur)="onCustomHeightBlur(i)" />
@@ -690,12 +611,7 @@
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">HEIGHT</label>
 
-                          <select class="form-control form-control-alternative" formControlName="height">
-                            <option value=""></option>
-                            <option value="80">80"</option>
-                            <option value="96">96"</option>
-                            <option value="custom">Custom</option>
-                          </select>
+                          <app-custom-combobox [options]="['80','96']" formControlName="height" placeholder="Enter height" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           <br />
                           <input *ngIf="archesForm.get('height')?.value === 'custom'" type="text"
                             class="form-control form-control-alternative" formControlName="heightCustom"
@@ -706,12 +622,7 @@
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">JAMB</label>
 
-                          <select class="form-control form-control-alternative" formControlName="jamb">
-                            <option value=""></option>
-                            <option value="475">475</option>
-                            <option value="675">675</option>
-                            <option value="custom">Custom</option>
-                          </select>
+                          <app-custom-combobox [options]="['475','675']" formControlName="jamb" placeholder="Enter jamb" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           <br />
                           <input *ngIf="archesForm.get('jamb')?.value === 'custom'" type="text"
                             class="form-control form-control-alternative" formControlName="jambCustom"
@@ -789,26 +700,11 @@
 
                           <ng-container [ngSwitch]="trimForm.get('item')?.value">
 
-                            <select *ngSwitchCase="'Base'" class="form-control form-control-alternative"
-                              formControlName="details">
-                              <option *ngFor="let opt of baseboardsValues" [value]="opt">
-                                {{ opt }}
-                              </option>
-                            </select>
+                            <app-custom-combobox *ngSwitchCase="'Base'" [options]="baseboardsValues" formControlName="details" placeholder="Select baseboard" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
 
-                            <select *ngSwitchCase="'Casing'" class="form-control form-control-alternative"
-                              formControlName="details">
-                              <option *ngFor="let opt of casingsValues" [value]="opt">
-                                {{ opt }}
-                              </option>
-                            </select>
+                            <app-custom-combobox *ngSwitchCase="'Casing'" [options]="casingsValues" formControlName="details" placeholder="Select casing" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
 
-                            <select *ngSwitchCase="'Doorstop'" class="form-control form-control-alternative"
-                              formControlName="details">
-                              <option *ngFor="let opt of doorStopsValues" [value]="opt">
-                                {{ opt }}
-                              </option>
-                            </select>
+                            <app-custom-combobox *ngSwitchCase="'Doorstop'" [options]="doorStopsValues" formControlName="details" placeholder="Select doorstop" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
 
                             <!-- Default -->
                             <input *ngSwitchDefault type="text" class="form-control form-control-alternative"
@@ -936,15 +832,7 @@
                         <div class="form-group">
                           <label class="form-control-label" for="input-city">SIZE</label>
 
-                          <select class="form-control form-control-alternative" formControlName="size">
-                            <option value=""></option>
-                            <option value="18">18"</option>
-                            <option value="24">24"</option>
-                            <option value="26">26"</option>
-                            <option value="28">28"</option>
-                            <option value="30">30"</option>
-                            <option value="32">32"</option>
-                          </select>
+                          <app-custom-combobox [options]="['18','24','26','28','30','32']" formControlName="size" placeholder="Select size" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                         </div>
                       </div>
                       <div class="col-2">
