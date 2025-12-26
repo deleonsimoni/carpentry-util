@@ -1,4 +1,13 @@
-import { Component, forwardRef, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import {
+  Component,
+  forwardRef,
+  Input,
+  OnInit,
+  Output,
+  EventEmitter,
+  OnChanges,
+  SimpleChanges
+} from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -13,11 +22,13 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     },
   ],
 })
-export class CustomComboboxComponent implements ControlValueAccessor, OnInit {
+export class CustomComboboxComponent
+  implements ControlValueAccessor, OnInit, OnChanges {
+
   @Input() options: string[] = [];
   @Input() placeholder = '';
   @Input() customLabel = 'Custom';
-  @Input() emptyOption = true; // show an empty option at top
+  @Input() emptyOption = true;
 
   isCustom = false;
   internalValue: string | null = null;
@@ -29,14 +40,25 @@ export class CustomComboboxComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {}
 
-  writeValue(obj: any): void {
-    this.internalValue = obj;
-    // if value is present and not one of options, treat it as custom
-    if (obj && this.options.indexOf(obj) === -1) {
-      this.isCustom = true;
-    } else {
-      this.isCustom = false;
+  /**
+   * Garante sincronização quando options chegam
+   * depois do writeValue (caso comum com backend)
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['options'] && this.internalValue !== null) {
+      this.syncValueWithOptions(this.internalValue);
     }
+  }
+
+  writeValue(obj: any): void {
+    if (obj === '' || obj === null || obj === undefined) {
+      this.internalValue = '';
+      this.isCustom = false;
+      return;
+    }
+
+    this.internalValue = obj;
+    this.syncValueWithOptions(obj);
   }
 
   registerOnChange(fn: any): void {
@@ -48,30 +70,29 @@ export class CustomComboboxComponent implements ControlValueAccessor, OnInit {
   }
 
   setDisabledState?(isDisabled: boolean): void {
-    // nothing for now
+    // opcional no futuro
   }
 
   onSelectChange(value: string) {
     if (value === 'custom') {
-      // switch to input mode and signal parent with token 'custom'
       this.isCustom = true;
       this.internalValue = '';
-      // set control to the special token so parent can react (like existing code expects)
       this.onChange('custom');
       this.valueChange.emit('custom');
     } else if (value === '') {
       this.internalValue = null;
-      this.onChange(this.internalValue);
+      this.isCustom = false;
+      this.onChange(null);
       this.valueChange.emit(null);
     } else {
       this.internalValue = value;
-      this.onChange(this.internalValue);
-      this.valueChange.emit(this.internalValue);
+      this.isCustom = false;
+      this.onChange(value);
+      this.valueChange.emit(value);
     }
   }
 
   onInputBlur() {
-    // if user left custom empty, revert to select
     if (!this.internalValue) {
       this.isCustom = false;
       this.onChange(null);
@@ -81,5 +102,21 @@ export class CustomComboboxComponent implements ControlValueAccessor, OnInit {
       this.valueChange.emit(this.internalValue);
     }
     this.onTouched();
+  }
+
+  /**
+   * Centraliza a regra de decisão entre select e custom
+   */
+  private syncValueWithOptions(value: string) {
+    if (value === '') {
+      this.isCustom = false;
+      return;
+    }
+
+    if (this.options && this.options.includes(value)) {
+      this.isCustom = false;
+    } else {
+      this.isCustom = true;
+    }
   }
 }

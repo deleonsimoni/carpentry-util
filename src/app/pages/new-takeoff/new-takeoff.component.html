@@ -510,7 +510,7 @@
                         <div class="col-6">
                           <div class="form-group">
                             <label class="form-control-label">SIZE</label>
-                            <app-custom-combobox [options]="['16&quot;','18&quot;','20&quot;','22&quot;','24&quot;','26&quot;','28&quot;','30&quot;','32&quot;','34&quot;','36&quot;','38&quot;']" formControlName="size" (valueChange)="updateSingleDoorSize(i)" placeholder="Select size" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
+                            <app-custom-combobox [options]="['16&quot;','18&quot;','20&quot;','22&quot;','24&quot;','26&quot;','28&quot;','30&quot;','32&quot;','34&quot;','36&quot;','38&quot;']" formControlName="size" (valueChange)="updateSingleDoorSize(i)" placeholder="Select size" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
                           </div>
                         </div>
                         <div class="col-6">
@@ -700,11 +700,11 @@
 
                           <ng-container [ngSwitch]="trimForm.get('item')?.value">
 
-                            <app-custom-combobox *ngSwitchCase="'Base'" [options]="baseboardsValues" formControlName="details" placeholder="Select baseboard" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
+                            <app-custom-combobox *ngSwitchCase="'Base'" [options]="baseboardsValues" formControlName="details" placeholder="Select baseboard" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
 
-                            <app-custom-combobox *ngSwitchCase="'Casing'" [options]="casingsValues" formControlName="details" placeholder="Select casing" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
+                            <app-custom-combobox *ngSwitchCase="'Casing'" [options]="casingsValues" formControlName="details" placeholder="Select casing" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
 
-                            <app-custom-combobox *ngSwitchCase="'Doorstop'" [options]="doorStopsValues" formControlName="details" placeholder="Select doorstop" customLabel="Custom" [emptyOption]="false"></app-custom-combobox>
+                            <app-custom-combobox *ngSwitchCase="'Doorstop'" [options]="doorStopsValues" formControlName="details" placeholder="Select doorstop" customLabel="Custom" [emptyOption]="true"></app-custom-combobox>
 
                             <!-- Default -->
                             <input *ngSwitchDefault type="text" class="form-control form-control-alternative"
