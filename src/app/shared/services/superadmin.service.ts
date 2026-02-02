@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface SystemStats {
   totals: {
@@ -47,7 +48,7 @@ export interface PaginatedResponse<T> {
 
 @Injectable({ providedIn: 'root' })
 export class SuperAdminService {
-  private baseUrl = '/api/superadmin';
+  private baseUrl = `${environment.apiUrl}/superadmin`;
 
   constructor(private http: HttpClient) {}
 

@@ -201,8 +201,8 @@ async function createUser(userData, companyFilter = {}, currentUser = null) {
     profile: Joi.string().valid(UserRoles.SUPERVISOR, UserRoles.DELIVERY, UserRoles.MANAGER, UserRoles.CARPENTER).required(),
     mobilePhone: Joi.string().optional(),
     homePhone: Joi.string().optional(),
-    hstRegistrationNumber: Joi.string().required(),
-    companyName: Joi.string().required(),
+    hstRegistrationNumber: Joi.string().optional().allow(''),
+    companyName: Joi.string().optional().allow(''),
     address: Joi.object().optional(),
     socialMedia: Joi.object().optional()
   });

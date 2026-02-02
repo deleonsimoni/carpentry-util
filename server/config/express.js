@@ -15,6 +15,9 @@ const passport = require('./passport');
 
 const app = express();
 
+// Trust proxy (Railway, Vercel, etc.)
+app.set('trust proxy', 1);
+
 if (config.env === 'development') {
   app.use(logger('dev'));
 }
@@ -27,12 +30,33 @@ app.use(compress());
 app.use(methodOverride());
 
 // secure apps by setting various HTTP headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
 
 // enable CORS - Cross Origin Resource Sharing
 app.use(cors());
 
 app.use(passport.initialize());
+
+// Health check
+app.get('/health', async (req, res) => {
+  const mongoose = require('mongoose');
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    database: dbStatus[dbState] || 'unknown',
+  });
+});
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

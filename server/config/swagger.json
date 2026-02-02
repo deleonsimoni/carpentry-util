@@ -9,7 +9,6 @@
         "url": "https://opensource.org/licenses/MIT"
       }
     },
-    "host": "localhost:4040",
     "basePath": "/api/",
     "tags": [
       {
@@ -22,6 +21,7 @@
       }
     ],
     "schemes": [
+      "https",
       "http"
     ],
     "consumes": [

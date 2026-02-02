@@ -7,6 +7,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { LoginComponent } from '../../pages/login/login.component';
 import { RegisterComponent } from '../../pages/register/register.component';
+import { ForgotPasswordComponent } from '../../pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from '../../pages/reset-password/reset-password.component';
 import { PublicHeaderComponent } from '../../shared/components/public-header/public-header.component';
 @NgModule({
   imports: [
@@ -19,7 +21,9 @@ import { PublicHeaderComponent } from '../../shared/components/public-header/pub
   ],
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent
   ]
 })
 export class AuthLayoutModule { }

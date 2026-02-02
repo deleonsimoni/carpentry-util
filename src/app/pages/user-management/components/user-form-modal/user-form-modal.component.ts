@@ -62,16 +62,37 @@ export class UserFormModalComponent implements OnInit {
   }
 
   private createForm(): FormGroup {
-    return this.fb.group({
+    const form = this.fb.group({
       fullname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
       email: ['', [Validators.required, Validators.email]],
       profile: ['', Validators.required],
       status: ['active'],
       mobilePhone: ['', [Validators.pattern(/^[\d\s\(\)\-\+]+$/)]],
       homePhone: ['', [Validators.pattern(/^[\d\s\(\)\-\+]+$/)]],
-      hstRegistrationNumber: ['', Validators.required],
-      companyName: ['', Validators.required]
+      hstRegistrationNumber: [''],
+      companyName: ['']
     });
+
+    // HST and Company Name are only required for CARPENTER profile
+    form.get('profile')?.valueChanges.subscribe(profile => {
+      const hst = form.get('hstRegistrationNumber');
+      const company = form.get('companyName');
+      if (profile === 'carpenter') {
+        hst?.setValidators([Validators.required]);
+        company?.setValidators([Validators.required]);
+      } else {
+        hst?.clearValidators();
+        company?.clearValidators();
+      }
+      hst?.updateValueAndValidity();
+      company?.updateValueAndValidity();
+    });
+
+    return form;
+  }
+
+  isCarpenter(): boolean {
+    return this.userForm.get('profile')?.value === 'carpenter';
   }
 
   private populateForm(): void {
@@ -112,6 +133,8 @@ export class UserFormModalComponent implements OnInit {
     // Remover campos vazios opcionais e status (não permitido na criação)
     if (!formValue.mobilePhone) delete formValue.mobilePhone;
     if (!formValue.homePhone) delete formValue.homePhone;
+    if (!formValue.hstRegistrationNumber) delete formValue.hstRegistrationNumber;
+    if (!formValue.companyName) delete formValue.companyName;
     delete (formValue as any).status; // Status não é permitido na criação
 
     this.userService.createUser(formValue).subscribe({

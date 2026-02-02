@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://SUA-API-URL-AQUI/api' // TODO: substituir pela URL real do backend
+  apiUrl: 'https://api-carpinter.nexttag.com.br/api'
 };

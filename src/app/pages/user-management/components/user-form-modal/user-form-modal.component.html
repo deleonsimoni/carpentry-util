@@ -128,7 +128,8 @@
       </select>
     </div>
 
-    <div class="row ">
+    <!-- HST and Company Name (only shown for Carpenter profile) -->
+    <div class="row" *ngIf="isCarpenter()">
       <!-- HST Registration Number -->
       <div class="col-md-6">
         <div class="form-group">

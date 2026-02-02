@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { User, UserProfile as UserProfileInterface, UserProfileType, UserStatusType } from '../interfaces/user.interface';
 import { UserRoles } from '../constants/user-roles.constants';
+import { environment } from '../../../environments/environment';
 
 export interface UserProfile {
   _id: string;
@@ -94,47 +95,47 @@ export class UserService {
     if (profile) params = params.set('profile', profile);
     if (status) params = params.set('status', status);
 
-    return this.http.get<UserListResponse>('/api/user/management', { params });
+    return this.http.get<UserListResponse>(`${environment.apiUrl}/user/management`, { params });
   }
 
   // Criar novo usuário
   createUser(userData: CreateUserRequest): Observable<CreateUserResponse> {
-    return this.http.post<CreateUserResponse>('/api/user/management', userData);
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/management`, userData);
   }
 
   // Buscar usuário por ID
   getUserById(id: string): Observable<{ success: boolean; data: UserProfile }> {
-    return this.http.get<{ success: boolean; data: UserProfile }>(`/api/user/management/${id}`);
+    return this.http.get<{ success: boolean; data: UserProfile }>(`${environment.apiUrl}/user/management/${id}`);
   }
 
   // Atualizar usuário
   updateUser(id: string, updateData: UpdateUserRequest): Observable<{ success: boolean; data: UserProfile; message: string }> {
-    return this.http.put<{ success: boolean; data: UserProfile; message: string }>(`/api/user/management/${id}`, updateData);
+    return this.http.put<{ success: boolean; data: UserProfile; message: string }>(`${environment.apiUrl}/user/management/${id}`, updateData);
   }
 
   // Inativar usuário
   deleteUser(id: string): Observable<{ success: boolean; data: UserProfile; message: string }> {
-    return this.http.delete<{ success: boolean; data: UserProfile; message: string }>(`/api/user/management/${id}`);
+    return this.http.delete<{ success: boolean; data: UserProfile; message: string }>(`${environment.apiUrl}/user/management/${id}`);
   }
 
   // Verificar status da senha
   checkPasswordStatus(): Observable<{ success: boolean; data: { requirePasswordChange: boolean; temporaryPassword: boolean } }> {
-    return this.http.get<{ success: boolean; data: { requirePasswordChange: boolean; temporaryPassword: boolean } }>('/api/user/password-status');
+    return this.http.get<{ success: boolean; data: { requirePasswordChange: boolean; temporaryPassword: boolean } }>(`${environment.apiUrl}/user/password-status`);
   }
 
   // Alterar senha (usuários normais)
   changePassword(passwordData: PasswordChangeRequest): Observable<{ success: boolean; data: UserProfile; message: string }> {
-    return this.http.post<{ success: boolean; data: UserProfile; message: string }>('/api/user/change-password', passwordData);
+    return this.http.post<{ success: boolean; data: UserProfile; message: string }>(`${environment.apiUrl}/user/change-password`, passwordData);
   }
 
   // Primeira troca de senha (via auth)
   firstPasswordChange(passwordData: PasswordChangeRequest): Observable<PasswordChangeResponse> {
-    return this.http.post<PasswordChangeResponse>('/api/auth/first-password-change', passwordData);
+    return this.http.post<PasswordChangeResponse>(`${environment.apiUrl}/auth/first-password-change`, passwordData);
   }
 
   // Reset de senha de usuário (admin/manager)
   resetUserPassword(id: string): Observable<CreateUserResponse> {
-    return this.http.post<CreateUserResponse>(`/api/user/reset-password/${id}`, {});
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/reset-password/${id}`, {});
   }
 
   // Obter lista de perfis disponíveis

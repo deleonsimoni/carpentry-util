@@ -5,6 +5,7 @@ import { tap, pluck, catchError, map } from 'rxjs/operators';
 import { User, CompanyOption } from '@app/shared/interfaces';
 import { TokenStorage } from './token.storage';
 import { CompanyHeaderInterceptor } from '../../interceptors/company-header.interceptor';
+import { environment } from '../../../../environments/environment';
 
 interface AuthResponse {
   token: string;
@@ -25,7 +26,7 @@ export class AuthService {
   }
 
   login(form: { email: string; password: string }): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/login', form).pipe(
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, form).pipe(
       tap((response) => {
         if (response.token) {
           this.tokenStorage.saveToken(response.token);
@@ -38,7 +39,7 @@ export class AuthService {
   }
 
   selectCompany(companyId: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>('/api/auth/select-company', { companyId }).pipe(
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/select-company`, { companyId }).pipe(
       tap((response) => {
         if (response.token) {
           this.tokenStorage.saveToken(response.token);
@@ -53,7 +54,7 @@ export class AuthService {
   }
 
   getMyCompanies(): Observable<{ companies: CompanyOption[]; activeCompany: string }> {
-    return this.http.get<any>('/api/auth/my-companies').pipe(
+    return this.http.get<any>(`${environment.apiUrl}/auth/my-companies`).pipe(
       map(response => ({
         companies: response.companies || [],
         activeCompany: response.activeCompany
@@ -62,7 +63,7 @@ export class AuthService {
   }
 
   register(form: any): Observable<User> {
-    return this.http.post<AuthResponse>('/api/auth/register', form).pipe(
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, form).pipe(
       tap(({ token, user }) => {
         this.setUser(user);
         this.tokenStorage.saveToken(token);
@@ -83,7 +84,7 @@ export class AuthService {
   }
 
   me(): Observable<User | null> {
-    return this.http.get<AuthResponse>('/api/auth/me').pipe(
+    return this.http.get<AuthResponse>(`${environment.apiUrl}/auth/me`).pipe(
       tap(({ user }) => this.setUser(user)),
       pluck('user'),
       catchError(() => of(null))
@@ -91,11 +92,11 @@ export class AuthService {
   }
 
   updateUser(form: any): Observable<any> {
-    return this.http.post<any>('/api/auth/me', form);
+    return this.http.post<any>(`${environment.apiUrl}/auth/me`, form);
   }
 
   updateImageUser(profilePicName: string, profilePic: any): Observable<any> {
-    return this.http.put<any>('/api/user/updateProfilePic', {
+    return this.http.put<any>(`${environment.apiUrl}/user/updateProfilePic`, {
       name: profilePicName,
       content: profilePic,
     });
@@ -124,8 +125,16 @@ export class AuthService {
     return firstValueFrom(this.me());
   }
 
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, password: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/reset-password`, { token, password });
+  }
+
   makeRequest(method: string, url: string, body?: any): Observable<any> {
-    const fullUrl = `/api${url}`;
+    const fullUrl = `${environment.apiUrl}${url}`;
     const headers = this.getAuthorizationHeaders();
 
     switch (method.toUpperCase()) {

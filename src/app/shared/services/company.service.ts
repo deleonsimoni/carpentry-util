@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Company, CompanyFilters, SendTakeoffRequest, SendTakeoffResponse } from '../interfaces/company.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -30,11 +31,11 @@ export class CompanyService {
       }
     }
 
-    return this.http.get<Company[]>(`/api/company`, { params });
+    return this.http.get<Company[]>(`${environment.apiUrl}/company`, { params });
   }
 
   getCompanyById(id: string): Observable<Company> {
-    return this.http.get<{success: boolean, data: Company}>(`/api/company/${id}`).pipe(
+    return this.http.get<{success: boolean, data: Company}>(`${environment.apiUrl}/company/${id}`).pipe(
       tap(response => console.log('CompanyService: Raw API response:', response)),
       map(response => response.data),
       catchError(error => {
@@ -45,23 +46,23 @@ export class CompanyService {
   }
 
   createCompany(company: Company): Observable<Company> {
-    return this.http.post<Company>(`/api/company`, company);
+    return this.http.post<Company>(`${environment.apiUrl}/company`, company);
   }
 
   updateCompany(id: string, company: Company): Observable<Company> {
-    return this.http.put<Company>(`/api/company/${id}`, company);
+    return this.http.put<Company>(`${environment.apiUrl}/company/${id}`, company);
   }
 
   deactivateCompany(id: string): Observable<Company> {
-    return this.http.patch<Company>(`/api/company/${id}/deactivate`, {});
+    return this.http.patch<Company>(`${environment.apiUrl}/company/${id}/deactivate`, {});
   }
 
   activateCompany(id: string): Observable<Company> {
-    return this.http.patch<Company>(`/api/company/${id}/activate`, {});
+    return this.http.patch<Company>(`${environment.apiUrl}/company/${id}/activate`, {});
   }
 
   sendTakeoffToCompanies(request: SendTakeoffRequest): Observable<SendTakeoffResponse> {
-    return this.http.post<SendTakeoffResponse>(`/api/company/send-takeoff`, request);
+    return this.http.post<SendTakeoffResponse>(`${environment.apiUrl}/company/send-takeoff`, request);
   }
 
   // Methods for current company management

@@ -9,9 +9,11 @@ mongoose.set('strictQuery', false); // Remove deprecation warning
 
 // connect to mongo db
 const mongoUri = config.mongo.host;
-mongoose.connect(mongoUri, { keepAlive: true }); // Update keepAlive to boolean
-mongoose.connection.on('error', () => {
-  throw new Error(`unable to connect to database: ${mongoUri}`);
+mongoose.connect(mongoUri, { keepAlive: true, dbName: 'carpentrygo' }).catch(err => {
+  console.error('MongoDB connection error:', err.message);
+});
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB error:', err.message);
 });
 
 // print mongoose logs in dev env

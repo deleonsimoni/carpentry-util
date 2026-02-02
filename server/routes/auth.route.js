@@ -15,6 +15,8 @@ module.exports = router;
 
 router.post('/register', asyncHandler(register));
 router.get('/verify-email', asyncHandler(verifyEmail));
+router.post('/forgot-password', asyncHandler(forgotPassword));
+router.post('/reset-password', asyncHandler(resetPassword));
 
 router.post(
   '/login',
@@ -264,6 +266,38 @@ function updateUser(req, res) {
   let user = req.user;
   let token = authCtrl.updateUser(user, req.body);
   res.json(token);
+}
+
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' });
+    }
+    await authCtrl.forgotPassword(email);
+    // Always return success to avoid revealing whether email exists
+    res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    // Still return success to avoid revealing information
+    res.json({ success: true, message: 'If an account with that email exists, a reset link has been sent.' });
+  }
+}
+
+async function resetPassword(req, res) {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ message: 'Token and password are required' });
+    }
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    await authCtrl.resetPassword(token, password);
+    res.json({ success: true, message: 'Password has been reset successfully.' });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
 }
 
 async function firstPasswordChange(req, res) {

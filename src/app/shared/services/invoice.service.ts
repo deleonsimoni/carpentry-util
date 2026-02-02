@@ -9,13 +9,13 @@ import { InvoiceCalculationResponse } from '../interfaces/invoice-calculation.in
   providedIn: 'root'
 })
 export class InvoiceService {
-  private apiUrl = `/api/invoices`;
+  private apiUrl = `${environment.apiUrl}/invoices`;
 
   constructor(private http: HttpClient) { }
 
   // Get takeoffs ready for invoice (status >= 3 - UNDER_REVIEW or higher)
   getTakeoffsForInvoice(): Observable<any> {
-    const url = `/api//takeoff/for-invoice`;
+    const url = `${environment.apiUrl}/takeoff/for-invoice`;
     console.log('🔍 Fetching takeoffs for invoice from:', url);
     return this.http.get(url);
   }
@@ -80,7 +80,7 @@ export class InvoiceService {
 
   // Get invoice history (sent/paid) - Groups de invoices gerados
   getInvoiceHistory(): Observable<any> {
-    return this.http.get(`/api/invoice/history`);
+    return this.http.get(`${environment.apiUrl}/invoice/history`);
 
     /* OLD MOCK DATA - REMOVED
     const mockHistory: InvoiceGroup[] = [
@@ -212,21 +212,21 @@ export class InvoiceService {
 
   // Calculate invoice preview for a takeoff
   calculateInvoicePreview(takeoffId: string): Observable<InvoiceCalculationResponse> {
-    return this.http.get<InvoiceCalculationResponse>(`/api/invoice/${takeoffId}/preview`);
+    return this.http.get<InvoiceCalculationResponse>(`${environment.apiUrl}/invoice/${takeoffId}/preview`);
   }
 
   // Generate invoice PDF for a takeoff
   generateInvoicePDF(takeoffId: string): Observable<any> {
-    return this.http.get<any>(`/api/invoice/${takeoffId}/generate-pdf`);
+    return this.http.get<any>(`${environment.apiUrl}/invoice/${takeoffId}/generate-pdf`);
   }
 
   // Generate multi-takeoff invoice PDF (up to 5 takeoffs)
   generateMultiTakeoffInvoicePDF(takeoffIds: string[]): Observable<any> {
-    return this.http.post<any>(`/api/invoice/generate-multi-takeoff-pdf`, { takeoffIds });
+    return this.http.post<any>(`${environment.apiUrl}/invoice/generate-multi-takeoff-pdf`, { takeoffIds });
   }
 
   // Download invoice PDF by invoice ID
   downloadInvoiceById(invoiceId: string): Observable<any> {
-    return this.http.get<any>(`/api/invoice/${invoiceId}/download`);
+    return this.http.get<any>(`${environment.apiUrl}/invoice/${invoiceId}/download`);
   }
 }

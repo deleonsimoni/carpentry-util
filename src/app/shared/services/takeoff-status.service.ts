@@ -8,6 +8,7 @@ import {
   getNextStatuses,
   canChangeStatus
 } from '../interfaces/takeoff-status.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,7 @@ export class TakeoffStatusService {
   constructor(private http: HttpClient) { }
 
   updateTakeoffStatus(takeoffId: string, newStatus: TakeoffStatus): Observable<any> {
-    return this.http.patch(`/api/takeoff/${takeoffId}/status`, { status: newStatus });
+    return this.http.patch(`${environment.apiUrl}/takeoff/${takeoffId}/status`, { status: newStatus });
   }
 
   getStatusInfo(status: number): TakeoffStatusInfo {

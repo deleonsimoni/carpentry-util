@@ -6,12 +6,13 @@ import {
   ScheduleEventFormData,
   ScheduleEventResponse
 } from '../interfaces/schedule.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ScheduleService {
-  private readonly apiPath = '/api/schedule';
+  private readonly apiPath = `${environment.apiUrl}/schedule`;
 
   constructor(private http: HttpClient) {}
 

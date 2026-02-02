@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 const config = require('../config/config');
 const User = require('../models/user.model');
 const Company = require('../models/company.model');
+const sendgridCtrl = require('./sendgrid.controller');
 
 module.exports = {
   generateToken,
@@ -9,6 +12,8 @@ module.exports = {
   updateLastLogin,
   selectCompany,
   getUserCompanies,
+  forgotPassword,
+  resetPassword,
 };
 
 function generateToken(user) {
@@ -93,4 +98,58 @@ async function getUserCompanies(userId) {
   );
 
   return activeCompanies;
+}
+
+async function forgotPassword(email) {
+  // Always return success to avoid revealing whether email exists
+  const user = await User.findOne({ email: email.toLowerCase() });
+  if (!user) {
+    return { success: true };
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+  await user.save();
+
+  const resetUrl = `https://carpentrygo.ca/reset-password?token=${token}`;
+
+  const html = `
+    <h2>Password Reset - CarpentryGo</h2>
+    <p>Hello,</p>
+    <p>You requested a password reset. Click the button below to set a new password:</p>
+    <a href="${resetUrl}"
+      style="display:inline-block;padding:10px 20px;background:#004a80;color:#fff;text-decoration:none;border-radius:5px;">
+      Reset my password
+    </a>
+    <p>Or copy and paste this link into your browser:</p>
+    <a href="${resetUrl}">${resetUrl}</a>
+    <p>This link will expire in 1 hour.</p>
+    <p>If you did not request a password reset, ignore this email.</p>
+  `;
+
+  await sendgridCtrl.enviarEmail(email, 'CarpentryGo - Password Reset', html);
+
+  return { success: true };
+}
+
+async function resetPassword(token, newPassword) {
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new Error('Invalid or expired reset token. Please request a new password reset link.');
+  }
+
+  const salt = bcrypt.genSaltSync(10);
+  user.hashedPassword = bcrypt.hashSync(newPassword, salt);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  user.requirePasswordChange = false;
+  user.temporaryPassword = false;
+  await user.save();
+
+  return { success: true };
 }
