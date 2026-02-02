@@ -1,12 +1,13 @@
-FROM node:14.18-alpine
+FROM node:18-alpine
 
 WORKDIR /usr/src/app
-COPY . /usr/src/app
 
-ENV HUSKY_SKIP_INSTALL=true
-RUN yarn --pure-lockfile --non-interactive --no-progress
-RUN yarn build:prod
+# Copiar apenas os arquivos do servidor
+COPY server/package.json ./
+RUN npm install --omit=dev
+
+COPY server/ ./
 
 EXPOSE 4040
 
-CMD ["yarn", "serve"]
+CMD ["node", "index.js"]

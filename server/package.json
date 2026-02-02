@@ -1,0 +1,39 @@
+{
+  "name": "carpentry-util-api",
+  "version": "2.0.2",
+  "private": true,
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.6",
+    "aws-sdk": "^2.1441.0",
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
+    "dotenv": "^10.0.0",
+    "express": "^4.16.3",
+    "express-async-handler": "^1.1.3",
+    "express-fileupload": "^1.4.0",
+    "express-jwt": "^5.3.1",
+    "express-validation": "^1.0.2",
+    "formidable": "^3.1.3",
+    "helmet": "^4.6.0",
+    "http-errors": "^1.6.3",
+    "joi": "^17.4.2",
+    "jsonwebtoken": "^8.2.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^6.0.13",
+    "morgan": "^1.9.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.10",
+    "passport": "^0.4.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "pdf-lib": "^1.17.1",
+    "pdfmake": "^0.2.20",
+    "swagger-ui-express": "^4.1.6"
+  }
+}

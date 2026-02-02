@@ -1,24 +1,13 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build: ./
-    image: mean
+    image: carpentry-api
     ports:
-      - 4040:4040
+      - "4040:4040"
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
-      SERVER_PORT: 4040
-      JWT_SECRET: 0a6b944d-d2fb-46fc-a85e-0295c986cd9f
-      MONGO_HOST: mongodb://mongo/mean
-    restart: always
-    depends_on:
-      - mongo
-
-  mongo:
-    image: mongo:4.2
-    volumes:
-      - mongo_data:/data/db
-
-volumes:
-  mongo_data:
+    restart: unless-stopped

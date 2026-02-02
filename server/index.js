@@ -14,10 +14,8 @@ try {
     cert: fs.readFileSync("/home/ubuntu/carpentryutil/certificado/certificate.crt")
   };
 } catch (err) {
-  console.warn('Certificados não encontrados', err?.message || err);
+  console.warn('Certificados SSL não encontrados, HTTPS desabilitado.');
 }
-
-const httpsServer = https.createServer(https_options, app);
 
 // module.parent check is required to support mocha watch
 // src: https://github.com/mochajs/mocha/issues/1912
@@ -26,9 +24,12 @@ if (!module.parent) {
     console.info(`server started on port ${config.port} (${config.env})`);
   });
 
-  httpsServer.listen(8443, () => {
-    console.info('HTTPS server running on port 8443');
-  });
+  if (https_options) {
+    const httpsServer = https.createServer(https_options, app);
+    httpsServer.listen(8443, () => {
+      console.info('HTTPS server running on port 8443');
+    });
+  }
 }
 
 module.exports = app;
