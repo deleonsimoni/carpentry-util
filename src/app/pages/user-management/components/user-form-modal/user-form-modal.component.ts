@@ -133,8 +133,8 @@ export class UserFormModalComponent implements OnInit {
     // Remover campos vazios opcionais e status (não permitido na criação)
     if (!formValue.mobilePhone) delete formValue.mobilePhone;
     if (!formValue.homePhone) delete formValue.homePhone;
-    if (!formValue.hstRegistrationNumber) delete formValue.hstRegistrationNumber;
-    if (!formValue.companyName) delete formValue.companyName;
+    if (!formValue.hstRegistrationNumber) delete (formValue as any).hstRegistrationNumber;
+    if (!formValue.companyName) delete (formValue as any).companyName;
     delete (formValue as any).status; // Status não é permitido na criação
 
     this.userService.createUser(formValue).subscribe({
