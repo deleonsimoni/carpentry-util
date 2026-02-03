@@ -52,8 +52,11 @@ export class TakeoffStatusComponent {
     // Check role-based permissions
     const userRole = this.currentUserRole;
 
-    // CARPENTER: Only show buttons during TO_MEASURE status
-    if (userRole === 'carpenter' && this.currentStatus !== TakeoffStatus.TO_MEASURE) {
+    // CARPENTER: Only show buttons during TO_MEASURE, SHIPPED (trim), and TRIMMING_COMPLETED (back trim)
+    if (userRole === 'carpenter' &&
+        this.currentStatus !== TakeoffStatus.TO_MEASURE &&
+        this.currentStatus !== TakeoffStatus.SHIPPED &&
+        this.currentStatus !== TakeoffStatus.TRIMMING_COMPLETED) {
       return [];
     }
 
@@ -104,12 +107,15 @@ export class TakeoffStatusComponent {
           return 'Advance Status';
       }
     } else if (userRole === 'carpenter') {
-      // Carpenter actions - ONLY during measurement
       switch (this.currentStatus) {
         case TakeoffStatus.TO_MEASURE:
           return 'Complete Measurement';
+        case TakeoffStatus.SHIPPED:
+          return 'Mark Trimming Completed';
+        case TakeoffStatus.TRIMMING_COMPLETED:
+          return 'Mark Back Trim Completed';
         default:
-          return 'No Action Available'; // Carpenter cannot advance other statuses
+          return 'No Action Available';
       }
     } else if (userRole === 'delivery') {
       // Delivery actions - ONLY when ready to ship
@@ -149,6 +155,10 @@ export class TakeoffStatusComponent {
           return STATUS_CONSTANTS.permissions.carpenter.canEdit(this.currentStatus);
         case 'complete_measurement':
           return STATUS_CONSTANTS.permissions.carpenter.canFinalizeMeasurement(this.currentStatus);
+        case 'mark_trimming_completed':
+          return STATUS_CONSTANTS.permissions.carpenter.canMarkTrimmingCompleted(this.currentStatus);
+        case 'mark_back_trim_completed':
+          return STATUS_CONSTANTS.permissions.carpenter.canMarkBackTrimCompleted(this.currentStatus);
         case 'start_installation':
           return STATUS_CONSTANTS.permissions.carpenter.canStartInstallation(this.currentStatus);
         case 'complete_installation':

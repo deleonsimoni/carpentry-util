@@ -1618,8 +1618,9 @@ export class TakeOffComponent implements OnInit {
     if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.UNDER_REVIEW) {
       return;
     }
-    if (this.orderForm?.get('trimCarpentry')?.value == '' && !this.isTrimCarpentryFound) {
-      this.notification.info('Set the trim carpenter from takeoff', 'Trim Carpenter');
+    const trimValue = this.orderForm?.get('trimCarpentry')?.value;
+    if ((!trimValue || trimValue.trim() === '') && !this.isTrimCarpentryFound) {
+      this.notification.error('Trim Carpenter is required before approving for shipping', 'Trim Carpenter Required');
       return;
     }
     this.advanceToSpecificStatus(TakeoffStatus.READY_TO_SHIP);
@@ -1659,20 +1660,22 @@ export class TakeOffComponent implements OnInit {
   }
 
   /**
-   * Company: Mark trimming completed - advances from SHIPPED to TRIMMING_COMPLETED
+   * Manager/Carpenter: Mark trimming completed - advances from SHIPPED to TRIMMING_COMPLETED
    */
   markTrimmingCompleted(): void {
-    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.SHIPPED) {
+    const canAdvance = this.isManager || this.userRole === 'carpenter';
+    if (this.isAdvancingStatus || !canAdvance || this.orderStatus !== TakeoffStatus.SHIPPED) {
       return;
     }
     this.advanceToSpecificStatus(TakeoffStatus.TRIMMING_COMPLETED);
   }
 
   /**
-   * Company: Mark back trim completed - advances from TRIMMING_COMPLETED to BACK_TRIM_COMPLETED
+   * Manager/Carpenter: Mark back trim completed - advances from TRIMMING_COMPLETED to BACK_TRIM_COMPLETED
    */
   markBackTrimCompleted(): void {
-    if (this.isAdvancingStatus || !this.isManager || this.orderStatus !== TakeoffStatus.TRIMMING_COMPLETED) {
+    const canAdvance = this.isManager || this.userRole === 'carpenter';
+    if (this.isAdvancingStatus || !canAdvance || this.orderStatus !== TakeoffStatus.TRIMMING_COMPLETED) {
       return;
     }
     this.advanceToSpecificStatus(TakeoffStatus.BACK_TRIM_COMPLETED);

@@ -65,10 +65,11 @@ export const STATUS_CONSTANTS = {
     carpenter: {
       canEdit: (status: number) => status === TakeoffStatus.TO_MEASURE,
       canSaveProgress: (status: number) => status === TakeoffStatus.TO_MEASURE,
-      canAdvanceStatus: (status: number) => status === TakeoffStatus.TO_MEASURE,
+      canAdvanceStatus: (status: number) => [TakeoffStatus.TO_MEASURE, TakeoffStatus.SHIPPED, TakeoffStatus.TRIMMING_COMPLETED].includes(status),
       canStartMeasurement: (status: number) => status === TakeoffStatus.TO_MEASURE,
       canFinalizeMeasurement: (status: number) => status === TakeoffStatus.TO_MEASURE,
-      // Carpenter cannot advance status in other phases - company controls installation flow
+      canMarkTrimmingCompleted: (status: number) => status === TakeoffStatus.SHIPPED,
+      canMarkBackTrimCompleted: (status: number) => status === TakeoffStatus.TRIMMING_COMPLETED,
       canStartInstallation: (status: number) => false,
       canCompleteInstallation: (status: number) => false,
       canFinishService: (status: number) => false

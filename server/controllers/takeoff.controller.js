@@ -1535,6 +1535,14 @@ async function updateTakeoffStatus(user, takeoffId, newStatus, companyFilter = {
     throw new Error('Invalid status value');
   }
 
+  // Validate: transitioning to READY_TO_SHIP (4) requires trimCarpentry
+  if (newStatus === 4) {
+    const takeoff = await Takeoff.findById(takeoffId);
+    if (takeoff && !takeoff.trimCarpentry) {
+      throw new Error('Trim Carpenter is required before advancing to Ready to Ship');
+    }
+  }
+
   let baseQuery;
 
   // If user is delivery, allow access to all company takeoffs

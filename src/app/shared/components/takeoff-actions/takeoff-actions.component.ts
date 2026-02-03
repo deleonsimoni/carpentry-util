@@ -97,19 +97,21 @@ export class TakeoffActionsComponent {
   }
 
   /**
-   * MANAGER: Mark Trimming Completed Button
+   * MANAGER/CARPENTER: Mark Trimming Completed Button
    * Show when takeoff is SHIPPED and trimming is completed
    */
   shouldShowMarkTrimmingCompleted(): boolean {
-    return this.isManager && this.currentStatus === TakeoffStatus.SHIPPED;
+    const userRole = this.currentUserRole;
+    return (userRole === 'manager' || userRole === 'carpenter') && this.currentStatus === TakeoffStatus.SHIPPED;
   }
 
   /**
-   * MANAGER: Mark Back Trim Completed Button
+   * MANAGER/CARPENTER: Mark Back Trim Completed Button
    * Show when takeoff is TRIMMING_COMPLETED and back trim is completed
    */
   shouldShowMarkBackTrimCompleted(): boolean {
-    return this.isManager && this.currentStatus === TakeoffStatus.TRIMMING_COMPLETED;
+    const userRole = this.currentUserRole;
+    return (userRole === 'manager' || userRole === 'carpenter') && this.currentStatus === TakeoffStatus.TRIMMING_COMPLETED;
   }
 
   /**
